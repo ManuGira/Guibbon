@@ -23,12 +23,12 @@ class ImageController():
 
     @staticmethod
     def imshow(winname, image):
-        ImageController.get_instance(winname)._imshow(image)
+        return ImageController.get_instance(winname)._imshow(image)
 
     @staticmethod
-    def waitKeyEx(delay):
+    def waitKey(delay):
         # self.frame.master = win
-        ImageController.get_active_instance()._waitKeyEx(delay)
+        return ImageController.get_active_instance()._waitKey(delay)
 
     def __init__(self, winname):
         self.root = tk.Tk()
@@ -45,15 +45,21 @@ class ImageController():
         img = np.zeros(shape=(100, 100, 3), dtype=np.uint8)
         self._imshow(img)
 
-
         self.ctrl_frame = tk.Frame(master=self.frame, bg="green")
 
         self.frame.pack()
         self.canvas.pack(side=tk.LEFT)
         self.ctrl_frame.pack()
 
-    def callback(self):
-        pass
+        self.is_keypressed = None
+        self.keypressed = None
+        self.reset()
+
+    def reset(self):
+        # TODO: make threadsafe
+        self.is_keypressed = False
+        self.keypressed = -1
+        self.is_timeout = False
 
     def _addbutton(self, text='Button', command=None):
         tk.Button(self.ctrl_frame, text=text, command=command).pack(padx=10, pady=10, )
@@ -72,18 +78,36 @@ class ImageController():
         self.canvas.create_image(self.canvas_shape_hw[1] // 2, self.canvas_shape_hw[0] // 2, anchor=tk.CENTER,
                                  image=self.imgtk)
 
-    def _waitKeyEx(self, delay):
-        # TODO: mimic cv2.waitLeyEx behavior
-        def keydown(event):
-            print("keydown", event)
-        def keyup(event):
-            print("keyup", event)
 
-        self.root.bind("<KeyPress>", keydown)
-        self.root.bind("<KeyRelease>", keyup)
+    def keydown(self, event):
+        print("keydown", event)
+        self.is_keypressed = True
+        self.keypressed = event.keycode  # TODO: make threadsafe
+
+    def keyup(self, event):
+        print("keyup", event)
+
+    def on_timeout(self):
+        self.is_timeout = True
+
+    def _waitKey(self, delay):
+        # TODO: support ctrl, maj, alt etc...
+        self.reset()
+
+        # TODO: mimic cv2.waitLeyEx behavior
+        self.root.bind("<KeyPress>", self.keydown)
+        self.root.bind("<KeyRelease>", self.keyup)
 
         if delay > 0:
-            self.root.after(delay, lambda: self.root.destroy())
+            self.root.after(delay, self.on_timeout)  # TODO: make threadsafe
 
-        self.root.mainloop()
+        print("okok")
+        while True:
+            self.root.update()
+            self.root.update_idletasks()
+            if self.is_keypressed or self.is_timeout:
+                break
+            time.sleep(0.04)
+
+        return self.keypressed  # TODO: make threadsafe
 

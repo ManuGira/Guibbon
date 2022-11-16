@@ -1,3 +1,4 @@
+import time
 import cv2
 from image_controller import ImageController as ic
 
@@ -11,7 +12,9 @@ def demo_cv():
     cv2.imshow(title, img)
     cv2.createTrackbar("trackbar name", title, 0, 10, on_trackbar)
 
-    print(cv2.waitKeyEx(1000))
+    while True:
+        print(cv2.waitKeyEx(0))
+        print(cv2.waitKey(0))
 
 def print_hello():
     print("hello")
@@ -21,8 +24,10 @@ def demo_ic():
     # ic.addbutton("yo", print_hello)
     img = cv2.imread("image.jpg")
     # for k in range(1, 10):
-    ic.imshow("Demo Image Controller", img)
-    ic.waitKeyEx(0)
+
+    for k in range(10):
+        ic.imshow("Demo Image Controller", img*k)
+        print(ic.waitKey(0))
 
 
 if __name__ == '__main__':
