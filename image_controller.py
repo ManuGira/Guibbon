@@ -103,13 +103,28 @@ class ImageController():
         return ImageController.get_instance(ImageController.active_instance_name)
 
     @staticmethod
-    def imshow(winname, image):
-        return ImageController.get_instance(winname)._imshow(image)
+    def imshow(winname, mat):
+        return ImageController.get_instance(winname)._imshow(mat)
 
     @staticmethod
     def waitKeyEx(delay, track_keypress=True, track_keyrelease=False):
-        # self.frame.master = win
         return ImageController.get_active_instance()._waitKeyEx(delay, track_keypress, track_keyrelease)
+
+    @staticmethod
+    def createButton(text='Button', command=None, winname=None):
+        if winname is None:
+            return ImageController.get_active_instance()._createButton(text, command)
+        else:
+            return ImageController.get_instance(winname)._createButton(text, command)
+
+    @staticmethod
+    def createTrackbar(trackbarName, windowName, value, count, onChange):
+        ImageController.get_instance(windowName)._createTrackbar(trackbarName, value, count, onChange)
+
+
+    @staticmethod
+    def namedWindow(winname):  # TODO: add "flags" argument
+        ImageController.get_instance(winname)
 
     def __init__(self, winname):
         self.root = tk.Tk()
@@ -126,33 +141,56 @@ class ImageController():
         img = np.zeros(shape=(100, 100, 3), dtype=np.uint8)
         self._imshow(img)
 
-        self.ctrl_frame = tk.Frame(master=self.frame, bg="green")
+        self.ctrl_frame = tk.Frame(master=self.frame, width=300, bg="green")
 
         self.frame.pack()
         self.canvas.pack(side=tk.LEFT)
+        # self.ctrl_frame.pack_propagate(False)
         self.ctrl_frame.pack()
 
         self.keyboard = KeyboardEventHandler()
+
+        self.observers = []  # todo: add trackbar handle and callback to this array. Then, on each loop, we must watch if the values has changed...
         self.reset()
 
     def reset(self):
         # TODO: make threadsafe
         self.is_timeout = False
 
-    def _addbutton(self, text='Button', command=None):
-        tk.Button(self.ctrl_frame, text=text, command=command).pack(padx=10, pady=10, )
 
-    def _imshow(self, img, mode="fit"):
+    def _createButton(self, text='Button', command=None):
+        frame = tk.Frame(self.ctrl_frame, bg="yellow")
+        frame.pack_propagate(True)
+        tk.Button(frame, text=text, command=command).pack(fill=tk.BOTH)
+        frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.BOTH)
+
+
+    def _createTrackbar(self, trackbarName, value, count, onChange):
+        frame = tk.Frame(self.ctrl_frame)
+        tk.Label(frame, text=trackbarName).pack(padx=2, side=tk.LEFT)
+        # tk.Button(frame, text=f"{value} {count}", command=onChange).pack(padx=2, fill=tk.X, expand=1)
+        trackbar = tk.Scale(frame, from_=0, to=count, orient=tk.HORIZONTAL)
+        trackbar.set(value)
+        trackbar["command"] = onChange
+        trackbar.pack(padx=2, fill=tk.X, expand=1)
+        frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
+
+        # self.observers.append(ObjectObserver(getter, on_change, is_equal))
+
+
+    def _imshow(self, mat, mode="fit"):
         ch, cw = self.canvas_shape_hw[:2]
-        ih, iw = img.shape[:2]
+        ih, iw = mat.shape[:2]
+
+        self.zoom_factor = 1
         if mode == "fit":
             self.zoom_factor = min(ch/ih, cw/iw)
         elif mode == "fill":
             self.zoom_factor = max(ch/ih, cw/iw)
 
-        img = cv2.resize(img, None, fx=self.zoom_factor, fy=self.zoom_factor, interpolation=cv2.INTER_LINEAR)
+        mat = cv2.resize(mat, None, fx=self.zoom_factor, fy=self.zoom_factor, interpolation=cv2.INTER_LINEAR)
 
-        self.imgtk = ImageTk.PhotoImage(image=Image.fromarray(img))
+        self.imgtk = ImageTk.PhotoImage(image=Image.fromarray(mat))
         self.canvas.create_image(self.canvas_shape_hw[1] // 2, self.canvas_shape_hw[0] // 2, anchor=tk.CENTER,
                                  image=self.imgtk)
 

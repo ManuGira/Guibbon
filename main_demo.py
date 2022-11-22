@@ -11,9 +11,12 @@ def demo_cv():
     img = cv2.resize(img, dsize=None, fx=0.2, fy=0.2)
 
     k = 0
+    title = "Demo OpenCV HighGUI"
+    cv2.namedWindow(title)
+    cv2.createTrackbar(trackbar_name, winname, 0, 10, on_trackbar)
     while True:
         k += 1
-        cv2.imshow("Demo OpenCV HighGUI", img*np.uint8(k))
+        cv2.imshow(title, img*np.uint8(k))
         print(cv2.waitKeyEx(0), end=", ")
 
 def print_hello():
@@ -23,9 +26,13 @@ def demo_ic():
     img = cv2.imread("image.jpg")
 
     k = 0
+    title = "Demo Image Controller"
+    ic.namedWindow(title)
+    ic.createButton("print hello", print_hello)
+    ic.createTrackbar("trackbar_name", title, 2, 10, on_trackbar)
     while True:
         k += 1
-        ic.imshow("Demo Image Controller", img*np.uint8(k))
+        ic.imshow(title, img*np.uint8(k))
         print(ic.waitKeyEx(0), end=", ")
 
 
