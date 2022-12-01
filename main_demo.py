@@ -1,10 +1,13 @@
 import time
 import cv2
-from image_controller import ImageController as ic
+from tk4cv2 import Tk4Cv2 as tcv2
 import numpy as np
 
 def on_trackbar(val):
     print("on_trackbar", val)
+
+def on_mouse_event(event, x, y, flags, param):
+    print(event, x, y, flags, param)
 
 def demo_cv():
     img = cv2.imread("image.jpg")
@@ -13,7 +16,8 @@ def demo_cv():
     k = 0
     title = "Demo OpenCV HighGUI"
     cv2.namedWindow(title)
-    cv2.createTrackbar(trackbar_name, winname, 0, 10, on_trackbar)
+    cv2.createTrackbar("trackbar_name", title, 0, 10, on_trackbar)
+    cv2.setMouseCallback(title, on_mouse_event)
     while True:
         k += 1
         cv2.imshow(title, img*np.uint8(k))
@@ -22,20 +26,22 @@ def demo_cv():
 def print_hello():
     print("hello")
 
-def demo_ic():
+def demo_tcv():
     img = cv2.imread("image.jpg")
 
     k = 0
     title = "Demo Image Controller"
-    ic.namedWindow(title)
-    ic.createButton("print hello", print_hello)
-    ic.createTrackbar("trackbar_name", title, 2, 10, on_trackbar)
+    tcv2.namedWindow(title)
+    tcv2.createTrackbar("trackbar_name", title, 2, 10, on_trackbar)
+    tcv2.setMouseCallback(title, on_mouse_event)
+
+    tcv2.createButton("print hello", print_hello)
     while True:
         k += 1
-        ic.imshow(title, img*np.uint8(k))
-        print(ic.waitKeyEx(0), end=", ")
+        tcv2.imshow(title, img * np.uint8(k))
+        print(tcv2.waitKeyEx(0), end=", ")
 
 
 if __name__ == '__main__':
-    demo_ic()
+    demo_tcv()
     # demo_cv()

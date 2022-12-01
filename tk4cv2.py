@@ -86,45 +86,49 @@ class KeyboardEventHandler:
 
 
 
-class ImageController():
+class Tk4Cv2():
     instances = {}
     active_instance_name = None
 
     @staticmethod
     def get_instance(winname):
         assert(isinstance(winname, str))
-        if winname not in ImageController.instances.keys():
-            ImageController.instances[winname] = ImageController(winname)
-        ImageController.active_instance_name = winname
-        return ImageController.instances[winname]
+        if winname not in Tk4Cv2.instances.keys():
+            Tk4Cv2.instances[winname] = Tk4Cv2(winname)
+        Tk4Cv2.active_instance_name = winname
+        return Tk4Cv2.instances[winname]
 
     @staticmethod
     def get_active_instance():
-        return ImageController.get_instance(ImageController.active_instance_name)
+        return Tk4Cv2.get_instance(Tk4Cv2.active_instance_name)
 
     @staticmethod
     def imshow(winname, mat):
-        return ImageController.get_instance(winname)._imshow(mat)
+        return Tk4Cv2.get_instance(winname)._imshow(mat)
 
     @staticmethod
     def waitKeyEx(delay, track_keypress=True, track_keyrelease=False):
-        return ImageController.get_active_instance()._waitKeyEx(delay, track_keypress, track_keyrelease)
+        return Tk4Cv2.get_active_instance()._waitKeyEx(delay, track_keypress, track_keyrelease)
+
+    @staticmethod
+    def setMouseCallback(windowName, onMouse, param=None):
+        return Tk4Cv2.get_active_instance()._setMouseCallback(onMouse, param=None)
 
     @staticmethod
     def createButton(text='Button', command=None, winname=None):
         if winname is None:
-            return ImageController.get_active_instance()._createButton(text, command)
+            return Tk4Cv2.get_active_instance()._createButton(text, command)
         else:
-            return ImageController.get_instance(winname)._createButton(text, command)
+            return Tk4Cv2.get_instance(winname)._createButton(text, command)
 
     @staticmethod
     def createTrackbar(trackbarName, windowName, value, count, onChange):
-        ImageController.get_instance(windowName)._createTrackbar(trackbarName, value, count, onChange)
+        Tk4Cv2.get_instance(windowName)._createTrackbar(trackbarName, value, count, onChange)
 
 
     @staticmethod
     def namedWindow(winname):  # TODO: add "flags" argument
-        ImageController.get_instance(winname)
+        Tk4Cv2.get_instance(winname)
 
     def __init__(self, winname):
         self.root = tk.Tk()
@@ -233,3 +237,6 @@ class ImageController():
                 return -1
 
             time.sleep(0.01)
+
+    def _setMouseCallback(self, onMouse, param=None):
+        
