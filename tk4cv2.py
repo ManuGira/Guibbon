@@ -85,13 +85,19 @@ class KeyboardEventHandler:
             self.keysdown.remove(num)
 
 
-class ImageViewer():
+class ImageViewer:
     def __init__(self, master, height: int, width: int):
         self.height = height
         self.width = width
         self.canvas = tk.Canvas(master=master, height=self.height, width=self.width, bg="blue")
         self.imgtk = None
         self.zoom_factor = None
+
+    def pack(self, *args, **kwargs):
+        self.canvas.pack(*args, **kwargs)
+
+    def bind(self, *args, **kwargs):
+        self.canvas.bind(*args, **kwargs)
 
     def imshow(self, mat, mode=None):
         mode = "fit" if mode is None else mode
@@ -171,7 +177,7 @@ class Tk4Cv2:
         self.ctrl_frame = tk.Frame(master=self.frame, width=300, bg="green")
 
         self.frame.pack()
-        self.image_viewer.canvas.pack(side=tk.LEFT)
+        self.image_viewer.pack(side=tk.LEFT)
         # self.ctrl_frame.pack_propagate(False)
         self.ctrl_frame.pack()
 
@@ -256,4 +262,4 @@ class Tk4Cv2:
             onMouse(event, x, y, flags, param)
 
         # <MODIFIER-MODIFIER-TYPE-DETAIL>
-        self.image_viewer.canvas.bind("<Motion>", on_motion)
+        self.image_viewer.bind("<Motion>", on_motion)
