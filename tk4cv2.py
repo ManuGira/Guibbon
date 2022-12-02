@@ -85,8 +85,32 @@ class KeyboardEventHandler:
             self.keysdown.remove(num)
 
 
+class ImageViewer():
+    def __init__(self, master, height: int, width: int):
+        self.height = height
+        self.width = width
+        self.canvas = tk.Canvas(master=master, height=self.height, width=self.width, bg="blue")
+        self.imgtk = None
+        self.zoom_factor = None
 
-class Tk4Cv2():
+    def imshow(self, mat, mode=None):
+        mode = "fit" if mode is None else mode
+
+        ch, cw = self.height, self.width
+        ih, iw = mat.shape[:2]
+
+        self.zoom_factor = 1
+        if mode == "fit":
+            self.zoom_factor = min(ch/ih, cw/iw)
+        elif mode == "fill":
+            self.zoom_factor = max(ch/ih, cw/iw)
+
+        mat = cv2.resize(mat, None, fx=self.zoom_factor, fy=self.zoom_factor, interpolation=cv2.INTER_LINEAR)
+
+        self.imgtk = ImageTk.PhotoImage(image=Image.fromarray(mat))
+        self.canvas.create_image(cw // 2, ch // 2, anchor=tk.CENTER, image=self.imgtk)
+
+class Tk4Cv2:
     instances = {}
     active_instance_name = None
 
@@ -103,8 +127,8 @@ class Tk4Cv2():
         return Tk4Cv2.get_instance(Tk4Cv2.active_instance_name)
 
     @staticmethod
-    def imshow(winname, mat):
-        return Tk4Cv2.get_instance(winname)._imshow(mat)
+    def imshow(winname, mat, mode=None):
+        return Tk4Cv2.get_instance(winname)._imshow(mat, mode)
 
     @staticmethod
     def waitKeyEx(delay, track_keypress=True, track_keyrelease=False):
@@ -138,17 +162,16 @@ class Tk4Cv2():
 
         # Load an image in the script
         self.img_ratio = 4/4
-        self.canvas_shape_hw = [720, int(720*self.img_ratio)]
-        self.canvas = tk.Canvas(master=self.frame, height=self.canvas_shape_hw[0], width=self.canvas_shape_hw[1], bg="blue")
-        self.imgtk = None
-        self.zoom_factor = None
+        self.image_viewer = ImageViewer(self.frame, height=720, width=int(720*self.img_ratio))
+
+        # add dummy image to image_viewer
         img = np.zeros(shape=(100, 100, 3), dtype=np.uint8)
         self._imshow(img)
 
         self.ctrl_frame = tk.Frame(master=self.frame, width=300, bg="green")
 
         self.frame.pack()
-        self.canvas.pack(side=tk.LEFT)
+        self.image_viewer.canvas.pack(side=tk.LEFT)
         # self.ctrl_frame.pack_propagate(False)
         self.ctrl_frame.pack()
 
@@ -182,21 +205,8 @@ class Tk4Cv2():
         # self.observers.append(ObjectObserver(getter, on_change, is_equal))
 
 
-    def _imshow(self, mat, mode="fit"):
-        ch, cw = self.canvas_shape_hw[:2]
-        ih, iw = mat.shape[:2]
-
-        self.zoom_factor = 1
-        if mode == "fit":
-            self.zoom_factor = min(ch/ih, cw/iw)
-        elif mode == "fill":
-            self.zoom_factor = max(ch/ih, cw/iw)
-
-        mat = cv2.resize(mat, None, fx=self.zoom_factor, fy=self.zoom_factor, interpolation=cv2.INTER_LINEAR)
-
-        self.imgtk = ImageTk.PhotoImage(image=Image.fromarray(mat))
-        self.canvas.create_image(self.canvas_shape_hw[1] // 2, self.canvas_shape_hw[0] // 2, anchor=tk.CENTER,
-                                 image=self.imgtk)
+    def _imshow(self, mat, mode=None):
+        self.image_viewer.imshow(mat, mode)
 
 
     # def keydown(self, event):
@@ -212,10 +222,8 @@ class Tk4Cv2():
         self.is_timeout = True
 
     def _waitKeyEx(self, delay, track_keypress=True, track_keyrelease=False):
-        # TODO: support ctrl, maj, alt etc...
         self.reset()
 
-        # TODO: mimic cv2.waitLeyEx behavior
         self.root.bind("<KeyPress>", self.keyboard.on_event)
         self.root.bind("<KeyRelease>", self.keyboard.on_event)
 
@@ -239,4 +247,13 @@ class Tk4Cv2():
             time.sleep(0.01)
 
     def _setMouseCallback(self, onMouse, param=None):
-        
+        # callback must have params: event, x, y, flags, param
+        def on_motion(event):
+            x = event.x
+            y = event.y
+            flags = 0
+            param = 0
+            onMouse(event, x, y, flags, param)
+
+        # <MODIFIER-MODIFIER-TYPE-DETAIL>
+        self.image_viewer.canvas.bind("<Motion>", on_motion)
