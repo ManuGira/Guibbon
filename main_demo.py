@@ -1,7 +1,8 @@
 import time
+import numpy as np
 import cv2
 from tk4cv2 import Tk4Cv2 as tcv2
-import numpy as np
+tcv2.inject(cv2)
 
 def on_trackbar(val):
     print("on_trackbar", val)
@@ -43,5 +44,21 @@ def demo_tcv():
 
 
 if __name__ == '__main__':
-    demo_tcv()
-    # demo_cv()
+    # demo_tcv()
+    demo_cv()
+
+# move
+# 0 32 375 0 None
+# l down-up
+# 1 175 300 1 None (l-down)
+# 4 175 300 0 None (l-up)
+# 0 175 300 0 None
+
+# R DOWN-UP
+# 2 445 402 2 None
+# 5 445 402 0 None
+# 0 445 402 0 None
+
+# wheel down - up
+# 10 301 327 7864320 None
+# 10 301 327 -7864320 None
