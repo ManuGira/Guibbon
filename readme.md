@@ -7,3 +7,7 @@ The TkInter wrapper that mimics the HighGUI of OpenCV
 * Scroll delta is missing
 * Linux and Mac support
 
+#### Other
+* add tests
+* add license
+* Move main_demo.py to tests folder?
