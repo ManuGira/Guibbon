@@ -6,3 +6,4 @@ The TkInter wrapper that mimics the HighGUI of OpenCV
 * handle double clicks
 * Scroll delta is missing
 * Linux and Mac support
+

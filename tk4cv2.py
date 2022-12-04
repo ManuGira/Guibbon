@@ -202,7 +202,6 @@ class ImageViewer:
         # EVENT_FLAG_MBUTTON = 4
         # EVENT_FLAG_RBUTTON = 2
         # EVENT_FLAG_SHIFTKEY = 16
-        cv2.EVENT_MOUSEWHEEL
 
         cvevent = 0
         flag = 0
