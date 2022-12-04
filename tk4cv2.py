@@ -260,6 +260,7 @@ class ImageViewer:
             self.zoom_factor = max(canh/imgh, canw/imgw)
 
         self.img_shape0_hw = mat.shape[:2]
+        mat = cv2.cvtColor(mat, cv2.COLOR_BGR2RGB)
         mat = cv2.resize(mat, None, fx=self.zoom_factor, fy=self.zoom_factor, interpolation=cv2.INTER_LINEAR)
         self.img_shape1_hw = mat.shape[:2]
 
