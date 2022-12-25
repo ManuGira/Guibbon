@@ -10,6 +10,9 @@ def on_trackbar(val):
 def on_mouse_event(event, x, y, flags, param):
     print(event, x, y, flags, param)
 
+def on_radio_button(i, opt):
+    print("XXXX", i, opt)
+
 def demo_cv():
     img = cv2.imread("images/dog.jpg")
 
@@ -17,6 +20,7 @@ def demo_cv():
     title = "Demo Tk4Cv2"
     cv2.namedWindow(title)
     cv2.createTrackbar("trackbar_name", title, 0, 10, on_trackbar)
+    tcv2.createRadioButtons("radio", ["pomme", "poire"], title, 1, on_radio_button)
     cv2.setMouseCallback(title, on_mouse_event)
     while True:
         k += 1

@@ -295,6 +295,9 @@ def createTrackbar(trackbarName, windowName, value, count, onChange):
 def namedWindow(winname):  # TODO: add "flags" argument
     Tk4Cv2.get_instance(winname)
 
+def createRadioButtons(name, options, windowName, value, onChange):
+    Tk4Cv2.get_instance(windowName)._createRadioButtons(name, options, value, onChange)
+
 class Tk4Cv2:
     instances = {}
     active_instance_name = None
@@ -361,6 +364,28 @@ class Tk4Cv2:
 
         # self.observers.append(ObjectObserver(getter, on_change, is_equal))
 
+    def _createRadioButtons(self, name, options, value, onChange):
+        frame = tk.Frame(self.ctrl_frame)
+        tk.Label(frame, text=name).pack(padx=2, side=tk.TOP, anchor=tk.W)
+        radioframeborder = tk.Frame(frame, bg="grey")
+        borderwidth=1
+        radioframe = tk.Frame(radioframeborder)
+
+        def callback():
+            i = var.get()
+            opt = options[i]
+            onChange(i, opt)
+
+        var = tk.IntVar()
+        for i, opt in enumerate(options):
+            rb = tk.Radiobutton(radioframe, text=str(opt), variable=var, value=i, command=callback)
+            if i == value:
+                rb.select()
+            rb.pack(side=tk.TOP, anchor=tk.W)
+
+        radioframe.pack(padx=borderwidth, pady=borderwidth, side=tk.TOP, fill=tk.X)
+        radioframeborder.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X)
+        frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
 
     def _imshow(self, mat, mode=None):
         self.image_viewer.imshow(mat, mode)
