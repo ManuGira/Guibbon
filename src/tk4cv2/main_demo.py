@@ -1,7 +1,7 @@
 import time
 import numpy as np
 import cv2
-from tk4cv2 import Tk4Cv2 as tcv2
+import tk4cv2 as tcv2
 tcv2.inject(cv2)
 
 def on_trackbar(val):

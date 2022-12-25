@@ -267,6 +267,33 @@ class ImageViewer:
         self.imgtk = ImageTk.PhotoImage(image=Image.fromarray(mat))
         self.canvas.create_image(canw // 2, canh // 2, anchor=tk.CENTER, image=self.imgtk)
 
+def inject(cv2_package):
+    cv2_package.imshow = imshow
+    cv2_package.waitKeyEx = waitKeyEx
+    cv2_package.setMouseCallback = setMouseCallback
+    cv2_package.createTrackbar = createTrackbar
+    cv2_package.namedWindow = namedWindow
+
+def imshow(winname, mat, mode=None):
+    return Tk4Cv2.get_instance(winname)._imshow(mat, mode)
+
+def waitKeyEx(delay, track_keypress=True, track_keyrelease=False):
+    return Tk4Cv2.get_active_instance()._waitKeyEx(delay, track_keypress, track_keyrelease)
+
+def setMouseCallback(windowName, onMouse, param=None):
+    return Tk4Cv2.get_active_instance()._setMouseCallback(onMouse, param=None)
+
+def createButton(text='Button', command=None, winname=None):
+    if winname is None:
+        return Tk4Cv2.get_active_instance()._createButton(text, command)
+    else:
+        return Tk4Cv2.get_instance(winname)._createButton(text, command)
+
+def createTrackbar(trackbarName, windowName, value, count, onChange):
+    Tk4Cv2.get_instance(windowName)._createTrackbar(trackbarName, value, count, onChange)
+
+def namedWindow(winname):  # TODO: add "flags" argument
+    Tk4Cv2.get_instance(winname)
 
 class Tk4Cv2:
     instances = {}
@@ -283,42 +310,6 @@ class Tk4Cv2:
     @staticmethod
     def get_active_instance():
         return Tk4Cv2.get_instance(Tk4Cv2.active_instance_name)
-
-    @staticmethod
-    def imshow(winname, mat, mode=None):
-        return Tk4Cv2.get_instance(winname)._imshow(mat, mode)
-
-    @staticmethod
-    def waitKeyEx(delay, track_keypress=True, track_keyrelease=False):
-        return Tk4Cv2.get_active_instance()._waitKeyEx(delay, track_keypress, track_keyrelease)
-
-    @staticmethod
-    def setMouseCallback(windowName, onMouse, param=None):
-        return Tk4Cv2.get_active_instance()._setMouseCallback(onMouse, param=None)
-
-    @staticmethod
-    def createButton(text='Button', command=None, winname=None):
-        if winname is None:
-            return Tk4Cv2.get_active_instance()._createButton(text, command)
-        else:
-            return Tk4Cv2.get_instance(winname)._createButton(text, command)
-
-    @staticmethod
-    def createTrackbar(trackbarName, windowName, value, count, onChange):
-        Tk4Cv2.get_instance(windowName)._createTrackbar(trackbarName, value, count, onChange)
-
-
-    @staticmethod
-    def namedWindow(winname):  # TODO: add "flags" argument
-        Tk4Cv2.get_instance(winname)
-
-    @staticmethod
-    def inject(cv2_package):
-        cv2_package.imshow = Tk4Cv2.imshow
-        cv2_package.waitKeyEx = Tk4Cv2.waitKeyEx
-        cv2_package.setMouseCallback = Tk4Cv2.setMouseCallback
-        cv2_package.createTrackbar = Tk4Cv2.createTrackbar
-        cv2_package.namedWindow = Tk4Cv2.namedWindow
 
     def __init__(self, winname):
         self.root = tk.Tk()
