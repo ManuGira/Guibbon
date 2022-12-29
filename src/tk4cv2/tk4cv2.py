@@ -4,6 +4,8 @@ import enum
 import time
 import math
 import tkinter as tk
+from tkinter import ttk
+from tkinter.colorchooser import askcolor
 
 import cv2
 import numpy as np
@@ -311,6 +313,9 @@ def createCheckbutton(name, windowName=None, value=False, onChange=None):
 def createCheckbuttons(name, options, windowName, values, onChange):
     Tk4Cv2.get_instance(windowName)._createCheckbuttons(name, options, values, onChange)
 
+def createColorPicker(name, windowName, values, onChange):
+    Tk4Cv2.get_instance(windowName)._createColorPicker(name, values, onChange)
+
 class Tk4Cv2:
     instances = {}
     active_instance_name = None
@@ -361,7 +366,8 @@ class Tk4Cv2:
     def _createButton(self, text='Button', command=None):
         frame = tk.Frame(self.ctrl_frame, bg="yellow")
         frame.pack_propagate(True)
-        tk.Button(frame, text=text, command=command).pack(fill=tk.BOTH)
+
+        tk.Button(frame, text=text, command=command).pack(side=tk.LEFT)
         frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.BOTH)
 
 
@@ -438,6 +444,23 @@ class Tk4Cv2:
         checkframe.pack(padx=borderwidth, pady=borderwidth, side=tk.TOP, fill=tk.X)
         checkframeborder.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X)
         frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
+
+    def _createColorPicker(self, name, values, onChange):
+        frame = tk.Frame(self.ctrl_frame)
+        label = tk.Label(frame, text=name)
+        label.pack(padx=2, side=tk.LEFT, anchor=tk.W)
+
+        def callback_canvas_click(event):
+            colors = askcolor(title="Tkinter Color Chooser")
+            canvas["bg"] = colors[1]
+            onChange(colors)
+
+        canvas = tk.Canvas(frame, bg="yellow", bd=2, height=10)
+        canvas.bind("<Button-1>", callback_canvas_click)
+
+        canvas.pack(side=tk.LEFT, anchor=tk.W)
+        frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
+
 
     def _imshow(self, mat, mode=None):
         self.image_viewer.imshow(mat, mode)

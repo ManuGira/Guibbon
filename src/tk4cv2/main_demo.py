@@ -28,6 +28,9 @@ def on_check_buttons(checks):
 def on_check_button(check):
     print("on_check_button", check)
 
+def on_color_pick(colors):
+    print("on_color_pick", colors)
+
 def demo_cv():
     img = cv2.imread("images/dog.jpg")
 
@@ -39,6 +42,7 @@ def demo_cv():
     tcv2.createRadioButtons("radio", ["pomme", "poire"], title, 1, on_radio_button)
     tcv2.createCheckbuttons("check multi", ["roue", "volant"], title, [False, True], on_check_buttons)
     tcv2.createCheckbutton("check single", title, False, on_check_button)
+    tcv2.createColorPicker("Color picker", title, "yellow", on_color_pick)
     cv2.setMouseCallback(title, on_mouse_event)
 
     while True:
