@@ -267,6 +267,7 @@ class ImageViewer:
         self.imgtk = ImageTk.PhotoImage(image=Image.fromarray(mat))
         self.canvas.create_image(canw // 2, canh // 2, anchor=tk.CENTER, image=self.imgtk)
 
+
 def inject(cv2_package):
     cv2_package.imshow = imshow
     cv2_package.waitKeyEx = waitKeyEx
@@ -274,32 +275,38 @@ def inject(cv2_package):
     cv2_package.createTrackbar = createTrackbar
     cv2_package.namedWindow = namedWindow
 
+
 def imshow(winname, mat, mode=None):
     return Tk4Cv2.get_instance(winname)._imshow(mat, mode)
+
 
 def waitKeyEx(delay, track_keypress=True, track_keyrelease=False):
     return Tk4Cv2.get_active_instance()._waitKeyEx(delay, track_keypress, track_keyrelease)
 
+
 def setMouseCallback(windowName, onMouse, param=None):
     return Tk4Cv2.get_active_instance()._setMouseCallback(onMouse, param=None)
 
-def createButton(text='Button', command=None, winname=None):
-    if winname is None:
-        return Tk4Cv2.get_active_instance()._createButton(text, command)
-    else:
-        return Tk4Cv2.get_instance(winname)._createButton(text, command)
 
-def createTrackbar(trackbarName, windowName, value, count, onChange):
+def createButton(text='Button', command=None, winname=None):
+    Tk4Cv2.get_instance(winname)._createButton(text, command)
+
+
+def createTrackbar(trackbarName, windowName=None, value=0, count=10, onChange=None):
     Tk4Cv2.get_instance(windowName)._createTrackbar(trackbarName, value, count, onChange)
+
 
 def namedWindow(winname):  # TODO: add "flags" argument
     Tk4Cv2.get_instance(winname)
 
+
 def createRadioButtons(name, options, windowName, value, onChange):
     Tk4Cv2.get_instance(windowName)._createRadioButtons(name, options, value, onChange)
 
-def createCheckbutton(name, windowName, value, onChange):
+
+def createCheckbutton(name, windowName=None, value=False, onChange=None):
     Tk4Cv2.get_instance(windowName)._createCheckbutton(name, value, onChange)
+
 
 def createCheckbuttons(name, options, windowName, values, onChange):
     Tk4Cv2.get_instance(windowName)._createCheckbuttons(name, options, values, onChange)
