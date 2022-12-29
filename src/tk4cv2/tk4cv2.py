@@ -298,6 +298,9 @@ def namedWindow(winname):  # TODO: add "flags" argument
 def createRadioButtons(name, options, windowName, value, onChange):
     Tk4Cv2.get_instance(windowName)._createRadioButtons(name, options, value, onChange)
 
+def createCheckbutton(name, windowName, value, onChange):
+    Tk4Cv2.get_instance(windowName)._createCheckbutton(name, value, onChange)
+
 def createCheckbuttons(name, options, windowName, values, onChange):
     Tk4Cv2.get_instance(windowName)._createCheckbuttons(name, options, values, onChange)
 
@@ -389,6 +392,21 @@ class Tk4Cv2:
 
         radioframe.pack(padx=borderwidth, pady=borderwidth, side=tk.TOP, fill=tk.X)
         radioframeborder.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X)
+        frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
+
+    def _createCheckbutton(self, name, value, onChange):
+        frame = tk.Frame(self.ctrl_frame)
+        tk.Label(frame, text=name).pack(padx=2, side=tk.LEFT, anchor=tk.W)
+
+        def callback():
+            onChange(var.get())
+
+        var = tk.BooleanVar()
+        cb = tk.Checkbutton(frame, text="", variable=var, onvalue=True, offvalue=False,
+                            command=callback)
+        if value:
+            cb.select()
+        cb.pack(side=tk.TOP, anchor=tk.W)
         frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
 
     def _createCheckbuttons(self, name, options, values, onChange):

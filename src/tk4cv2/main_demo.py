@@ -18,8 +18,11 @@ def on_radio_button(i, opt):
 
 
 def on_check_buttons(checks):
-    print("on_check_button", checks)
+    print("on_check_buttons", checks)
 
+
+def on_check_button(check):
+    print("on_check_button", check)
 
 def demo_cv():
     img = cv2.imread("images/dog.jpg")
@@ -29,7 +32,8 @@ def demo_cv():
     cv2.namedWindow(title)
     cv2.createTrackbar("trackbar_name", title, 0, 10, on_trackbar)
     tcv2.createRadioButtons("radio", ["pomme", "poire"], title, 1, on_radio_button)
-    tcv2.createCheckbuttons("check", ["roue", "volant"], title, [False, True], on_check_buttons)
+    tcv2.createCheckbuttons("check multi", ["roue", "volant"], title, [False, True], on_check_buttons)
+    tcv2.createCheckbutton("check single", title, False, on_check_button)
     cv2.setMouseCallback(title, on_mouse_event)
 
     while True:
