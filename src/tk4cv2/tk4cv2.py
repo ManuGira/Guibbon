@@ -298,6 +298,9 @@ def namedWindow(winname):  # TODO: add "flags" argument
 def createRadioButtons(name, options, windowName, value, onChange):
     Tk4Cv2.get_instance(windowName)._createRadioButtons(name, options, value, onChange)
 
+def createCheckbuttons(name, options, windowName, values, onChange):
+    Tk4Cv2.get_instance(windowName)._createCheckbuttons(name, options, values, onChange)
+
 class Tk4Cv2:
     instances = {}
     active_instance_name = None
@@ -381,10 +384,34 @@ class Tk4Cv2:
             rb = tk.Radiobutton(radioframe, text=str(opt), variable=var, value=i, command=callback)
             if i == value:
                 rb.select()
+                onChange(i, opt)
             rb.pack(side=tk.TOP, anchor=tk.W)
 
         radioframe.pack(padx=borderwidth, pady=borderwidth, side=tk.TOP, fill=tk.X)
         radioframeborder.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X)
+        frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
+
+    def _createCheckbuttons(self, name, options, values, onChange):
+        frame = tk.Frame(self.ctrl_frame)
+        tk.Label(frame, text=name).pack(padx=2, side=tk.TOP, anchor=tk.W)
+        checkframeborder = tk.Frame(frame, bg="grey")
+        borderwidth=1
+        checkframe = tk.Frame(checkframeborder)
+
+        def callback():
+            res = [var.get() for var in vars]
+            onChange(res)
+
+        vars = [tk.BooleanVar() for opt in options]
+        for i, opt in enumerate(options):
+            checkvar = vars[i]
+            cb = tk.Checkbutton(checkframe, text=str(opt), variable=checkvar, onvalue=True, offvalue=False, command=callback)
+            if values[i]:
+                cb.select()
+            cb.pack(side=tk.TOP, anchor=tk.W)
+
+        checkframe.pack(padx=borderwidth, pady=borderwidth, side=tk.TOP, fill=tk.X)
+        checkframeborder.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X)
         frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
 
     def _imshow(self, mat, mode=None):
