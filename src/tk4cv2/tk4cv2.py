@@ -1,4 +1,5 @@
 import types
+from typing import Any, Tuple, Dict
 import dataclasses
 import enum
 import time
@@ -64,6 +65,7 @@ class KeyboardEventHandler:
         if event.keycode == self.KEYCODE.ALT.value:
             self.modifier.ALT = is_down
 
+
     def on_event(self, event):
         # def printkey(event, keywords):
         #     print(", ".join([f"{kw}: {event.__getattribute__(kw)}".ljust(5) for kw in keywords]))
@@ -125,10 +127,10 @@ class ImageViewer:
         self.canvas_shape_hw = (height, width)
 
         self.imgtk = None
-        self.img_shape0_hw = None
-        self.img_shape1_hw = None
-        self.zoom_factor = None
-        self.onMouse = None
+        self.img_shape0_hw: Tuple[int, int]
+        self.img_shape1_hw: Tuple[int, int]
+        self.zoom_factor: float
+        self.onMouse: Any = None
         self.modifier = ImageViewer.Modifier()
 
     def canvas2img_space(self, can_x, can_y):
@@ -230,12 +232,12 @@ class ImageViewer:
             cvevent = cv2.EVENT_MOUSEHWHEEL
             flag += int(math.copysign(0x780000, event.delta))  # 7864320
 
-        self.modifier.ALT = event.state & ImageViewer.EVENTSTATE.LEFT_ALT > 0
-        self.modifier.CTRL = event.state & ImageViewer.EVENTSTATE.CONTROL > 0
+        self.modifier.LEFT_ALT = event.state & ImageViewer.EVENTSTATE.LEFT_ALT > 0
+        self.modifier.CONTROL = event.state & ImageViewer.EVENTSTATE.CONTROL > 0
         self.modifier.SHIFT = event.state & ImageViewer.EVENTSTATE.SHIFT > 0
 
-        flag += cv2.EVENT_FLAG_ALTKEY if self.modifier.ALT else 0
-        flag += cv2.EVENT_FLAG_CTRLKEY if self.modifier.CTRL else 0
+        flag += cv2.EVENT_FLAG_ALTKEY if self.modifier.LEFT_ALT else 0
+        flag += cv2.EVENT_FLAG_CTRLKEY if self.modifier.CONTROL else 0
         flag += cv2.EVENT_FLAG_SHIFTKEY if self.modifier.SHIFT else 0
 
         x, y = self.canvas2img_space(event.x, event.y)
@@ -317,7 +319,7 @@ def createColorPicker(name, windowName, values, onChange):
     Tk4Cv2.get_instance(windowName)._createColorPicker(name, values, onChange)
 
 class Tk4Cv2:
-    instances = {}
+    instances: Dict[str, Any] = {}
     active_instance_name = None
 
     @staticmethod
@@ -429,11 +431,12 @@ class Tk4Cv2:
         borderwidth=1
         checkframe = tk.Frame(checkframeborder)
 
+        vars = [tk.BooleanVar() for opt in options]
+
         def callback():
             res = [var.get() for var in vars]
             onChange(res)
 
-        vars = [tk.BooleanVar() for opt in options]
         for i, opt in enumerate(options):
             checkvar = vars[i]
             cb = tk.Checkbutton(checkframe, text=str(opt), variable=checkvar, onvalue=True, offvalue=False, command=callback)
