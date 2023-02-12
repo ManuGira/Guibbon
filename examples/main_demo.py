@@ -1,4 +1,3 @@
-import time
 import numpy as np
 import cv2
 import tk4cv2 as tcv2
@@ -28,8 +27,10 @@ def on_check_buttons(checks):
 def on_check_button(check):
     print("on_check_button", check)
 
+
 def on_color_pick(colors):
     print("on_color_pick", colors)
+
 
 def demo_cv():
     img = cv2.imread("../src/tk4cv2/images/dog.jpg")
@@ -47,8 +48,9 @@ def demo_cv():
 
     while True:
         k += 1
-        cv2.imshow(title, img*np.uint8(k))
+        cv2.imshow(title, img * np.uint8(k))
         print(cv2.waitKeyEx(0), end=", ")
+
 
 def print_hello():
     print("hello")

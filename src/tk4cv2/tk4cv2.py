@@ -65,7 +65,6 @@ class KeyboardEventHandler:
         if event.keycode == self.KEYCODE.ALT.value:
             self.modifier.ALT = is_down
 
-
     def on_event(self, event):
         # def printkey(event, keywords):
         #     print(", ".join([f"{kw}: {event.__getattribute__(kw)}".ljust(5) for kw in keywords]))
@@ -137,16 +136,18 @@ class ImageViewer:
         canh, canw = self.canvas_shape_hw
         img0h, img0w = self.img_shape0_hw
         img1h, img1w = self.img_shape1_hw
-        corner_y, corner_x = (canh-img1h)/2, (canw-img1w)/2
+        corner_y, corner_x = (canh - img1h) / 2, (canw - img1w) / 2
 
         img_x = (can_x - corner_x) * img0w / img1w
         img_y = (can_y - corner_y) * img0h / img1h
 
-        return int(img_x+0.5), int(img_y+0.5)
+        return int(img_x + 0.5), int(img_y + 0.5)
 
     def setMouseCallback(self, onMouse, param=None):
-        if type(onMouse) != types.FunctionType: raise TypeError(f"onMouse must be a function, got {type(onMouse)} instead")
-        if param is not None: raise TypeError( "param argument of function setMouseCallback is not handled in current version of tk4cv2")
+        if not isinstance(onMouse, types.FunctionType):
+            raise TypeError(f"onMouse must be a function, got {type(onMouse)} instead")
+        if param is not None:
+            raise TypeError("param argument of function setMouseCallback is not handled in current version of tk4cv2")
 
         if self.onMouse is None:
             # <MODIFIER-MODIFIER-TYPE-DETAIL>
@@ -156,7 +157,6 @@ class ImageViewer:
             self.canvas.bind("<MouseWheel>", self.on_event)
 
         self.onMouse = onMouse
-
 
     def on_event(self, event):
         # event x y flag param
@@ -259,9 +259,9 @@ class ImageViewer:
 
         self.zoom_factor = 1
         if mode == "fit":
-            self.zoom_factor = min(canh/imgh, canw/imgw)
+            self.zoom_factor = min(canh / imgh, canw / imgw)
         elif mode == "fill":
-            self.zoom_factor = max(canh/imgh, canw/imgw)
+            self.zoom_factor = max(canh / imgh, canw / imgw)
 
         self.img_shape0_hw = mat.shape[:2]
         mat = cv2.cvtColor(mat, cv2.COLOR_BGR2RGB)
@@ -315,8 +315,10 @@ def createCheckbutton(name, windowName=None, value=False, onChange=None):
 def createCheckbuttons(name, options, windowName, values, onChange):
     Tk4Cv2.get_instance(windowName)._createCheckbuttons(name, options, values, onChange)
 
+
 def createColorPicker(name, windowName, values, onChange):
     Tk4Cv2.get_instance(windowName)._createColorPicker(name, values, onChange)
+
 
 class Tk4Cv2:
     instances: Dict[str, Any] = {}
@@ -341,8 +343,8 @@ class Tk4Cv2:
         self.frame = tk.Frame(master=self.root, bg="red")
 
         # Load an image in the script
-        self.img_ratio = 4/4
-        self.image_viewer = ImageViewer(self.frame, height=720, width=int(720*self.img_ratio))
+        self.img_ratio = 4 / 4
+        self.image_viewer = ImageViewer(self.frame, height=720, width=int(720 * self.img_ratio))
 
         # add dummy image to image_viewer
         img = np.zeros(shape=(100, 100, 3), dtype=np.uint8)
@@ -364,14 +366,12 @@ class Tk4Cv2:
         # TODO: make threadsafe
         self.is_timeout = False
 
-
     def _createButton(self, text='Button', command=None):
         frame = tk.Frame(self.ctrl_frame, bg="yellow")
         frame.pack_propagate(True)
 
         tk.Button(frame, text=text, command=command).pack(side=tk.LEFT)
         frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.BOTH)
-
 
     def _createTrackbar(self, trackbarName, value, count, onChange):
         frame = tk.Frame(self.ctrl_frame)
@@ -389,7 +389,7 @@ class Tk4Cv2:
         frame = tk.Frame(self.ctrl_frame)
         tk.Label(frame, text=name).pack(padx=2, side=tk.TOP, anchor=tk.W)
         radioframeborder = tk.Frame(frame, bg="grey")
-        borderwidth=1
+        borderwidth = 1
         radioframe = tk.Frame(radioframeborder)
 
         def callback():
@@ -428,7 +428,7 @@ class Tk4Cv2:
         frame = tk.Frame(self.ctrl_frame)
         tk.Label(frame, text=name).pack(padx=2, side=tk.TOP, anchor=tk.W)
         checkframeborder = tk.Frame(frame, bg="grey")
-        borderwidth=1
+        borderwidth = 1
         checkframe = tk.Frame(checkframeborder)
 
         vars = [tk.BooleanVar() for opt in options]
@@ -464,10 +464,8 @@ class Tk4Cv2:
         canvas.pack(side=tk.LEFT, anchor=tk.W)
         frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
 
-
     def _imshow(self, mat, mode=None):
         self.image_viewer.imshow(mat, mode)
-
 
     # def keydown(self, event):
     #     def printkey(event, keywords):
@@ -477,7 +475,6 @@ class Tk4Cv2:
     #     self.is_keypressed = True
     #     self.keypressed = event.keycode  # TODO: make threadsafe
 
-
     def on_timeout(self):
         self.is_timeout = True
 
@@ -486,8 +483,6 @@ class Tk4Cv2:
 
         self.root.bind("<KeyPress>", self.keyboard.on_event)
         self.root.bind("<KeyRelease>", self.keyboard.on_event)
-
-
 
         if delay > 0:
             self.root.after(delay, self.on_timeout)  # TODO: make threadsafe
@@ -508,4 +503,3 @@ class Tk4Cv2:
 
     def _setMouseCallback(self, onMouse, param=None):
         self.image_viewer.setMouseCallback(onMouse, param)
-
