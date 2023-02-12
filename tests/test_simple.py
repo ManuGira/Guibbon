@@ -6,7 +6,7 @@ import unittest
 import sys, os
 
 # from sample.simple import add_one
-sys.path.insert(0, os.path.abspath("../src/"))
+# sys.path.insert(0, os.path.abspath("../src/"))
 import tk4cv2.tk4cv2 as tcv2
 
 
