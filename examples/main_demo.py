@@ -32,7 +32,7 @@ def on_color_pick(colors):
     print("on_color_pick", colors)
 
 def demo_cv():
-    img = cv2.imread("images/dog.jpg")
+    img = cv2.imread("../src/tk4cv2/images/dog.jpg")
 
     k = 0
     title = "Demo Tk4Cv2"
