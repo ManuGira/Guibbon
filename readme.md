@@ -12,4 +12,4 @@ The TkInter wrapper that mimics the HighGUI of OpenCV
 * add license
 * Move main_demo.py to tests folder?
 
-![Tests](https://https://github.com/ManuGira/Tk4Cv2/actions/workflows/tests.yml/badge.svg)
+![Tests](github.com/ManuGira/Tk4Cv2/actions/workflows/tests.yml/badge.svg)
