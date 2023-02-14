@@ -5,7 +5,7 @@ import unittest
 
 # from sample.simple import add_one
 # sys.path.insert(0, os.path.abspath("../src/"))
-import tk4cv2.tk4cv2 as tcv2
+import tk4cv2 as tcv2
 
 
 class TestTk4Cv2(unittest.TestCase):
