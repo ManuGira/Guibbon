@@ -32,7 +32,7 @@ def imshow(winname, mat, mode=None):
 
 
 def getWindowProperty(winname: str, prop_id: int):
-    return Tk4Cv2.get_active_instance()._getWindowProperty(prop_id)
+    return Tk4Cv2.get_instance(winname)._getWindowProperty(prop_id)
 
 
 def waitKeyEx(delay, track_keypress=True, track_keyrelease=False):
