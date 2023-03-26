@@ -76,8 +76,11 @@ class Tk4Cv2:
         return Tk4Cv2.get_instance(Tk4Cv2.active_instance_name)
 
     def __init__(self, winname):
-        self.root = tk.Tk()
-        self.root.title(winname)
+        self.root = tk.Toplevel()
+        self.root.master.withdraw()  # Make master root windows invisible
+        self.root.protocol("WM_DELETE_WINDOW", self.on_closing)  # add callback when user closes the window
+        self.winname = winname
+        self.root.title(self.winname)
 
         self.frame = tk.Frame(master=self.root, bg="red")
 
@@ -100,6 +103,17 @@ class Tk4Cv2:
 
         self.observers = []  # todo: add trackbar handle and callback to this array. Then, on each loop, we must watch if the values has changed...
         self.reset()
+
+    def on_closing(self):
+        print("Destroy Root", self.winname)
+        Tk4Cv2.instances.pop(self.winname)
+        root_master = self.root.master
+        if len(Tk4Cv2.instances) == 0:
+            root_master.destroy()
+        else:
+            self.root.destroy()
+            if Tk4Cv2.active_instance_name == self.winname:
+                Tk4Cv2.active_instance_name = list(Tk4Cv2.instances.keys())[-1]
 
     def reset(self):
         # TODO: make threadsafe

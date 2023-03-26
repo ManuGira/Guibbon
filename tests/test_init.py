@@ -1,7 +1,13 @@
 import unittest
 import tk4cv2 as tcv2
 
+
 class TestTk4Cv2(unittest.TestCase):
+
+    def tearDown(self) -> None:
+        tcv2.Tk4Cv2.instances = {}
+        tcv2.Tk4Cv2.active_instance_name = None
+
     def test_package(self):
         self.assertIsNotNone(tcv2.__version__)
         self.assertIsNotNone(tcv2.__version_info__)
@@ -12,6 +18,11 @@ class TestTk4Cv2(unittest.TestCase):
         self.assertIsNone(res, msg="function tcv2.namedWindow(winname) must return None")
         self.assertEqual(len(tcv2.Tk4Cv2.instances), 1, msg="After first use of tcv2.namedWindow(...), number of instances must be 1.")
         self.assertIsNotNone(tcv2.Tk4Cv2.instances["win0"], msg='After use of tcv2.namedWindow("win0"), tcv2.Tk4Cv2.instances["win0"] must not be None')
+
+    def test_multiple_instances(self):
+        self.assertEqual(len(tcv2.Tk4Cv2.instances), 0, msg="At initialisation, number of instances must be 0.")
+        res = tcv2.namedWindow("win0")
+        res = tcv2.namedWindow("win1")
 
 
 def find_widget_by_name(tk4cv2_instance, widgetname):
@@ -25,6 +36,7 @@ def find_widget_by_name(tk4cv2_instance, widgetname):
     widget = last_tk4cv2_widget.children[widgetname]
     return widget
 
+
 class TestTk4Cv2_button(unittest.TestCase):
     def setUp(self):
         self.winname = "win0"
@@ -37,7 +49,8 @@ class TestTk4Cv2_button(unittest.TestCase):
         self.triggered = True
 
     def test_createButton(self):
-        tcv2.createButton(text='Button', command=self.callback, winname=self.winname)
+        res = tcv2.createButton(text='Button', command=self.callback, winname=self.winname)
+        self.assertIsNone(res, msg="function tcv2.createButton must return None")
 
         widget = find_widget_by_name(self.tk4cv2_instance, "button")
 
@@ -58,7 +71,8 @@ class TestTk4Cv2_checkbutton(unittest.TestCase):
         self.triggered = True
 
     def test_createCheckButton(self):
-        tcv2.createCheckbutton(name="CheckButton", windowName=self.winname, value=False, onChange=self.callback)
+        res = tcv2.createCheckbutton(name="CheckButton", windowName=self.winname, value=False, onChange=self.callback)
+        self.assertIsNone(res, msg="function tcv2.createCheckbutton must return None")
 
         widget = find_widget_by_name(self.tk4cv2_instance, "checkbutton")
 
