@@ -100,8 +100,16 @@ def namedWindow(winname):  # TODO: add "flags" argument
     Tk4Cv2.get_instance(winname)
 
 
-def createRadioButtons(name, options, windowName, value, onChange):
-    Tk4Cv2.get_instance(windowName)._createRadioButtons(name, options, value, onChange)
+def createRadioButtons(name, options, winname, value, onChange):
+    Tk4Cv2.get_instance(winname)._createRadioButtons(name, options, value, onChange)
+
+
+def setRadioButtons(name, winname, ind):
+    Tk4Cv2.get_instance(winname)._setRadioButtons(name, ind)
+
+
+def getRadioButtons(name, winname):
+    return Tk4Cv2.get_instance(winname)._getRadioButtons(name)
 
 
 def createCheckbutton(name, windowName=None, value=False, onChange=None):
@@ -152,6 +160,7 @@ class Tk4Cv2:
 
         self.ctrl_frame = tk.Frame(master=self.frame, width=300, bg="green")
         self.trackbars_by_names = {}
+        self.radiobuttons_by_names = {}
 
         self.frame.pack()
         self.image_viewer.pack(side=tk.LEFT)
@@ -215,6 +224,7 @@ class Tk4Cv2:
         return self.trackbars_by_names[trackbarname]["to"]
 
     def _createRadioButtons(self, name, options, value, onChange):
+        options = options + []  # copy
         frame = tk.Frame(self.ctrl_frame)
         tk.Label(frame, text=name).pack(padx=2, side=tk.TOP, anchor=tk.W)
         radioframeborder = tk.Frame(frame, bg="grey")
@@ -227,16 +237,31 @@ class Tk4Cv2:
             onChange(i, opt)
 
         var = tk.IntVar()
+        buttons_list = []
         for i, opt in enumerate(options):
             rb = tk.Radiobutton(radioframe, text=str(opt), variable=var, value=i, command=callback)
             if i == value:
                 rb.select()
                 onChange(i, opt)
             rb.pack(side=tk.TOP, anchor=tk.W)
+            buttons_list.append(rb)
+        self.radiobuttons_by_names[name] = {"var": var, "buttons_list": buttons_list, "options_list": options}
 
         radioframe.pack(padx=borderwidth, pady=borderwidth, side=tk.TOP, fill=tk.X)
         radioframeborder.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X)
         frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
+
+    def _setRadioButtons(self, name, ind):
+        radiolist = self.radiobuttons_by_names[name]["buttons_list"]
+        radiolist[ind].invoke()
+
+    def _getRadioButtons(self, name):
+        radio_var = self.radiobuttons_by_names[name]["var"]
+        radio_options = self.radiobuttons_by_names[name]["options_list"]
+        i = radio_var.get()
+        opt = radio_options[i]
+        return i, opt
+
 
     def _createCheckbutton(self, name, value, onChange):
         frame = tk.Frame(self.ctrl_frame)
