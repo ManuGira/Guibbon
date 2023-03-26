@@ -297,11 +297,10 @@ class Tk4Cv2:
             cv2.WND_PROP_VSYNC:         enable or disable VSYNC (in OpenGL mode)
         :return:
         """
-        match prop_id:
-            case cv2.WND_PROP_VISIBLE:
-                return 1 if self.root.state() == "normal" else 0
-            case _:
-                raise NotImplementedError
+        if prop_id == cv2.WND_PROP_VISIBLE:
+            return 1 if self.root.state() == "normal" else 0
+        else:
+            raise NotImplementedError
 
     def _waitKeyEx(self, delay, track_keypress=True, track_keyrelease=False):
         self.reset()
