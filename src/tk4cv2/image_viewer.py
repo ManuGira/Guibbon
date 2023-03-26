@@ -10,7 +10,7 @@ from PIL import Image, ImageTk
 
 
 class ImageViewer:
-    class BUTTONNUM(enum.Enum):
+    class BUTTONNUM(enum.IntEnum):
         LEFT = 1
         MID = 2
         RIGHT = 3
@@ -64,7 +64,7 @@ class ImageViewer:
         if not isinstance(onMouse, types.FunctionType) and not isinstance(onMouse, types.MethodType):
             raise TypeError(f"onMouse must be a function, got {type(onMouse)} instead")
         if param is not None:
-            raise TypeError("param argument of function setMouseCallback is not handled in current version of tk4cv2")
+            raise NotImplementedError("param argument of function setMouseCallback is not handled in current version of tk4cv2")
 
         if self.onMouse is None:
             # <MODIFIER-MODIFIER-TYPE-DETAIL>
@@ -104,18 +104,18 @@ class ImageViewer:
         is_mid = event.num == ImageViewer.BUTTONNUM.MID
         is_right = event.num == ImageViewer.BUTTONNUM.RIGHT
 
-        # cv.EVENT_LBUTTONDBLCLK = 7
-        # cv.EVENT_LBUTTONDOWN = 1
-        # cv.EVENT_LBUTTONUP = 4
-        # cv.EVENT_MBUTTONDBLCLK = 9
-        # cv.EVENT_MBUTTONDOWN = 3
-        # cv.EVENT_MBUTTONUP = 6
-        # cv.EVENT_MOUSEHWHEEL = 11
-        # cv.EVENT_MOUSEMOVE = 0
-        # cv.EVENT_MOUSEWHEEL = 10
-        # cv.EVENT_RBUTTONDBLCLK = 8
-        # cv.EVENT_RBUTTONDOWN = 2
-        # cv.EVENT_RBUTTONUP = 5
+        # cv2.EVENT_LBUTTONDBLCLK = 7
+        # cv2.EVENT_LBUTTONDOWN = 1
+        # cv2.EVENT_LBUTTONUP = 4
+        # cv2.EVENT_MBUTTONDBLCLK = 9
+        # cv2.EVENT_MBUTTONDOWN = 3
+        # cv2.EVENT_MBUTTONUP = 6
+        # cv2.EVENT_MOUSEHWHEEL = 11
+        # cv2.EVENT_MOUSEMOVE = 0
+        # cv2.EVENT_MOUSEWHEEL = 10
+        # cv2.EVENT_RBUTTONDBLCLK = 8
+        # cv2.EVENT_RBUTTONDOWN = 2
+        # cv2.EVENT_RBUTTONUP = 5
 
         # EVENT_FLAG_ALTKEY = 32
         # EVENT_FLAG_CTRLKEY = 8

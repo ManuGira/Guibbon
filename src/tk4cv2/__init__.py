@@ -39,8 +39,8 @@ def waitKeyEx(delay, track_keypress=True, track_keyrelease=False):
     return Tk4Cv2.get_active_instance()._waitKeyEx(delay, track_keypress, track_keyrelease)
 
 
-def setMouseCallback(windowName, onMouse, param=None):
-    return Tk4Cv2.get_active_instance()._setMouseCallback(onMouse, param=None)
+def setMouseCallback(winname, onMouse, param=None):
+    return Tk4Cv2.get_instance(winname)._setMouseCallback(onMouse, param=param)
 
 
 def createButton(text='Button', command=None, winname=None):
