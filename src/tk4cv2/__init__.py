@@ -15,6 +15,7 @@ __version_info__ = tuple(int(i) for i in __version__.split(".") if i.isdigit())
 def inject(cv2_package):
     cv2_package.imshow = imshow
     cv2_package.getWindowProperty = getWindowProperty
+    cv2_package.waitKey = waitKey
     cv2_package.waitKeyEx = waitKeyEx
     cv2_package.setMouseCallback = setMouseCallback
     cv2_package.createTrackbar = createTrackbar
@@ -33,6 +34,12 @@ def imshow(winname, mat, mode=None):
 
 def getWindowProperty(winname: str, prop_id: int):
     return Tk4Cv2.get_instance(winname)._getWindowProperty(prop_id)
+
+
+def waitKey(delay, track_keypress=True, track_keyrelease=False, SilentWarning=False):
+    if not SilentWarning:
+        print("WARNING: waitKey function not implemented in Tk4Cv2. The current version is similar to waitKeyEx function. (To suppress this warning, use SilentWarning=True)")
+    return waitKeyEx(delay, track_keypress, track_keyrelease)
 
 
 def waitKeyEx(delay, track_keypress=True, track_keyrelease=False):
