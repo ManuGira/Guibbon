@@ -1,7 +1,10 @@
 import numpy as np
 import cv2
+
+tcv2 = None
 import tk4cv2 as tcv2
-tcv2.inject(cv2)
+if tcv2:
+    tcv2.inject(cv2)
 
 
 def on_trackbar(val):
@@ -42,17 +45,21 @@ def demo_cv():
     cv2.setTrackbarMin("trackbar_name", title, 2)
     cv2.setTrackbarMax("trackbar_name", title, 12)
     cv2.setTrackbarPos("trackbar_name", title, 4)
-
-    tcv2.createButton("the button", on_button_click, title)
-    tcv2.createRadioButtons("radio", ["pomme", "poire"], title, 1, on_radio_button)
-    tcv2.createCheckbuttons("check multi", ["roue", "volant"], title, [False, True], on_check_buttons)
-    tcv2.createCheckbutton("check single", title, False, on_check_button)
-    tcv2.createColorPicker("Color picker", title, "yellow", on_color_pick)
     cv2.setMouseCallback(title, on_mouse_event)
 
-    while True:
+    if tcv2:
+        tcv2.createButton("the button", on_button_click, title)
+        tcv2.createRadioButtons("radio", ["pomme", "poire"], title, 1, on_radio_button)
+        tcv2.createCheckbuttons("check multi", ["roue", "volant"], title, [False, True], on_check_buttons)
+        tcv2.createCheckbutton("check single", title, False, on_check_button)
+        tcv2.createColorPicker("Color picker", title, "yellow", on_color_pick)
+
+    cv2.namedWindow("ok")
+
+    while cv2.getWindowProperty(title, cv2.WND_PROP_VISIBLE) > 0.5:
         k += 1
         cv2.imshow(title, img * np.uint8(k))
+        # tcv2.imshow("ok", img * np.uint8(k))
         print(cv2.waitKeyEx(0), end=", ")
 
 
