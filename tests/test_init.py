@@ -21,8 +21,9 @@ class TestTk4Cv2(unittest.TestCase):
 
     def test_multiple_instances(self):
         self.assertEqual(len(tcv2.Tk4Cv2.instances), 0, msg="At initialisation, number of instances must be 0.")
-        res = tcv2.namedWindow("win0")
-        res = tcv2.namedWindow("win1")
+        tcv2.namedWindow("win0")
+        tcv2.namedWindow("win1")
+        self.assertEqual(len(tcv2.Tk4Cv2.instances), 2, msg="After 2 uses of tcv2.namedWindow(...), number of instances must be 2.")
 
 
 def find_widget_by_name(tk4cv2_instance, widgetname):

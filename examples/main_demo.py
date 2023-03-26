@@ -1,10 +1,7 @@
 import numpy as np
 import cv2
-
-tcv2 = None
 import tk4cv2 as tcv2
-if tcv2:
-    tcv2.inject(cv2)
+tcv2.inject(cv2)
 
 
 def on_trackbar(val):

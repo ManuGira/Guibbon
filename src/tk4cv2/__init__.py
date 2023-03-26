@@ -51,7 +51,8 @@ def getWindowProperty(winname: str, prop_id: int):
 
 def waitKey(delay, track_keypress=True, track_keyrelease=False, SilentWarning=False):
     if not SilentWarning:
-        print("WARNING: waitKey function not implemented in Tk4Cv2. The current version is similar to waitKeyEx function. (To suppress this warning, use SilentWarning=True)")
+        print("WARNING: waitKey function not implemented in Tk4Cv2. The current version is similar to waitKeyEx function. (To suppress this warning, use "
+              "SilentWarning=True)")
     return waitKeyEx(delay, track_keypress, track_keyrelease)
 
 
@@ -133,7 +134,8 @@ class Tk4Cv2:
 
     def __init__(self, winname):
         self.root = tk.Toplevel()
-        self.root.master.withdraw()  # Make master root windows invisible
+        # Make master root windows invisible
+        self.root.master.withdraw()  # type: ignore
         self.root.protocol("WM_DELETE_WINDOW", self.on_closing)  # add callback when user closes the window
         self.winname = winname
         self.root.title(self.winname)
@@ -319,7 +321,8 @@ class Tk4Cv2:
         if prop_id == cv2.WND_PROP_VISIBLE:
             return 1 if self.root.state() == "normal" else 0
         else:
-            raise NotImplementedError(f"Function getWindowProperty is not fully implemented in current version of Tk4Cv2 and does not support the provided flag: prop_id={prop_id}")
+            raise NotImplementedError(f"Function getWindowProperty is not fully implemented in current version of Tk4Cv2 and does not support the provided "
+                                      f"flag: prop_id={prop_id}")
 
     def _waitKeyEx(self, delay, track_keypress=True, track_keyrelease=False):
         self.reset()

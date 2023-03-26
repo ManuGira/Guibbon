@@ -42,7 +42,10 @@ $ tox
 
 
 ## TODO
+
+* Bug: Process is not stopped when windows is closed 
+
 #### Image Viewer
-* handle double clicks
-* Scroll delta is missing
-* Linux and Mac support
+* Feature: handle double clicks
+* Feature: Scroll delta is missing
+* Feature: Linux and Mac support
