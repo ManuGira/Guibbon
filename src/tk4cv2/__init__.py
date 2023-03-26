@@ -16,6 +16,12 @@ def inject(cv2_package):
     cv2_package.waitKeyEx = waitKeyEx
     cv2_package.setMouseCallback = setMouseCallback
     cv2_package.createTrackbar = createTrackbar
+    cv2_package.setTrackbarPos = setTrackbarPos
+    cv2_package.getTrackbarPos = getTrackbarPos
+    cv2_package.setTrackbarMin = setTrackbarMin
+    cv2_package.getTrackbarMin = getTrackbarMin
+    cv2_package.setTrackbarMax = setTrackbarMax
+    cv2_package.getTrackbarMax = getTrackbarMax
     cv2_package.namedWindow = namedWindow
 
 
@@ -37,6 +43,30 @@ def createButton(text='Button', command=None, winname=None):
 
 def createTrackbar(trackbarName, windowName=None, value=0, count=10, onChange=None):
     Tk4Cv2.get_instance(windowName)._createTrackbar(trackbarName, value, count, onChange)
+
+
+def setTrackbarPos(trackbarname, winname, pos):
+    Tk4Cv2.get_instance(winname)._setTrackbarPos(trackbarname, pos)
+
+
+def getTrackbarPos(trackbarname, winname):
+    return Tk4Cv2.get_instance(winname)._getTrackbarPos(trackbarname)
+
+
+def setTrackbarMin(trackbarname, winname, minval):
+    Tk4Cv2.get_instance(winname)._setTrackbarMin(trackbarname, minval)
+
+
+def getTrackbarMin(trackbarname, winname):
+    return Tk4Cv2.get_instance(winname)._getTrackbarMin(trackbarname)
+
+
+def setTrackbarMax(trackbarname, winname, maxval):
+    Tk4Cv2.get_instance(winname)._setTrackbarMax(trackbarname, maxval)
+
+
+def getTrackbarMax(trackbarname, winname):
+    return Tk4Cv2.get_instance(winname)._getTrackbarMax(trackbarname)
 
 
 def namedWindow(winname):  # TODO: add "flags" argument
@@ -93,6 +123,7 @@ class Tk4Cv2:
         self._imshow(img)
 
         self.ctrl_frame = tk.Frame(master=self.frame, width=300, bg="green")
+        self.trackbars_by_names = {}
 
         self.frame.pack()
         self.image_viewer.pack(side=tk.LEFT)
@@ -134,9 +165,26 @@ class Tk4Cv2:
         trackbar.set(value)
         trackbar["command"] = onChange
         trackbar.pack(padx=2, fill=tk.X, expand=1)
+        self.trackbars_by_names[trackbarName] = trackbar
         frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
 
-        # self.observers.append(ObjectObserver(getter, on_change, is_equal))
+    def _setTrackbarPos(self, trackbarname, pos):
+        self.trackbars_by_names[trackbarname].set(pos)
+
+    def _getTrackbarPos(self, trackbarname):
+        return self.trackbars_by_names[trackbarname].get(pos)
+
+    def _setTrackbarMin(self, trackbarname, minval):
+        self.trackbars_by_names[trackbarname]["from"] = minval
+
+    def _getTrackbarMin(self, trackbarname):
+        return self.trackbars_by_names[trackbarname]["from"]
+
+    def _setTrackbarMax(self, trackbarname, maxval):
+        self.trackbars_by_names[trackbarname]["to"] = maxval
+
+    def _getTrackbarMax(self, trackbarname):
+        return self.trackbars_by_names[trackbarname]["to"]
 
     def _createRadioButtons(self, name, options, value, onChange):
         frame = tk.Frame(self.ctrl_frame)

@@ -39,6 +39,10 @@ def demo_cv():
     title = "Demo Tk4Cv2"
     cv2.namedWindow(title)
     cv2.createTrackbar("trackbar_name", title, 0, 10, on_trackbar)
+    cv2.setTrackbarMin("trackbar_name", title, 2)
+    cv2.setTrackbarMax("trackbar_name", title, 12)
+    cv2.setTrackbarPos("trackbar_name", title, 4)
+
     tcv2.createButton("the button", on_button_click, title)
     tcv2.createRadioButtons("radio", ["pomme", "poire"], title, 1, on_radio_button)
     tcv2.createCheckbuttons("check multi", ["roue", "volant"], title, [False, True], on_check_buttons)
