@@ -1,7 +1,10 @@
 import numpy as np
 import cv2
+tcv2 = None
 import tk4cv2 as tcv2
-tcv2.inject(cv2)
+
+if tcv2:
+    tcv2.inject(cv2)
 
 
 def on_trackbar(val):
@@ -41,7 +44,7 @@ def demo_cv():
     cv2.createTrackbar("trackbar_name", title, 0, 10, on_trackbar)
     cv2.setTrackbarMin("trackbar_name", title, 2)
     cv2.setTrackbarMax("trackbar_name", title, 12)
-    cv2.setTrackbarPos("trackbar_name", title, 4)
+    cv2.setTrackbarPos("trackbar_name", title, 6)
     cv2.setMouseCallback(title, on_mouse_event)
 
     if tcv2:

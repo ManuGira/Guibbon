@@ -202,26 +202,30 @@ class Tk4Cv2:
         trackbar.set(value)
         trackbar["command"] = onChange
         trackbar.pack(padx=2, fill=tk.X, expand=1)
-        self.trackbars_by_names[trackbarName] = trackbar
+        self.trackbars_by_names[trackbarName] = {"tkObject": trackbar, "callback": onChange}
+        # self.trackbars_by_names[trackbarName] = {"tkObject": trackbar}
         frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
 
     def _setTrackbarPos(self, trackbarname, pos):
-        self.trackbars_by_names[trackbarname].set(pos)
+        trackbar = self.trackbars_by_names[trackbarname]["tkObject"]
+        onChange = self.trackbars_by_names[trackbarname]["callback"]
+        trackbar.set(pos)
+        onChange(pos)
 
     def _getTrackbarPos(self, trackbarname):
-        return self.trackbars_by_names[trackbarname].get()
+        return self.trackbars_by_names[trackbarname]["tkObject"].get()
 
     def _setTrackbarMin(self, trackbarname, minval):
-        self.trackbars_by_names[trackbarname]["from"] = minval
+        self.trackbars_by_names[trackbarname]["tkObject"]["from"] = minval
 
     def _getTrackbarMin(self, trackbarname):
-        return self.trackbars_by_names[trackbarname]["from"]
+        return self.trackbars_by_names[trackbarname]["tkObject"]["from"]
 
     def _setTrackbarMax(self, trackbarname, maxval):
-        self.trackbars_by_names[trackbarname]["to"] = maxval
+        self.trackbars_by_names[trackbarname]["tkObject"]["to"] = maxval
 
     def _getTrackbarMax(self, trackbarname):
-        return self.trackbars_by_names[trackbarname]["to"]
+        return self.trackbars_by_names[trackbarname]["tkObject"]["to"]
 
     def _createRadioButtons(self, name, options, value, onChange):
         options = options + []  # copy

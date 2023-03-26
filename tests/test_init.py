@@ -83,5 +83,78 @@ class TestTk4Cv2_checkbutton(unittest.TestCase):
         self.assertTrue(self.triggered)
 
 
+class TestTk4Cv2_RadioButtons(unittest.TestCase):
+    def setUp(self):
+        self.winname = "win0"
+        tcv2.namedWindow(self.winname)
+        self.tk4cv2_instance = tcv2.Tk4Cv2.instances["win0"]
+        self.triggered = None
+
+    def callback(self, *args):
+        print("callback radiobuttons triggered", args)
+        self.triggered = True
+
+    def test_RadioButtons(self):
+        """
+        testing 3 functions:
+         - createRadioButtons
+         - getRadioButtons
+         - setRadioButtons
+        """
+        name = "RadioButtons"
+        res = tcv2.createRadioButtons(
+            name=name, options=["A", "B", "C"], winname=self.winname, value=1, onChange=self.callback)
+        self.assertIsNone(res, msg="function tcv2.createRadioButtons must return None")
+
+        i, opt = tcv2.getRadioButtons(name, self.winname)
+        self.assertEqual(i , 1, msg="function tcv2.getRadioButtons must return correct index")
+        self.assertEqual(opt, "B", msg="function tcv2.getRadioButtons must return correct option")
+
+        self.triggered = False
+        tcv2.setRadioButtons(name, self.winname, 2)
+        self.assertTrue(self.triggered, "function tcv2.setRadioButtons must trigger callback")
+        i, opt = tcv2.getRadioButtons(name, self.winname)
+        self.assertEqual(i, 2, msg="function tcv2.getRadioButtons must return correct index")
+        self.assertEqual(opt, "C", msg="function tcv2.getRadioButtons must return correct option")
+
+
+class TestTk4Cv2_TrackBar(unittest.TestCase):
+    def setUp(self):
+        self.winname = "win0"
+        tcv2.namedWindow(self.winname)
+        self.tk4cv2_instance = tcv2.Tk4Cv2.instances["win0"]
+        self.triggered = None
+
+    def callback(self, *args):
+        print("callback trackBar triggered", args)
+        self.triggered = True
+
+    def test_TrackBar(self):
+        """
+        testing 3 functions:
+         - createTrackBar
+         - getTrackBarPos
+         - setTrackBarPos
+        """
+        name = "TrackBar"
+        res = tcv2.createTrackbar(trackbarName=name, windowName=self.winname, value=1, count=10, onChange=self.callback)
+        self.assertIsNone(res, msg="function tcv2.createTrackBar must return None")
+
+        value = tcv2.getTrackbarPos(name, self.winname)
+        self.assertEqual(value , 1, msg="function tcv2.getTrackbarPos must return correct value")
+
+        self.triggered = False
+        tcv2.setTrackbarPos(name, self.winname, 8)
+        self.assertTrue(self.triggered, "function tcv2.setTrackbarPos must trigger callback")
+        value = tcv2.getTrackbarPos(name, self.winname)
+        self.assertEqual(value, 8, msg="function tcv2.getTrackbarPos must return correct value")
+
+
+class TestTk4Cv2_other(unittest.TestCase):
+    def test_not_implemented(self):
+        with self.assertRaises(NotImplementedError):
+            tcv2.not_implemented_error()
+
+
 if __name__ == '__main__':
     unittest.main()
