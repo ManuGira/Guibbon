@@ -178,7 +178,7 @@ class Tk4Cv2:
         self.trackbars_by_names[trackbarname].set(pos)
 
     def _getTrackbarPos(self, trackbarname):
-        return self.trackbars_by_names[trackbarname].get(pos)
+        return self.trackbars_by_names[trackbarname].get()
 
     def _setTrackbarMin(self, trackbarname, minval):
         self.trackbars_by_names[trackbarname]["from"] = minval
