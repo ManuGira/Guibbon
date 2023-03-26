@@ -61,7 +61,7 @@ class ImageViewer:
         return int(img_x + 0.5), int(img_y + 0.5)
 
     def setMouseCallback(self, onMouse, param=None):
-        if not isinstance(onMouse, types.FunctionType):
+        if not isinstance(onMouse, types.FunctionType) and not isinstance(onMouse, types.MethodType):
             raise TypeError(f"onMouse must be a function, got {type(onMouse)} instead")
         if param is not None:
             raise TypeError("param argument of function setMouseCallback is not handled in current version of tk4cv2")
