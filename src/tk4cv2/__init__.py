@@ -307,7 +307,7 @@ class Tk4Cv2:
 
     def _getWindowProperty(self, prop_id: int):
         """
-        # TODO: not all flags ar handled
+        TODO: not all flags ar handled
             cv2.WND_PROP_FULLSCREEN:    fullscreen property (can be WINDOW_NORMAL or WINDOW_FULLSCREEN).
             cv2.WND_PROP_AUTOSIZE:      autosize property (can be WINDOW_NORMAL or WINDOW_AUTOSIZE).
             cv2.WND_PROP_ASPECT_RATIO:  window's aspect ration (can be set to WINDOW_FREERATIO or WINDOW_KEEPRATIO).
@@ -315,12 +315,11 @@ class Tk4Cv2:
             cv2.WND_PROP_VISIBLE:       checks whether the window exists and is visible
             cv2.WND_PROP_TOPMOST:       property to toggle normal window being topmost or not
             cv2.WND_PROP_VSYNC:         enable or disable VSYNC (in OpenGL mode)
-        :return:
         """
         if prop_id == cv2.WND_PROP_VISIBLE:
             return 1 if self.root.state() == "normal" else 0
         else:
-            raise NotImplementedError
+            raise NotImplementedError(f"Function getWindowProperty is not fully implemented in current version of Tk4Cv2 and does not support the provided flag: prop_id={prop_id}")
 
     def _waitKeyEx(self, delay, track_keypress=True, track_keyrelease=False):
         self.reset()
