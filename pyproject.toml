@@ -20,6 +20,7 @@ warn_return_any = true
 warn_unreachable = true
 warn_unused_configs = true
 implicit_reexport = true
+pretty = true
 
 [tool.ruff]
 line-length = 160

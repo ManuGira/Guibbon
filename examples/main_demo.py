@@ -1,9 +1,9 @@
+import sys
 import numpy as np
 import cv2
-tcv2 = None
 import tk4cv2 as tcv2
 
-if tcv2:
+if 'tk4cv2' in sys.modules:
     tcv2.inject(cv2)
 
 
@@ -47,7 +47,8 @@ def demo_cv():
     cv2.setTrackbarPos("trackbar_name", title, 6)
     cv2.setMouseCallback(title, on_mouse_event)
 
-    if tcv2:
+    if 'tk4cv2' in sys.modules:
+        # type: ignore
         tcv2.createButton("the button", on_button_click, title)
         tcv2.createRadioButtons("radio", ["pomme", "poire"], title, 1, on_radio_button)
         tcv2.createCheckbuttons("check multi", ["roue", "volant"], title, [False, True], on_check_buttons)
