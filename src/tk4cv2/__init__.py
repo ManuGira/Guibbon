@@ -13,20 +13,33 @@ __version__ = "0.0.0"
 __version_info__ = tuple(int(i) for i in __version__.split(".") if i.isdigit())
 
 def inject(cv2_package):
-    cv2_package.imshow = imshow
+    cv2_package.createTrackbar = createTrackbar
+    cv2_package.destroyAllWindows = not_implemented_error
+    cv2_package.destroyWindow = not_implemented_error
+    cv2_package.getMouseWheelDelta = not_implemented_error
+    cv2_package.getTrackbarPos = getTrackbarPos
+    cv2_package.getWindowImageRect = not_implemented_error
     cv2_package.getWindowProperty = getWindowProperty
+    cv2_package.imshow = imshow
+    cv2_package.moveWindow = not_implemented_error
+    cv2_package.namedWindow = namedWindow
+    cv2_package.pollKey = not_implemented_error
+    cv2_package.resizeWindow = not_implemented_error
+    cv2_package.selectROI = not_implemented_error
+    cv2_package.selectROIs = not_implemented_error
+    cv2_package.setMouseCallback = setMouseCallback
+    cv2_package.setTrackbarMax = setTrackbarMax
+    cv2_package.setTrackbarMin = setTrackbarMin
+    cv2_package.setTrackbarPos = setTrackbarPos
+    cv2_package.setWindowProperty = not_implemented_error
+    cv2_package.setWindowTitle = not_implemented_error
+    cv2_package.startWindowThread = not_implemented_error
     cv2_package.waitKey = waitKey
     cv2_package.waitKeyEx = waitKeyEx
-    cv2_package.setMouseCallback = setMouseCallback
-    cv2_package.createTrackbar = createTrackbar
-    cv2_package.setTrackbarPos = setTrackbarPos
-    cv2_package.getTrackbarPos = getTrackbarPos
-    cv2_package.setTrackbarMin = setTrackbarMin
-    cv2_package.getTrackbarMin = getTrackbarMin
-    cv2_package.setTrackbarMax = setTrackbarMax
-    cv2_package.getTrackbarMax = getTrackbarMax
-    cv2_package.namedWindow = namedWindow
 
+
+def not_implemented_error():
+    raise NotImplementedError("Function not implemented in current version of Tk4Cv2")
 
 def imshow(winname, mat, mode=None):
     return Tk4Cv2.get_instance(winname)._imshow(mat, mode)
