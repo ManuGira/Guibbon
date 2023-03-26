@@ -4,6 +4,7 @@ import tkinter as tk
 from tkinter.colorchooser import askcolor
 
 import numpy as np
+import cv2
 
 from .image_viewer import ImageViewer
 from .keyboard_event_handler import KeyboardEventHandler
@@ -13,6 +14,7 @@ __version_info__ = tuple(int(i) for i in __version__.split(".") if i.isdigit())
 
 def inject(cv2_package):
     cv2_package.imshow = imshow
+    cv2_package.getWindowProperty = getWindowProperty
     cv2_package.waitKeyEx = waitKeyEx
     cv2_package.setMouseCallback = setMouseCallback
     cv2_package.createTrackbar = createTrackbar
@@ -27,6 +29,10 @@ def inject(cv2_package):
 
 def imshow(winname, mat, mode=None):
     return Tk4Cv2.get_instance(winname)._imshow(mat, mode)
+
+
+def getWindowProperty(winname: str, prop_id: int):
+    return Tk4Cv2.get_active_instance()._getWindowProperty(prop_id)
 
 
 def waitKeyEx(delay, track_keypress=True, track_keyrelease=False):
@@ -278,6 +284,24 @@ class Tk4Cv2:
 
     def on_timeout(self):
         self.is_timeout = True
+
+    def _getWindowProperty(self, prop_id: int):
+        """
+        # TODO: not all flags ar handled
+            cv2.WND_PROP_FULLSCREEN:    fullscreen property (can be WINDOW_NORMAL or WINDOW_FULLSCREEN).
+            cv2.WND_PROP_AUTOSIZE:      autosize property (can be WINDOW_NORMAL or WINDOW_AUTOSIZE).
+            cv2.WND_PROP_ASPECT_RATIO:  window's aspect ration (can be set to WINDOW_FREERATIO or WINDOW_KEEPRATIO).
+            cv2.WND_PROP_OPENGL:        opengl support.
+            cv2.WND_PROP_VISIBLE:       checks whether the window exists and is visible
+            cv2.WND_PROP_TOPMOST:       property to toggle normal window being topmost or not
+            cv2.WND_PROP_VSYNC:         enable or disable VSYNC (in OpenGL mode)
+        :return:
+        """
+        match prop_id:
+            case cv2.WND_PROP_VISIBLE:
+                return 1 if self.root.state() == "normal" else 0
+            case _:
+                raise NotImplementedError
 
     def _waitKeyEx(self, delay, track_keypress=True, track_keyrelease=False):
         self.reset()
