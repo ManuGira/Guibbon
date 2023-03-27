@@ -149,6 +149,32 @@ class TestTk4Cv2_TrackBar(unittest.TestCase):
         value = tcv2.getTrackbarPos(name, self.winname)
         self.assertEqual(value, 8, msg="function tcv2.getTrackbarPos must return correct value")
 
+    def test_TrackBar_min_max(self):
+        """
+        testing 4 functions:
+         - setTrackbarMax
+         - setTrackbarMin
+         - getTrackbarMax
+         - getTrackbarMin
+        """
+        name = "TrackBar"
+        tcv2.createTrackbar(trackbarName=name, windowName=self.winname, value=1, count=10, onChange=self.callback)
+        initial_min = tcv2.getTrackbarMin(trackbarname=name, winname=self.winname)
+        initial_max = tcv2.getTrackbarMax(trackbarname=name, winname=self.winname)
+
+        self.assertEqual(initial_min, 0)
+        self.assertEqual(initial_max, 10)
+
+        tcv2.setTrackbarMin(trackbarname=name, winname=self.winname, minval=5)
+        tcv2.setTrackbarMax(trackbarname=name, winname=self.winname, maxval=20)
+
+        new_min = tcv2.getTrackbarMin(trackbarname=name, winname=self.winname)
+        new_max = tcv2.getTrackbarMax(trackbarname=name, winname=self.winname)
+
+        self.assertEqual(new_min, 5)
+        self.assertEqual(new_max, 20)
+
+
 
 class TestTk4Cv2_other(unittest.TestCase):
     def test_not_implemented(self):
