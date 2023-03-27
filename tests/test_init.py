@@ -1,4 +1,5 @@
 import unittest
+import cv2
 import tk4cv2 as tcv2
 
 
@@ -11,6 +12,13 @@ class TestTk4Cv2(unittest.TestCase):
     def test_package(self):
         self.assertIsNotNone(tcv2.__version__)
         self.assertIsNotNone(tcv2.__version_info__)
+
+    def test_inject(self):
+        cv2_func = cv2.namedWindow
+        tcv2_func = tcv2.namedWindow
+        self.assertNotEqual(cv2_func, tcv2_func)
+        tcv2.inject(cv2)
+        self.assertEqual(cv2.namedWindow, tcv2_func, msg="tcv2.inject must correctly inject function to cv2")
 
     def test_namedWindow(self):
         self.assertEqual(len(tcv2.Tk4Cv2.instances), 0, msg="At initialisation, number of instances must be 0.")
