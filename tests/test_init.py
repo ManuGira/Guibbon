@@ -1,7 +1,10 @@
+import sys
 import unittest
 import cv2
 import tk4cv2 as tcv2
+import numpy as np
 
+eps = sys.float_info.epsilon
 
 class TestTk4Cv2(unittest.TestCase):
 
@@ -32,6 +35,27 @@ class TestTk4Cv2(unittest.TestCase):
         tcv2.namedWindow("win0")
         tcv2.namedWindow("win1")
         self.assertEqual(len(tcv2.Tk4Cv2.instances), 2, msg="After 2 uses of tcv2.namedWindow(...), number of instances must be 2.")
+
+    def test_imshow_and_getWindowProperty(self):
+        img = np.zeros((10, 10), dtype=np.uint8)
+        winname = "win0"
+        self.assertEqual(len(tcv2.Tk4Cv2.instances), 0, msg="At initialisation, number of instances must be 0.")
+        res = tcv2.getWindowProperty(winname, cv2.WND_PROP_VISIBLE)
+        self.assertTrue(abs(res-0.0) <= eps, msg="Non existant windows must have property WND_PROP_VISIBLE set to 0.0")
+        self.assertFalse(tcv2.Tk4Cv2.is_instance(winname), msg="tcv2.Tk4Cv2.is_instance must return false for non-existant windows")
+        self.assertEqual(len(tcv2.Tk4Cv2.instances), 0, msg="getWindowProperty should not be able to create new window")
+
+        res = tcv2.imshow(winname, img)
+        self.assertEqual(len(tcv2.Tk4Cv2.instances), 1, msg="tcv2.imshow must be able to create new window")
+        self.assertTrue(tcv2.Tk4Cv2.is_instance(winname), msg="tcv2.imshow must be able to create new window with given name")
+        self.assertIsNone(res, msg="tcv2.imshow must return None")
+
+        res = tcv2.getWindowProperty(winname, cv2.WND_PROP_VISIBLE)
+        self.assertTrue(abs(res-1.0) <= eps, msg="Existant and visible windows must have property WND_PROP_VISIBLE set to 1.0")
+        tcv2.Tk4Cv2.instances = {}  # TODO: use
+        res = tcv2.getWindowProperty(winname, cv2.WND_PROP_VISIBLE)
+        self.assertTrue(abs(res-0.0) <= eps, msg="Deleting instance of a windows must destroy it. getWindowProperty must return 0")
+
 
 
 def find_widget_by_name(tk4cv2_instance, widgetname):
@@ -67,6 +91,7 @@ class TestTk4Cv2_button(unittest.TestCase):
         self.assertFalse(self.triggered)
         widget.invoke()
         self.assertTrue(self.triggered)
+
 
 class TestTk4Cv2_checkbutton(unittest.TestCase):
     def setUp(self):
@@ -181,7 +206,6 @@ class TestTk4Cv2_TrackBar(unittest.TestCase):
 
         self.assertEqual(new_min, 5)
         self.assertEqual(new_max, 20)
-
 
 
 class TestTk4Cv2_other(unittest.TestCase):

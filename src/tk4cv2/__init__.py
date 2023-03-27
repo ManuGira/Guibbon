@@ -42,10 +42,12 @@ def not_implemented_error():
     raise NotImplementedError("Function not implemented in current version of Tk4Cv2")
 
 def imshow(winname, mat, mode=None):
-    return Tk4Cv2.get_instance(winname)._imshow(mat, mode)
+    Tk4Cv2.get_instance(winname)._imshow(mat, mode)
 
 
 def getWindowProperty(winname: str, prop_id: int):
+    if not Tk4Cv2.is_instance(winname):
+        return 0.0
     return Tk4Cv2.get_instance(winname)._getWindowProperty(prop_id)
 
 
@@ -127,6 +129,11 @@ def createColorPicker(name, windowName, values, onChange):
 class Tk4Cv2:
     instances: Dict[str, Any] = {}
     active_instance_name = None
+
+    @staticmethod
+    def is_instance(winname: str):
+        assert (isinstance(winname, str))
+        return winname in Tk4Cv2.instances.keys()
 
     @staticmethod
     def get_instance(winname):
@@ -348,7 +355,7 @@ class Tk4Cv2:
             cv2.WND_PROP_VSYNC:         enable or disable VSYNC (in OpenGL mode)
         """
         if prop_id == cv2.WND_PROP_VISIBLE:
-            return 1 if self.root.state() == "normal" else 0
+            return 1.0 if self.root.state() == "normal" else 0.0
         else:
             raise NotImplementedError(f"Function getWindowProperty is not fully implemented in current version of Tk4Cv2 and does not support the provided "
                                       f"flag: prop_id={prop_id}")
