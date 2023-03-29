@@ -1,5 +1,7 @@
+import threading
 from typing import Any, Dict
 import time
+
 import tkinter as tk
 from tkinter.colorchooser import askcolor
 
@@ -11,6 +13,13 @@ from .keyboard_event_handler import KeyboardEventHandler
 
 __version__ = "0.0.0"
 __version_info__ = tuple(int(i) for i in __version__.split(".") if i.isdigit())
+
+class COLORS:
+    background = "gray80"
+    ctrl_panel = "gray80"
+    widget = None
+    border = "gray70"
+
 
 def inject(cv2_package):
     cv2_package.createTrackbar = createTrackbar
@@ -59,7 +68,7 @@ def waitKey(delay, track_keypress=True, track_keyrelease=False, SilentWarning=Fa
 
 
 def waitKeyEx(delay, track_keypress=True, track_keyrelease=False):
-    return Tk4Cv2.get_active_instance()._waitKeyEx(delay, track_keypress, track_keyrelease)
+    return Tk4Cv2._waitKeyEx(delay, track_keypress, track_keyrelease)
 
 
 def setMouseCallback(winname, onMouse, param=None):
@@ -127,8 +136,24 @@ def createColorPicker(name, windowName, values, onChange):
 
 
 class Tk4Cv2:
+    root = None
     instances: Dict[str, Any] = {}
-    active_instance_name = None
+    active_instance_name: str
+    is_timeout: bool
+    keyboard: KeyboardEventHandler
+    lock: threading.Lock
+
+    @staticmethod
+    def init():
+        Tk4Cv2.root = tk.Tk()
+        Tk4Cv2.keyboard = KeyboardEventHandler()
+        Tk4Cv2.lock = threading.Lock()
+        Tk4Cv2.root.withdraw()
+        Tk4Cv2.reset()
+
+    @staticmethod
+    def reset():
+        Tk4Cv2.is_timeout = False
 
     @staticmethod
     def is_instance(winname: str):
@@ -147,15 +172,45 @@ class Tk4Cv2:
     def get_active_instance():
         return Tk4Cv2.get_instance(Tk4Cv2.active_instance_name)
 
-    def __init__(self, winname):
-        self.root = tk.Toplevel()
-        # Make master root windows invisible
-        self.root.master.withdraw()  # type: ignore
-        self.root.protocol("WM_DELETE_WINDOW", self.on_closing)  # add callback when user closes the window
-        self.winname = winname
-        self.root.title(self.winname)
+    @staticmethod
+    def _waitKeyEx(delay, track_keypress=True, track_keyrelease=False):
+        Tk4Cv2.reset()
 
-        self.frame = tk.Frame(master=self.root, bg="red")
+        if delay > 0:
+            Tk4Cv2.after(delay, self.on_timeout)  # TODO: make threadsafe
+
+        while True:
+            Tk4Cv2.root.update_idletasks()
+            Tk4Cv2.root.update()  # root can be destroyed at this line
+
+            if Tk4Cv2.root is None:
+                return -1
+
+            if track_keypress and Tk4Cv2.keyboard.is_keypress_updated:
+                Tk4Cv2.keyboard.is_keypress_updated = False
+                return Tk4Cv2.keyboard.last_keypressed
+            if track_keyrelease and Tk4Cv2.keyboard.is_keyrelease_updated:
+                Tk4Cv2.keyboard.is_keyrelease_updated = False
+                return Tk4Cv2.keyboard.last_keyreleased
+            if Tk4Cv2.is_timeout:
+                return -1
+            time.sleep(0.2)
+
+
+    def __init__(self, winname):
+        if Tk4Cv2.root is None:
+            Tk4Cv2.init()
+
+        # Make master root windows invisible
+        self.window = tk.Toplevel(Tk4Cv2.root)  # type: ignore
+        self.window.protocol("WM_DELETE_WINDOW", self.on_closing)  # add callback when user closes the window
+        self.winname = winname
+        self.window.title(self.winname)
+
+        self.window.bind("<KeyPress>", Tk4Cv2.keyboard.on_event)
+        self.window.bind("<KeyRelease>", Tk4Cv2.keyboard.on_event)
+
+        self.frame = tk.Frame(master=self.window, bg=COLORS.background)
 
         # Load an image in the script
         self.img_ratio = 4 / 4
@@ -165,7 +220,7 @@ class Tk4Cv2:
         img = np.zeros(shape=(100, 100, 3), dtype=np.uint8)
         self._imshow(img)
 
-        self.ctrl_frame = tk.Frame(master=self.frame, width=300, bg="green")
+        self.ctrl_frame = tk.Frame(master=self.frame, width=300, bg=COLORS.ctrl_panel)
         self.trackbars_by_names = {}
         self.radiobuttons_by_names = {}
 
@@ -174,38 +229,33 @@ class Tk4Cv2:
         # self.ctrl_frame.pack_propagate(False)
         self.ctrl_frame.pack()
 
-        self.keyboard = KeyboardEventHandler()
-
-        self.observers = []  # todo: add trackbar handle and callback to this array. Then, on each loop, we must watch if the values has changed...
-        self.reset()
 
     def on_closing(self):
         print("Destroy Root", self.winname)
         Tk4Cv2.instances.pop(self.winname)
-        root_master = self.root.master
-        if len(Tk4Cv2.instances) == 0:
-            root_master.destroy()
-        else:
-            self.root.destroy()
-            if Tk4Cv2.active_instance_name == self.winname:
-                Tk4Cv2.active_instance_name = list(Tk4Cv2.instances.keys())[-1]
+        self.window.destroy()
 
-    def reset(self):
-        # TODO: make threadsafe
-        self.is_timeout = False
+        if len(Tk4Cv2.instances) == 0:
+            print("destroy root master")
+            # with Tk4Cv2.lock:
+            Tk4Cv2.root.destroy()
+            Tk4Cv2.root = None
+            print("unlocked")
+        elif Tk4Cv2.active_instance_name == self.winname:
+            Tk4Cv2.active_instance_name = list(Tk4Cv2.instances.keys())[-1]
 
     def _createButton(self, text='Button', command=None):
-        frame = tk.Frame(self.ctrl_frame, bg="yellow")
+        frame = tk.Frame(self.ctrl_frame, bg=COLORS.ctrl_panel)
         frame.pack_propagate(True)
 
         tk.Button(frame, text=text, command=command).pack(side=tk.LEFT)
         frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.BOTH)
 
     def _createTrackbar(self, trackbarName, value, count, onChange):
-        frame = tk.Frame(self.ctrl_frame)
-        tk.Label(frame, text=trackbarName).pack(padx=2, side=tk.LEFT)
+        frame = tk.Frame(self.ctrl_frame, bg=COLORS.widget)
+        tk.Label(frame, text=trackbarName, bg=COLORS.widget).pack(padx=2, side=tk.LEFT)
         # tk.Button(frame, text=f"{value} {count}", command=onChange).pack(padx=2, fill=tk.X, expand=1)
-        trackbar = tk.Scale(frame, from_=0, to=count, orient=tk.HORIZONTAL)
+        trackbar = tk.Scale(frame, from_=0, to=count, orient=tk.HORIZONTAL, bg=COLORS.widget, borderwidth=0)
         trackbar.set(value)
         trackbar["command"] = onChange
         trackbar.pack(padx=2, fill=tk.X, expand=1)
@@ -238,7 +288,7 @@ class Tk4Cv2:
         options = options + []  # copy
         frame = tk.Frame(self.ctrl_frame)
         tk.Label(frame, text=name).pack(padx=2, side=tk.TOP, anchor=tk.W)
-        radioframeborder = tk.Frame(frame, bg="grey")
+        radioframeborder = tk.Frame(frame, bg=COLORS.border)
         borderwidth = 1
         radioframe = tk.Frame(radioframeborder)
 
@@ -323,7 +373,7 @@ class Tk4Cv2:
             canvas["bg"] = colors[1]
             onChange(colors)
 
-        canvas = tk.Canvas(frame, bg="yellow", bd=2, height=10)
+        canvas = tk.Canvas(frame, bg=COLORS.widget, bd=2, height=10)
         canvas.bind("<Button-1>", callback_canvas_click)
 
         canvas.pack(side=tk.LEFT, anchor=tk.W)
@@ -355,33 +405,11 @@ class Tk4Cv2:
             cv2.WND_PROP_VSYNC:         enable or disable VSYNC (in OpenGL mode)
         """
         if prop_id == cv2.WND_PROP_VISIBLE:
-            return 1.0 if self.root.state() == "normal" else 0.0
+            return 1.0 if self.window.state() == "normal" else 0.0
         else:
             raise NotImplementedError(f"Function getWindowProperty is not fully implemented in current version of Tk4Cv2 and does not support the provided "
                                       f"flag: prop_id={prop_id}")
 
-    def _waitKeyEx(self, delay, track_keypress=True, track_keyrelease=False):
-        self.reset()
-
-        self.root.bind("<KeyPress>", self.keyboard.on_event)
-        self.root.bind("<KeyRelease>", self.keyboard.on_event)
-
-        if delay > 0:
-            self.root.after(delay, self.on_timeout)  # TODO: make threadsafe
-
-        while True:
-            self.root.update()
-            self.root.update_idletasks()
-            if track_keypress and self.keyboard.is_keypress_updated:
-                self.keyboard.is_keypress_updated = False
-                return self.keyboard.last_keypressed
-            if track_keyrelease and self.keyboard.is_keyrelease_updated:
-                self.keyboard.is_keyrelease_updated = False
-                return self.keyboard.last_keyreleased
-            if self.is_timeout:
-                return -1
-
-            time.sleep(0.01)
 
     def _setMouseCallback(self, onMouse, param=None):
         self.image_viewer.setMouseCallback(onMouse, param)

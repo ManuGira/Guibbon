@@ -39,7 +39,7 @@ class ImageViewer:
         MOUSE_BUTTON_3: bool = False
 
     def __init__(self, master, height: int, width: int):
-        self.canvas = tk.Canvas(master=master, height=height, width=width, bg="blue")
+        self.canvas = tk.Canvas(master=master, height=height, width=width, bg="gray10")
         self.canvas_shape_hw = (height, width)
 
         self.imgtk = None

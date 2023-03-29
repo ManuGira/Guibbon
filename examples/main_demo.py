@@ -57,11 +57,12 @@ def demo_cv():
 
     cv2.namedWindow("ok")
 
-    while cv2.getWindowProperty(title, cv2.WND_PROP_VISIBLE) > 0.5:
+    while True: # cv2.getWindowProperty(title, cv2.WND_PROP_VISIBLE) > 0.5:
         k += 1
         cv2.imshow(title, img * np.uint8(k))
         # tcv2.imshow("ok", img * np.uint8(k))
         print(cv2.waitKeyEx(0), end=", ")
+    print("thats good")
 
 
 def print_hello():
