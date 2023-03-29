@@ -1,5 +1,5 @@
 ﻿.idea
-﻿build/
+build/
 dist/
 *.egg-info/
 *.egg
@@ -8,7 +8,3 @@ __pycache__/
 *.so
 *~
 
-# due to using tox and pytest
-.tox
-.cache
-.coverage

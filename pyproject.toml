@@ -3,10 +3,12 @@ requires = ["setuptools>=42.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.pytest.ini_options]
-addopts = "--cov-report=term --cov-report=html --cov=tk4cv2"
+addopts = "--cov-report=term --cov-report=html:build/.pytest_coverage_html --cov=tk4cv2"
 testpaths = [
     "tests",
 ]
+cache_dir = "build/.pytest_cache"
+
 
 [tool.mypy]
 check_untyped_defs = true
@@ -21,6 +23,8 @@ warn_unreachable = true
 warn_unused_configs = true
 implicit_reexport = true
 pretty = true
+cache_dir = "build/.mypy_cache"
 
 [tool.ruff]
 line-length = 160
+cache-dir = "build/.ruff_cache"
