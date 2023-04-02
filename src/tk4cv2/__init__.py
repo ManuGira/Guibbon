@@ -1,4 +1,4 @@
-import threading
+import typing
 from typing import Any, Dict
 import time
 
@@ -17,7 +17,7 @@ __version_info__ = tuple(int(i) for i in __version__.split(".") if i.isdigit())
 class COLORS:
     background = "gray80"
     ctrl_panel = "gray80"
-    widget = None
+    widget = "gray90"
     border = "gray70"
 
 
@@ -136,24 +136,28 @@ def createColorPicker(name, windowName, values, onChange):
 
 
 class Tk4Cv2:
-    root = None
+    root: tk.Tk
+    is_alive: bool = False
     instances: Dict[str, Any] = {}
-    active_instance_name: str
+    active_instance_name: typing.Optional[str]
     is_timeout: bool
     keyboard: KeyboardEventHandler
-    lock: threading.Lock
 
     @staticmethod
     def init():
         Tk4Cv2.root = tk.Tk()
+        Tk4Cv2.is_alive = True
         Tk4Cv2.keyboard = KeyboardEventHandler()
-        Tk4Cv2.lock = threading.Lock()
         Tk4Cv2.root.withdraw()
         Tk4Cv2.reset()
 
     @staticmethod
     def reset():
         Tk4Cv2.is_timeout = False
+
+    @staticmethod
+    def on_timeout(self):
+        Tk4Cv2.is_timeout = True
 
     @staticmethod
     def is_instance(winname: str):
@@ -177,13 +181,13 @@ class Tk4Cv2:
         Tk4Cv2.reset()
 
         if delay > 0:
-            Tk4Cv2.after(delay, self.on_timeout)  # TODO: make threadsafe
+            Tk4Cv2.get_active_instance().window.after(delay, Tk4Cv2.on_timeout)  # TODO: make threadsafe
 
         while True:
             Tk4Cv2.root.update_idletasks()
             Tk4Cv2.root.update()  # root can be destroyed at this line
 
-            if Tk4Cv2.root is None:
+            if not Tk4Cv2.is_alive:
                 return -1
 
             if track_keypress and Tk4Cv2.keyboard.is_keypress_updated:
@@ -198,7 +202,7 @@ class Tk4Cv2:
 
 
     def __init__(self, winname):
-        if Tk4Cv2.root is None:
+        if not Tk4Cv2.is_alive:
             Tk4Cv2.init()
 
         # Make master root windows invisible
@@ -237,10 +241,8 @@ class Tk4Cv2:
 
         if len(Tk4Cv2.instances) == 0:
             print("destroy root master")
-            # with Tk4Cv2.lock:
             Tk4Cv2.root.destroy()
-            Tk4Cv2.root = None
-            print("unlocked")
+            Tk4Cv2.is_alive = False
         elif Tk4Cv2.active_instance_name == self.winname:
             Tk4Cv2.active_instance_name = list(Tk4Cv2.instances.keys())[-1]
 
@@ -390,8 +392,6 @@ class Tk4Cv2:
     #     self.is_keypressed = True
     #     self.keypressed = event.keycode  # TODO: make threadsafe
 
-    def on_timeout(self):
-        self.is_timeout = True
 
     def _getWindowProperty(self, prop_id: int):
         """

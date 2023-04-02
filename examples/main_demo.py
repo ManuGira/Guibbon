@@ -62,7 +62,6 @@ def demo_cv():
         cv2.imshow(title, img * np.uint8(k))
         # tcv2.imshow("ok", img * np.uint8(k))
         print(cv2.waitKeyEx(0), end=", ")
-    print("thats good")
 
 
 def print_hello():
