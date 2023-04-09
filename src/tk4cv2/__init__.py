@@ -156,7 +156,7 @@ class Tk4Cv2:
         Tk4Cv2.is_timeout = False
 
     @staticmethod
-    def on_timeout(self):
+    def on_timeout():
         Tk4Cv2.is_timeout = True
 
     @staticmethod
