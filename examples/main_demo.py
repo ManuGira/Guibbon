@@ -39,27 +39,31 @@ def demo_cv():
     img = cv2.imread("images/dog.jpg")
 
     k = 0
-    title = "Demo Tk4Cv2"
-    cv2.namedWindow(title)
-    cv2.createTrackbar("trackbar_name", title, 0, 10, on_trackbar)
-    cv2.setTrackbarMin("trackbar_name", title, 2)
-    cv2.setTrackbarMax("trackbar_name", title, 12)
-    cv2.setTrackbarPos("trackbar_name", title, 6)
-    cv2.setMouseCallback(title, on_mouse_event)
+    winname = "Demo Tk4Cv2"
+    cv2.namedWindow(winname)
+    cv2.createTrackbar("trackbar_name", winname, 0, 10, on_trackbar)
+    cv2.setTrackbarMin("trackbar_name", winname, 2)
+    cv2.setTrackbarMax("trackbar_name", winname, 12)
+    cv2.setTrackbarPos("trackbar_name", winname, 6)
+    cv2.setMouseCallback(winname, on_mouse_event)
 
     if 'tk4cv2' in sys.modules:
         # type: ignore
-        tcv2.createButton("the button", on_button_click, title)
-        tcv2.createRadioButtons("radio", ["pomme", "poire"], title, 1, on_radio_button)
-        tcv2.createCheckbuttons("check multi", ["roue", "volant"], title, [False, True], on_check_buttons)
-        tcv2.createCheckbutton("check single", title, False, on_check_button)
-        tcv2.createColorPicker("Color picker", title, "yellow", on_color_pick)
+        tcv2.createButton("the button", on_button_click, winname)
+        tcv2.createRadioButtons("radio", ["pomme", "poire"], winname, 1, on_radio_button)
+        tcv2.createCheckbuttons("check multi", ["roue", "volant"], winname, [False, True], on_check_buttons)
+        tcv2.createCheckbutton("check single", winname, False, on_check_button)
+        tcv2.createColorPicker("Color picker", winname, "yellow", on_color_pick)
+        tcv2.createInteractivePoint(winname, 100, 100, "point",
+                on_click=lambda ev: print("on_click callback"),
+                on_drag=lambda ev: print("on_drag callback"),
+                on_release=lambda ev: print("on_release callback"))
 
     cv2.namedWindow("ok")
 
     while True: # cv2.getWindowProperty(title, cv2.WND_PROP_VISIBLE) > 0.5:
         k += 1
-        cv2.imshow(title, img * np.uint8(k))
+        cv2.imshow(winname, img * np.uint8(k))
         # tcv2.imshow("ok", img * np.uint8(k))
         print(cv2.waitKeyEx(0), end=", ")
 
