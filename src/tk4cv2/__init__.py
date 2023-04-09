@@ -1,5 +1,5 @@
 import typing
-from typing import Any, Dict
+from typing import Optional, Callable, Tuple, NoReturn, Dict, Any
 import time
 
 import tkinter as tk
@@ -13,6 +13,9 @@ from .keyboard_event_handler import KeyboardEventHandler
 
 __version__ = "0.0.0"
 __version_info__ = tuple(int(i) for i in __version__.split(".") if i.isdigit())
+
+# foo(event) -> None
+Callback = Optional[Callable[[tk.Event], NoReturn]]
 
 class COLORS:
     background = "gray80"
@@ -135,6 +138,10 @@ def createColorPicker(name, windowName, values, onChange):
     Tk4Cv2.get_instance(windowName)._createColorPicker(name, values, onChange)
 
 
+def createInteractivePoint(windowName, x, y, label="", on_click:Callback=None, on_drag:Callback=None, on_release:Callback=None):
+    Tk4Cv2.get_instance(windowName).image_viewer.createInteractivePoint(x, y, label, on_click, on_drag, on_release)
+
+
 class Tk4Cv2:
     root: tk.Tk
     is_alive: bool = False
@@ -183,6 +190,7 @@ class Tk4Cv2:
         if delay > 0:
             Tk4Cv2.get_active_instance().window.after(delay, Tk4Cv2.on_timeout)  # TODO: make threadsafe
 
+        tic = time.time()
         while True:
             Tk4Cv2.root.update_idletasks()
             Tk4Cv2.root.update()  # root can be destroyed at this line
@@ -198,7 +206,11 @@ class Tk4Cv2:
                 return Tk4Cv2.keyboard.last_keyreleased
             if Tk4Cv2.is_timeout:
                 return -1
-            time.sleep(0.2)
+
+            dt = (time.time()-tic)
+            sleep_time = max(0.0, 1/20 - dt)
+            time.sleep(sleep_time)
+            tic = time.time()
 
 
     def __init__(self, winname):

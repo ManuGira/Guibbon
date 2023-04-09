@@ -1,5 +1,5 @@
 import types
-from typing import Any, Tuple
+from typing import Optional, Callable, Tuple, NoReturn
 import dataclasses
 import enum
 import math
@@ -8,6 +8,12 @@ import tkinter as tk
 import cv2
 from PIL import Image, ImageTk
 
+from . import interactive_overlays
+
+# foo(event) -> None
+Callback = Optional[Callable[[tk.Event], NoReturn]]
+# foo(cvevent, x, y, flag, param) -> None
+MouseCallback = Optional[Callable[[int, int, int, int, int], NoReturn]]
 
 class ImageViewer:
     class BUTTONNUM(enum.IntEnum):
@@ -46,8 +52,9 @@ class ImageViewer:
         self.img_shape0_hw: Tuple[int, int]
         self.img_shape1_hw: Tuple[int, int]
         self.zoom_factor: float
-        self.onMouse: Any = None
+        self.onMouse: MouseCallback = None
         self.modifier = ImageViewer.Modifier()
+        self.interactive_overlays: List[Any] = []
 
     def canvas2img_space(self, can_x, can_y):
         canh, canw = self.canvas_shape_hw
@@ -162,6 +169,10 @@ class ImageViewer:
 
         self.onMouse(cvevent, x, y, flag, param)
 
+    def createInteractivePoint(self, x, y, label="", on_click:Callback=None, on_drag:Callback=None, on_release:Callback=None):
+        ipoint = interactive_overlays.Point(self.canvas, x, y, label, on_click, on_drag, on_release)
+        self.interactive_overlays.append(ipoint)
+
     def pack(self, *args, **kwargs):
         self.canvas.pack(*args, **kwargs)
 
@@ -187,5 +198,8 @@ class ImageViewer:
 
         self.imgtk = ImageTk.PhotoImage(image=Image.fromarray(mat))
         self.canvas.create_image(canw // 2, canh // 2, anchor=tk.CENTER, image=self.imgtk)
+
+        for overlay in self.interactive_overlays:
+            overlay.update()
 
 
