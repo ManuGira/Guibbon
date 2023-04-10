@@ -23,8 +23,11 @@ class DemoMVCAppFail:
 
     def update(self):
         w, h = self.img.shape[:2]
-        gain_b = 2*self.x/w
-        gain_r = 2*self.y/h
+        x = self.x / w
+        y = self.y / h
+        gain_b = max(0.5, min(2.0, 1.5 * x + 0.5))
+        gain_r = max(0.5, min(2.0, 1.5 * y + 0.5))
+
         res = self.img.copy()
         res = res.astype(np.uint16)
         res[:, :, 0:1] = res[:, :, 0:1]*gain_b

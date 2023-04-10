@@ -20,17 +20,17 @@ class DemoMVCAdvApp:
         tcv2.namedWindow(self.winname)
         tcv2.createInteractivePoint(self.winname, 100, 100, "point", on_drag=self.on_drag)
 
-        self.model = DemoMVCApp.Model()
-        self.result = DemoMVCApp.Result()
+        self.model = DemoMVCAdvApp.Model()
+        self.result = DemoMVCAdvApp.Result()
         self.is_update_needed: bool = True
 
     def update(self):
-        x = self.model.x
-        y = self.model.y
+        h, w = self.img.shape[:2]
+        x = self.model.x/w
+        y = self.model.y/h
+        gain_b = max(0.5, min(2.0, 1.5*x + 0.5))
+        gain_r = max(0.5, min(2.0, 1.5*y + 0.5))
 
-        w, h = self.img.shape[:2]
-        gain_b = 2*x/w
-        gain_r = 2*y/h
         res = self.img.copy()
         res = res.astype(np.uint16)
         res[:, :, 0:1] = res[:, :, 0:1]*gain_b
@@ -51,6 +51,7 @@ class DemoMVCAdvApp:
     def on_drag(self, event):
         self.model.x = event.x
         self.model.y = event.y
+        # print(event.x, event.y)
         self.is_update_needed = True
 
 if __name__ == '__main__':

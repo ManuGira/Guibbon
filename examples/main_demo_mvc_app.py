@@ -17,8 +17,11 @@ class DemoMVCApp:
 
     def update(self):
         w, h = self.img.shape[:2]
-        gain_b = 2*self.x/w
-        gain_r = 2*self.y/h
+        x = self.x / w
+        y = self.y / h
+        gain_b = max(0.5, min(2.0, 1.5 * x + 0.5))
+        gain_r = max(0.5, min(2.0, 1.5 * y + 0.5))
+
         res = self.img.copy()
         res = res.astype(np.uint16)
         res[:, :, 0:1] = res[:, :, 0:1]*gain_b
@@ -37,13 +40,9 @@ class DemoMVCApp:
             tcv2.waitKeyEx(20)
 
     def on_drag(self, event):
-        print("MyClass.on_drag", event)
         self.x = event.x
         self.y = event.y
         self.is_update_needed = True
-        # TODO: demonstrate the problem of having compute() and show() in this function.
-        #  (leeds to TkInter callback error (maximum recursion etc)
-        #  verify if the same bugs appear with cv2 gui
 
 
 if __name__ == '__main__':
