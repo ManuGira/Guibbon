@@ -34,6 +34,14 @@ def on_check_button(check):
 def on_color_pick(colors):
     print("on_color_pick", colors)
 
+def on_point_click(event):
+    print("on_point_click", event)
+
+def on_point_drag(event):
+    print("on_point_drag", event)
+
+def on_point_release(event):
+    print("on_point_release", event)
 
 def demo_cv():
     img = cv2.imread("images/dog.jpg")
@@ -55,9 +63,9 @@ def demo_cv():
         tcv2.createCheckbutton("check single", winname, False, on_check_button)
         tcv2.createColorPicker("Color picker", winname, "yellow", on_color_pick)
         tcv2.createInteractivePoint(winname, 100, 100, "point",
-                on_click=lambda ev: print("on_click callback"),
-                on_drag=lambda ev: print("on_drag callback"),
-                on_release=lambda ev: print("on_release callback"))
+                on_click=on_point_click,
+                on_drag=on_point_drag,
+                on_release=on_point_release)
 
     cv2.namedWindow("ok")
 

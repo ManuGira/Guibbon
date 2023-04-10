@@ -1,5 +1,5 @@
 import types
-from typing import Optional, Callable, Tuple, NoReturn
+from typing import Optional, Callable, Tuple, NoReturn, List, Any
 import dataclasses
 import enum
 import math
@@ -13,7 +13,7 @@ from . import interactive_overlays
 # foo(event) -> None
 Callback = Optional[Callable[[tk.Event], NoReturn]]
 # foo(cvevent, x, y, flag, param) -> None
-MouseCallback = Optional[Callable[[int, int, int, int, int], NoReturn]]
+MouseCallback = Optional[Callable[[int, int, int, int, None], NoReturn]]
 
 class ImageViewer:
     class BUTTONNUM(enum.IntEnum):
@@ -167,24 +167,24 @@ class ImageViewer:
         x, y = self.canvas2img_space(event.x, event.y)
         param = None
 
-        self.onMouse(cvevent, x, y, flag, param)
+        self.onMouse(cvevent, x, y, flag, param)  # type: ignore
 
     def createInteractivePoint(self, x, y, label="", on_click:Callback=None, on_drag:Callback=None, on_release:Callback=None):
         # Callbacks are wrapped to convert coordinate from canvas to image space.
-        def on_click_img(event):
+        def on_click_img0(event):
             event.x, event.y = self.canvas2img_space(event.x, event.y)
-            on_click(event)
-        on_click_img = on_click_img if on_click else None
+            on_click(event)  # type: ignore
+        on_click_img = on_click_img0 if on_click else None
 
-        def on_drag_img(event):
+        def on_drag_img0(event):
             event.x, event.y = self.canvas2img_space(event.x, event.y)
-            on_drag(event)
-        on_drag_img = on_drag_img if on_drag else None
+            on_drag(event)  # type: ignore
+        on_drag_img = on_drag_img0 if on_drag else None
 
-        def on_release_img(event):
+        def on_release_img0(event):
             event.x, event.y = self.canvas2img_space(event.x, event.y)
-            on_release(event)
-        on_release_img = on_release_img if on_release else None
+            on_release(event)  # type: ignore
+        on_release_img = on_release_img0 if on_release else None
 
         ipoint = interactive_overlays.Point(self.canvas, x, y, label, on_click_img, on_drag_img, on_release_img)
         self.interactive_overlays.append(ipoint)

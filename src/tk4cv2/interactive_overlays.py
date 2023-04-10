@@ -1,8 +1,7 @@
 import tkinter
 
-import cv2
 import enum
-from typing import Optional, Callable, Tuple, NoReturn
+from typing import Optional, Callable, NoReturn
 import tkinter as tk
 
 # foo(event) -> None

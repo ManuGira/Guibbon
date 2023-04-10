@@ -1,5 +1,5 @@
 import typing
-from typing import Optional, Callable, Tuple, NoReturn, Dict, Any
+from typing import Optional, Callable, NoReturn, Dict, Any
 import time
 
 import tkinter as tk

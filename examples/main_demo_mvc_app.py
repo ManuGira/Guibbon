@@ -1,6 +1,10 @@
+from typing import Optional
 import numpy as np
+import numpy.typing as npt
 import cv2
 import tk4cv2 as tcv2
+
+Image_t = Optional[npt.NDArray[np.uint8]]
 
 class DemoMVCApp:
     def __init__(self, filename):
@@ -12,7 +16,7 @@ class DemoMVCApp:
         self.x = 0
         self.y = 0
 
-        self.res: Optional[np.ndarray] = None
+        self.res: Image_t = None
         self.is_update_needed: bool = True
 
     def update(self):
