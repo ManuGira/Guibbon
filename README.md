@@ -52,9 +52,16 @@ $ tox
 
 ## TODO
 
-* **Bug**: Process is not stopped when windows is closed 
-
 #### Image Viewer
-* **Feature**: handle double clicks
+* **Feature**: Handle double clicks
+* **Feature**: Handle **param** field of mouse callback
 * **Feature**: Scroll delta is missing
 * **Feature**: Linux and Mac support
+
+#### Demos
+* **Feature**: Make sure that the failing demo also fails with cv2
+
+#### Interactive Overlays
+* **Feature**: Make sure that the failing demo also fails with cv2
+
+
