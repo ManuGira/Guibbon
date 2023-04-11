@@ -74,8 +74,8 @@ class Point:
             if self.on_drag is not None:
                 self.on_drag(event)
         except Exception as e:
-            print(e)
-            print(event)
+            print(f"ERROR: {self}: self._on_drag({event}) --->", e)
+            raise(e)
 
     def _on_release(self, event):
         self.state = Point.State.HOVERED
