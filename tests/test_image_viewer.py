@@ -23,8 +23,7 @@ class EventName:
 
 class TestImageViewer(unittest.TestCase):
     def setUp(self) -> None:
-        self.x = 400
-        self.y = 400
+        self.point_xy = (400, 400)
         self.img = np.zeros(shape=(100, 200), dtype=np.uint8)
         
         # create an instance of the image viewer
@@ -33,12 +32,12 @@ class TestImageViewer(unittest.TestCase):
         self.image_viewer = ImageViewer(self.frame, height=1000, width=1000)
 
         # create 2 interactive points. The scond one doesnt implement all callbacks
-        self.image_viewer.createInteractivePoint(100, 100, "point0",
+        self.image_viewer.createInteractivePoint((100, 100), "point0",
                 on_click=self.iteractive_point_event,
                 on_drag=self.iteractive_point_event,
                 on_release=self.iteractive_point_event)
 
-        self.image_viewer.createInteractivePoint(200, 200, "point1",
+        self.image_viewer.createInteractivePoint((200, 200), "point1",
                 on_click=None,
                 on_drag=self.iteractive_point_event,
                 on_release=None)
@@ -52,8 +51,7 @@ class TestImageViewer(unittest.TestCase):
 
     def iteractive_point_event(self, event):
         self.iteractive_point_event_count += 1
-        self.x = event.x
-        self.y = event.y
+        self.point_xy = (event.x, event.y)
 
 
     def test_imshow(self):
@@ -101,10 +99,8 @@ class TestImageViewer(unittest.TestCase):
         point1._on_release(Event(x_screen, y_screen))
         self.assertEqual(1, self.iteractive_point_event_count, "Undefined callback should not be triggered")
 
-        self.assertNotEqual(x_screen, self.x, "Coordinate must be converted in image space")
-        self.assertNotEqual(y_screen, self.y, "Coordinate must be converted in image space")
-        self.assertEqual(x_img, self.x, "Coordinate must be converted in image space")
-        self.assertEqual(y_img, self.y, "Coordinate must be converted in image space")
+        self.assertNotEqual((x_screen, y_screen), self.point_xy, "Coordinate must be converted in image space")
+        self.assertEqual((x_img, y_img), self.point_xy, "Coordinate must be converted in image space")
 
 
 if __name__ == '__main__':

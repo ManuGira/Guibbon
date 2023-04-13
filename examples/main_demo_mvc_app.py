@@ -11,7 +11,7 @@ class DemoMVCApp:
         self.img = cv2.imread(filename)
         self.winname = "demo app"
         tcv2.namedWindow(self.winname)
-        tcv2.createInteractivePoint(self.winname, 100, 100, "point", on_drag=self.on_drag)
+        tcv2.createInteractivePoint(self.winname, (100, 100), "point", on_drag=self.on_drag)
 
         self.x = 0
         self.y = 0

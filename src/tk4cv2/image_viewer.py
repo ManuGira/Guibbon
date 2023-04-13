@@ -169,7 +169,7 @@ class ImageViewer:
 
         self.onMouse(cvevent, x, y, flag, param)  # type: ignore
 
-    def createInteractivePoint(self, x, y, label="", on_click:Callback=None, on_drag:Callback=None, on_release:Callback=None):
+    def createInteractivePoint(self, point_xy, label="", on_click:Callback=None, on_drag:Callback=None, on_release:Callback=None):
         # Callbacks are wrapped to convert coordinate from canvas to image space.
         def on_click_img0(event):
             event.x, event.y = self.canvas2img_space(event.x, event.y)
@@ -186,7 +186,7 @@ class ImageViewer:
             on_release(event)  # type: ignore
         on_release_img = on_release_img0 if on_release else None
 
-        ipoint = interactive_overlays.Point(self.canvas, x, y, label, on_click_img, on_drag_img, on_release_img)
+        ipoint = interactive_overlays.Point(self.canvas, point_xy, label, on_click_img, on_drag_img, on_release_img)
         self.interactive_overlays.append(ipoint)
 
     def pack(self, *args, **kwargs):

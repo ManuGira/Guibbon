@@ -138,8 +138,8 @@ def createColorPicker(name, windowName, values, onChange):
     Tk4Cv2.get_instance(windowName)._createColorPicker(name, values, onChange)
 
 
-def createInteractivePoint(windowName, x, y, label="", on_click:Callback=None, on_drag:Callback=None, on_release:Callback=None):
-    Tk4Cv2.get_instance(windowName).image_viewer.createInteractivePoint(x, y, label, on_click, on_drag, on_release)
+def createInteractivePoint(windowName, point_xy, label="", on_click:Callback=None, on_drag:Callback=None, on_release:Callback=None):
+    Tk4Cv2.get_instance(windowName).image_viewer.createInteractivePoint(point_xy, label, on_click, on_drag, on_release)
 
 
 class Tk4Cv2:

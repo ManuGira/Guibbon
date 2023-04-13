@@ -1,7 +1,7 @@
 import tkinter
 
 import enum
-from typing import Optional, Callable, NoReturn
+from typing import Optional, Callable, NoReturn, Tuple
 import tkinter as tk
 
 # foo(event) -> None
@@ -25,11 +25,10 @@ class Point:
         State.DRAGGED: 7,
     }
 
-    def __init__(self, canvas: tk.Canvas, x:float, y:float, label:str="", on_click:Callback=None, on_drag:Callback=None, on_release:Callback=None):
+    def __init__(self, canvas: tk.Canvas, point_xy: Tuple[float, float], label:str="", on_click:Callback=None, on_drag:Callback=None, on_release:Callback=None):
         self.canvas = canvas
         self.state: Point.State = Point.State.NORMAL
-        self.x = x
-        self.y = y
+        self.point_xy = point_xy
         self.label = label
         self.visible: bool = True
 
@@ -49,10 +48,10 @@ class Point:
 
     def update(self):
         radius = Point.radius[self.state]
-        x1 = self.x - radius
-        y1 = self.y - radius
-        x2 = self.x + radius
-        y2 = self.y + radius
+        x1 = self.point_xy[0] - radius
+        y1 = self.point_xy[1] - radius
+        x2 = self.point_xy[0] + radius
+        y2 = self.point_xy[1] + radius
         self.canvas.coords(self.circle_id, x1, y1, x2, y2)
         self.canvas.itemconfig(self.circle_id, fill=Point.colors[self.state])
         self.canvas.tag_raise(self.circle_id)
@@ -67,8 +66,7 @@ class Point:
 
     def _on_drag(self, event):
         try:
-            self.x = event.x
-            self.y = event.y
+            self.point_xy = (event.x, event.y)
             self.state = Point.State.DRAGGED
             self.update()
             if self.on_drag is not None:
@@ -93,4 +91,6 @@ class Point:
         self.update()
 
 
-
+# class Polygon:
+#     def __init__(self, canvas: tk.Canvas, xs: float, ys: float, labels: str = "", on_click: Callback = None, on_drag: Callback = None, on_release: Callback = None):
+#         self.canvas = canvas
