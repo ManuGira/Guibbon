@@ -189,6 +189,30 @@ class ImageViewer:
         ipoint = interactive_overlays.Point(self.canvas, point_xy, label, on_click_img, on_drag_img, on_release_img)
         self.interactive_overlays.append(ipoint)
 
+
+    def createInteractivePolygon(self, point_xy_list, label="", on_click:Callback=None, on_drag:Callback=None, on_release:Callback=None):
+        # Callbacks are wrapped to convert coordinate from canvas to image space.
+        def on_click_img0(event, _point_xy_list):
+            event.x, event.y = self.canvas2img_space(event.x, event.y)
+            _point_xy_list = [self.canvas2img_space(*pt) for pt in _point_xy_list]
+            on_click(event, _point_xy_list)  # type: ignore
+        on_click_img = on_click_img0 if on_click else None
+
+        def on_drag_img0(event, _point_xy_list):
+            event.x, event.y = self.canvas2img_space(event.x, event.y)
+            _point_xy_list = [self.canvas2img_space(*pt) for pt in _point_xy_list]
+            on_drag(event, _point_xy_list)  # type: ignore
+        on_drag_img = on_drag_img0 if on_drag else None
+
+        def on_release_img0(event, _point_xy_list):
+            event.x, event.y = self.canvas2img_space(event.x, event.y)
+            _point_xy_list = [self.canvas2img_space(*pt) for pt in _point_xy_list]
+            on_release(event, _point_xy_list)  # type: ignore
+        on_release_img = on_release_img0 if on_release else None
+
+        ipolygon = interactive_overlays.Polygon(self.canvas, point_xy_list, label, on_click_img, on_drag_img, on_release_img)
+        self.interactive_overlays.append(ipolygon)
+
     def pack(self, *args, **kwargs):
         self.canvas.pack(*args, **kwargs)
 

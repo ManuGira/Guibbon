@@ -23,6 +23,9 @@ class DemoMVCAdvApp:
         tcv2.namedWindow(self.winname)
         tcv2.createInteractivePoint(self.winname, (100, 100), "point", on_drag=self.on_drag)
 
+        point_xy_list  = [(300, 300), (300, 500), (500, 400), (400, 300)]
+        tcv2.createInteractivePolygon(self.winname, point_xy_list, "polygon", on_drag=self.on_drag_poly)
+
         self.model = DemoMVCAdvApp.Model()
         self.result = DemoMVCAdvApp.Result()
         self.is_update_needed: bool = True
@@ -55,6 +58,11 @@ class DemoMVCAdvApp:
         self.model.x = event.x
         self.model.y = event.y
         # print(event.x, event.y)
+        self.is_update_needed = True
+
+    def on_drag_poly(self, event, point_xy_list):
+        # print(point_xy_list)
+        self.point_xy_list = point_xy_list+[]
         self.is_update_needed = True
 
 if __name__ == '__main__':
