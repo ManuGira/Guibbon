@@ -8,7 +8,6 @@ from tkinter.colorchooser import askcolor
 
 import numpy as np
 import cv2
-import types
 
 from .image_viewer import ImageViewer
 from .keyboard_event_handler import KeyboardEventHandler

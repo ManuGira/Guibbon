@@ -1,5 +1,5 @@
 import types
-from typing import Optional, Callable, Tuple, NoReturn, List, Any
+from typing import Tuple, List, Any
 from .typedef import CallbackPoint, CallbackPolygon, MouseCallback
 
 import dataclasses

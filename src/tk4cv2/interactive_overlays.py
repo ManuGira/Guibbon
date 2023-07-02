@@ -1,4 +1,4 @@
-from typing import Optional, Callable, NoReturn, Tuple, List, Sequence
+from typing import Sequence
 from .typedef import Point2D, Point2DList, CallbackPoint, CallbackPolygon
 
 import enum
