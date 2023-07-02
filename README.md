@@ -65,3 +65,30 @@ $ tox
 * **Feature**: Make sure that the failing demo also fails with cv2
 
 
+## Documentation
+
+#### Class hierarchy
+* Tk4Cv2
+  * keyboard_event_hander: *static KeyboardEventHandler*
+  * root: *static tk.Tk*
+  * self.window: *tk.Frame*
+  * frame: *tk.Frame*
+  * ctrl_frame: *tk.Frame*
+  * image_viewer: *ImageViewer*
+    * canvas: *tk.Canvas*
+    * imgtk: *PIL.ImageTk*
+    * interactive_overlays: *List(InteractiveOverlay)*
+      * canvas*
+        * circle_id: *id of canvas oval*
+        * 
+
+#### TkInter hierarchy
+* Tk4Cv2.root: *static Tk*
+  * tk4cv2.window: *TopLevel*
+    * tkcv2.frame: *Frame*
+      * tkcv2.ctrl_frame: *Frame*
+        * controller: *Frame*
+        * controller: *Frame*
+        * ...
+      * tkcv2.image_viewer.canvas: *Canvas*
+        * tkcv2.image_viewer.imgtk: *PIL.ImageTk*

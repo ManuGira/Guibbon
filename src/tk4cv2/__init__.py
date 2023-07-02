@@ -1,5 +1,6 @@
-import typing
-from typing import Optional, Callable, NoReturn, Dict, Any
+from typing import Dict, Any, Optional
+from .typedef import CallbackPoint, CallbackPolygon
+
 import time
 
 import tkinter as tk
@@ -13,9 +14,6 @@ from .keyboard_event_handler import KeyboardEventHandler
 
 __version__ = "0.0.0"
 __version_info__ = tuple(int(i) for i in __version__.split(".") if i.isdigit())
-
-# foo(event) -> None
-Callback = Optional[Callable[[tk.Event], NoReturn]]
 
 class COLORS:
     background = "gray80"
@@ -138,15 +136,17 @@ def createColorPicker(name, windowName, values, onChange):
     Tk4Cv2.get_instance(windowName)._createColorPicker(name, values, onChange)
 
 
-def createInteractivePoint(windowName, x, y, label="", on_click:Callback=None, on_drag:Callback=None, on_release:Callback=None):
-    Tk4Cv2.get_instance(windowName).image_viewer.createInteractivePoint(x, y, label, on_click, on_drag, on_release)
+def createInteractivePoint(windowName, point_xy, label="", on_click:CallbackPoint=None, on_drag:CallbackPoint=None, on_release:CallbackPoint=None):
+    Tk4Cv2.get_instance(windowName).image_viewer.createInteractivePoint(point_xy, label, on_click, on_drag, on_release)
 
+def createInteractivePolygon(windowName, point_xy_list, label="", on_click:CallbackPolygon=None, on_drag:CallbackPolygon=None, on_release:CallbackPolygon=None):
+    Tk4Cv2.get_instance(windowName).image_viewer.createInteractivePolygon(point_xy_list, label, on_click, on_drag, on_release)
 
 class Tk4Cv2:
     root: tk.Tk
     is_alive: bool = False
     instances: Dict[str, Any] = {}
-    active_instance_name: typing.Optional[str]
+    active_instance_name: Optional[str]
     is_timeout: bool
     keyboard: KeyboardEventHandler
 
