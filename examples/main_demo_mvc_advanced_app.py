@@ -1,11 +1,10 @@
+from typing import Optional, Callable, NoReturn
+
 import dataclasses
-from typing import Optional
 import numpy as np
-import numpy.typing as npt
 import cv2
 import tk4cv2 as tcv2
-
-Image_t = Optional[npt.NDArray[np.uint8]]
+from tk4cv2.typedef import Image_t
 
 class DemoMVCAdvApp:
     @dataclasses.dataclass

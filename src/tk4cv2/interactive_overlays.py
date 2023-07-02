@@ -1,15 +1,8 @@
-import tkinter
+from typing import Optional, Callable, NoReturn, Tuple, List, Sequence
+from .typedef import Point2D, Point2DList, CallbackPoint, CallbackPolygon
 
 import enum
-from typing import Optional, Callable, NoReturn, Tuple, List
 import tkinter as tk
-
-Point2D = Tuple[float, float]
-Point2DList = List[Point2D]
-# foo(event) -> None
-CallbackPoint = Optional[Callable[[tk.Event], NoReturn]]
-# foo(event, point_xy_list) -> None
-CallbackPolygon = Optional[Callable[[tk.Event, Point2DList], NoReturn]]
 
 class Point:
     class State(enum.IntEnum):
@@ -108,14 +101,15 @@ class Polygon:
         N = len(self.point_xy_list)
 
         self.ipoints = []
-        on_drag_lambdas = [lambda event: self._on_drag(str(k), event) for k in range(N)]
+        on_drag_lambdas: Sequence[CallbackPoint] = [lambda event, k_=k: self._on_drag(k_, event) for k in range(N)]
+
         for k, point_xy in enumerate(self.point_xy_list):
             # subscribe to on_click only if needed.
             # subscribe to on_drag in any cases (to update points coordinates). Use lambda to pass point index.
             # subscribe to on_release only if needed.
             ipoint = Point(canvas, point_xy, label="",
                     on_click=None if on_click is None else self._on_click,
-                    on_drag=lambda event, k_=k: self._on_drag(k_, event),  # k_=k to fix value of k
+                    on_drag=on_drag_lambdas[k],  # k_=k to fix value of k
                     on_release=None if on_release is None else self._on_release)
             self.ipoints.append(ipoint)
 
@@ -141,8 +135,8 @@ class Polygon:
             ipoint.update()
 
     def _on_click(self, event):
-        self.on_click(event, self.point_xy_list)
-
+        if self.on_click is not None:
+            self.on_click(event, self.point_xy_list)
 
     def _on_drag(self, i, event):
         try:
@@ -155,4 +149,5 @@ class Polygon:
             raise(e)
 
     def _on_release(self, event):
-        self.on_release(event, self.point_xy_list)
+        if self.on_release is not None:
+            self.on_release(event, self.point_xy_list)

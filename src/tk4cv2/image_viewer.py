@@ -1,5 +1,7 @@
 import types
 from typing import Optional, Callable, Tuple, NoReturn, List, Any
+from .typedef import CallbackPoint, CallbackPolygon, MouseCallback
+
 import dataclasses
 import enum
 import math
@@ -10,10 +12,6 @@ from PIL import Image, ImageTk
 
 from . import interactive_overlays
 
-# foo(event) -> None
-Callback = Optional[Callable[[tk.Event], NoReturn]]
-# foo(cvevent, x, y, flag, param) -> None
-MouseCallback = Optional[Callable[[int, int, int, int, None], NoReturn]]
 
 class ImageViewer:
     class BUTTONNUM(enum.IntEnum):
@@ -169,7 +167,7 @@ class ImageViewer:
 
         self.onMouse(cvevent, x, y, flag, param)  # type: ignore
 
-    def createInteractivePoint(self, point_xy, label="", on_click:Callback=None, on_drag:Callback=None, on_release:Callback=None):
+    def createInteractivePoint(self, point_xy, label="", on_click:CallbackPoint=None, on_drag:CallbackPoint=None, on_release:CallbackPoint=None):
         # Callbacks are wrapped to convert coordinate from canvas to image space.
         def on_click_img0(event):
             event.x, event.y = self.canvas2img_space(event.x, event.y)
@@ -190,7 +188,7 @@ class ImageViewer:
         self.interactive_overlays.append(ipoint)
 
 
-    def createInteractivePolygon(self, point_xy_list, label="", on_click:Callback=None, on_drag:Callback=None, on_release:Callback=None):
+    def createInteractivePolygon(self, point_xy_list, label="", on_click:CallbackPolygon=None, on_drag:CallbackPolygon=None, on_release:CallbackPolygon=None):
         # Callbacks are wrapped to convert coordinate from canvas to image space.
         def on_click_img0(event, _point_xy_list):
             event.x, event.y = self.canvas2img_space(event.x, event.y)
