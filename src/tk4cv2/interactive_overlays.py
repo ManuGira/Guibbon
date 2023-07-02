@@ -4,6 +4,8 @@ from .typedef import Point2D, Point2DList, CallbackPoint, CallbackPolygon
 import enum
 import tkinter as tk
 
+
+
 class Point:
     class State(enum.IntEnum):
         NORMAL = 0
@@ -73,7 +75,7 @@ class Point:
                 self.on_drag(event)
         except Exception as e:
             print(f"ERROR: {self}: self._on_drag({event}) --->", e)
-            raise(e)
+            raise e
 
     def _on_release(self, event):
         self.state = Point.State.HOVERED
@@ -106,16 +108,17 @@ class Polygon:
         self.on_release = on_release
         N = len(self.point_xy_list)
 
-        self.ipoints = []
+        # k_=k to fix value of k
         on_drag_lambdas: Sequence[CallbackPoint] = [lambda event, k_=k: self._on_drag(k_, event) for k in range(N)]
 
+        self.ipoints = []
         for k, point_xy in enumerate(self.point_xy_list):
             # subscribe to on_click only if needed.
             # subscribe to on_drag in any cases (to update points coordinates). Use lambda to pass point index.
             # subscribe to on_release only if needed.
             ipoint = Point(canvas, point_xy, label="",
                     on_click=None if on_click is None else self._on_click,
-                    on_drag=on_drag_lambdas[k],  # k_=k to fix value of k
+                    on_drag=on_drag_lambdas[k],
                     on_release=None if on_release is None else self._on_release)
             self.ipoints.append(ipoint)
 
@@ -127,8 +130,7 @@ class Polygon:
             self.lines.append((i1, i2, line_id))
         self.update()
 
-
-    def update(self):
+    def _update_lines(self):
         # draw lines
         for i1, i2, line_id in self.lines:
             x1, y1 = self.point_xy_list[i1]
@@ -136,9 +138,13 @@ class Polygon:
             self.canvas.coords(line_id, x1, y1, x2, y2)
             self.canvas.tag_raise(line_id)
 
-
+    def _update_points(self):
         for ipoint in self.ipoints:
             ipoint.update()
+
+    def update(self):
+        self._update_lines()
+        self._update_points()
 
     def _on_click(self, event):
         if self.on_click is not None:
@@ -146,13 +152,13 @@ class Polygon:
 
     def _on_drag(self, i, event):
         try:
-            print(i, event)
             self.point_xy_list[i] = (event.x, event.y)
+            self._update_lines()
             if self.on_drag is not None:
                 self.on_drag(event, self.point_xy_list)
         except Exception as e:
             print(f"ERROR: {self}: self._on_drag({event}) --->", e)
-            raise(e)
+            raise e
 
     def _on_release(self, event):
         if self.on_release is not None:
