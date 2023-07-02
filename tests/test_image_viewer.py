@@ -7,6 +7,8 @@ import numpy as np
 
 from tk4cv2.image_viewer import ImageViewer
 
+from tk4cv2.typedef import Point2DList
+
 eps = sys.float_info.epsilon
 
 @dataclasses.dataclass
@@ -24,6 +26,7 @@ class EventName:
 class TestImageViewer(unittest.TestCase):
     def setUp(self) -> None:
         self.point_xy = (400, 400)
+        self.point_xy_list: Point2DList = []
         self.img = np.zeros(shape=(100, 200), dtype=np.uint8)
         
         # create an instance of the image viewer
@@ -31,7 +34,7 @@ class TestImageViewer(unittest.TestCase):
         self.frame = tk.Frame(self.root)
         self.image_viewer = ImageViewer(self.frame, height=1000, width=1000)
 
-        # create 2 interactive points. The scond one doesnt implement all callbacks
+        # create 2 interactive points. The second one doesnt implement all callbacks
         self.image_viewer.createInteractivePoint((100, 100), "point0",
                 on_click=self.iteractive_point_event,
                 on_drag=self.iteractive_point_event,
@@ -42,7 +45,23 @@ class TestImageViewer(unittest.TestCase):
                 on_drag=self.iteractive_point_event,
                 on_release=None)
 
+        # create 2 interactive polygons. The second one doesnt implement all callbacks
+        self.image_viewer.createInteractivePolygon(
+            [(0, 0), (0, 100), (100, 100)],
+            "poly0",
+            on_click=self.iteractive_polygon_event,
+            on_drag=self.iteractive_polygon_event,
+            on_release=self.iteractive_polygon_event)
+
+        self.image_viewer.createInteractivePolygon(
+            [(200, 200), (200, 300), (300, 300)],
+            "poly1",
+            on_click=None,
+            on_drag=self.iteractive_polygon_event,
+            on_release=None)
+
         self.iteractive_point_event_count = 0
+        self.iteractive_polygon_event_count = 0
 
         self.image_viewer.imshow(self.img)
 
@@ -53,6 +72,9 @@ class TestImageViewer(unittest.TestCase):
         self.iteractive_point_event_count += 1
         self.point_xy = (event.x, event.y)
 
+    def iteractive_polygon_event(self, event, point_xy_list):
+        self.iteractive_polygon_event_count += 1
+        self.point_xy_list = point_xy_list + []
 
     def test_imshow(self):
         self.image_viewer.imshow(self.img, mode="fit")
@@ -71,12 +93,14 @@ class TestImageViewer(unittest.TestCase):
         # self.assertIn(EventName.ENTER, binds)
         # self.assertIn(EventName.LEAVE, binds)
 
+    def test_overlay_number(self):
+        self.assertEqual(4, len(self.image_viewer.interactive_overlays), "2 points and 2 polygons are 4 interactives overlays")
+
+
     def test_createInteractivePoint(self):
         """
         Make sure the method createInteractivePoint() correctly creates the 2 points
         """
-        self.assertEqual(2, len(self.image_viewer.interactive_overlays), "Calling createInteractivePoint N times should creates N interactive points")
-
         point0 = self.image_viewer.interactive_overlays[0]
         point1 = self.image_viewer.interactive_overlays[1]
         x_screen = 400
@@ -101,6 +125,38 @@ class TestImageViewer(unittest.TestCase):
 
         self.assertNotEqual((x_screen, y_screen), self.point_xy, "Coordinate must be converted in image space")
         self.assertEqual((x_img, y_img), self.point_xy, "Coordinate must be converted in image space")
+
+
+    def test_createInteractivePolygon(self):
+        """
+        Make sure the method createInteractivePolygon() correctly creates the 2 points
+        """
+        self.assertEqual(4, len(self.image_viewer.interactive_overlays), "Calling createInteractivePolygon N times should creates N interactive polygons")
+
+        poly0 = self.image_viewer.interactive_overlays[2]
+        poly1 = self.image_viewer.interactive_overlays[3]
+        x_screen = 400
+        y_screen = 400
+        x_img, y_img = self.image_viewer.canvas2img_space(x_screen, y_screen)
+
+        self.iteractive_polygon_event_count = 0
+        poly0._on_click(Event(x_screen, y_screen))
+        self.assertEqual(1, self.iteractive_polygon_event_count, "Callback should be triggered")
+        poly0._on_drag(0, Event(x_screen, y_screen))
+        self.assertEqual(2, self.iteractive_polygon_event_count, "Callback should be triggered")
+        poly0._on_release(Event(x_screen, y_screen))
+        self.assertEqual(3, self.iteractive_polygon_event_count, "Callback should be triggered")
+
+        self.iteractive_polygon_event_count = 0
+        poly1._on_click(Event(x_screen, y_screen))
+        self.assertEqual(0, self.iteractive_polygon_event_count, "Undefined callback should not be triggered")
+        poly1._on_drag(0, Event(x_screen, y_screen))
+        self.assertEqual(1, self.iteractive_polygon_event_count, "Callback should be triggered")
+        poly1._on_release(Event(x_screen, y_screen))
+        self.assertEqual(1, self.iteractive_polygon_event_count, "Undefined callback should not be triggered")
+
+        self.assertNotEqual((x_screen, y_screen), self.point_xy_list[0], "Coordinate must be converted in image space")
+        self.assertEqual((x_img, y_img), self.point_xy_list[0], "Coordinate must be converted in image space")
 
 
 if __name__ == '__main__':
