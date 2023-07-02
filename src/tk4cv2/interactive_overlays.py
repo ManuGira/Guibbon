@@ -22,7 +22,10 @@ class Point:
         State.DRAGGED: 7,
     }
 
-    def __init__(self, canvas: tk.Canvas, point_xy: Point2D, label:str="", on_click:CallbackPoint=None, on_drag:CallbackPoint=None, on_release:CallbackPoint=None):
+    def __init__(self, canvas: tk.Canvas, point_xy: Point2D, label:str="",
+                 on_click:CallbackPoint=None,
+                 on_drag:CallbackPoint=None,
+                 on_release:CallbackPoint=None):
         self.canvas = canvas
         self.state: Point.State = Point.State.NORMAL
         self.point_xy = point_xy
@@ -89,7 +92,10 @@ class Point:
 
 
 class Polygon:
-    def __init__(self, canvas: tk.Canvas, point_xy_list: Point2DList, label:str="", on_click:CallbackPolygon=None, on_drag:CallbackPolygon=None, on_release:CallbackPolygon=None):
+    def __init__(self, canvas: tk.Canvas, point_xy_list: Point2DList, label:str="",
+                 on_click:CallbackPolygon=None,
+                 on_drag:CallbackPolygon=None,
+                 on_release:CallbackPolygon=None):
         self.canvas = canvas
         self.point_xy_list = point_xy_list + []
         self.label = label
