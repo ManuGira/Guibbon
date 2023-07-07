@@ -172,8 +172,7 @@ class TestPolygon(unittest.TestCase):
             on_drag=self.on_event,
             on_release=self.on_event)
 
-        self.assertEqual(len(self.plg.ipoints), len(self.point_xy_list),
-                         "Polygon must have 1 Interactive Point instance for each point in point_xy_list")
+        self.assertEqual(len(self.plg.ipoints), len(self.point_xy_list), "Polygon must have 1 Interactive Point instance for each point in point_xy_list")
 
         for k in range(len(self.plg.ipoints)):
             binds = self.canvas.tag_bind(self.plg.ipoints[k].circle_id)
@@ -238,8 +237,7 @@ class TestPolygon(unittest.TestCase):
         self.plg._on_release(event)
 
         self.assertEqual(0, self.event_count, "Event should not be triggered")
-        self.assertEqual(point_xy_list_bck, self.point_xy_list,
-                         "those callbacks should not be able to change self.point_xy_list")
+        self.assertEqual(point_xy_list_bck, self.point_xy_list, "those callbacks should not be able to change self.point_xy_list")
         self.assertEqual([(123, 456), (0, 100), (100, 100)], self.plg.point_xy_list,
                          "even with no user callback subscribed, the polygon should still respond to mouse drag...")
 
@@ -277,6 +275,159 @@ class TestPolygon(unittest.TestCase):
 
         with self.assertRaises(Exception):
             self.plg._on_drag(0, event)
+
+
+class TestRectangle(unittest.TestCase):
+    def setUp(self) -> None:
+        self.event_count = 0
+        self.drag_count = 0
+        self.release_count = 0
+        self.point0_xy = (0.0, 0.0)
+        self.point1_xy = (100.0, 100.0)
+
+        self.event = None
+        self.canvas = tkinter.Canvas()
+
+    def tearDown(self) -> None:
+        pass
+
+    def on_event(self, event, point0_xy, point1_xy):
+        self.event_count += 1
+        self.point0_xy = point0_xy
+        self.point1_xy = point1_xy
+
+    def on_event_error(self, event, point0_xy, point1_xy):
+        raise
+
+    def test_callback(self):
+        point0_xy_bck = self.point0_xy
+        point1_xy_bck = self.point1_xy
+
+        self.rect = interactive_overlays.Rectangle(
+            canvas=self.canvas,
+            point0_xy=self.point0_xy,
+            point1_xy=self.point1_xy,
+            label="ok",
+            on_click=self.on_event,
+            on_drag=self.on_event,
+            on_release=self.on_event)
+
+        self.assertEqual(2, len(self.rect.ipoints), "Rectangle must have 2 Interactive Point instances")
+
+        for k in range(2):
+            binds = self.canvas.tag_bind(self.rect.ipoints[k].circle_id)
+            self.assertIn(EventName.CLICK, binds, f"{EventName.CLICK} tag not binded")
+            self.assertIn(EventName.DRAG, binds, f"{EventName.DRAG} tag not binded")
+            self.assertIn(EventName.RELEASE, binds, f"{EventName.RELEASE} tag not binded")
+            self.assertIn(EventName.ENTER, binds, f"{EventName.ENTER} tag not binded")
+            self.assertIn(EventName.LEAVE, binds, f"{EventName.LEAVE} tag not binded")
+
+        self.assertEqual(0, self.event_count)
+        self.assertEqual(point0_xy_bck, self.point0_xy, "point0_xy should not change at Rectangle creation")
+        self.assertEqual(point1_xy_bck, self.point1_xy, "point1_xy should not change at Rectangle creation")
+
+        point0_xy_bck = self.point0_xy
+        point1_xy_bck = self.point1_xy
+        event = Event(x=11, y=12)
+        self.rect._on_click(event)
+        self.assertEqual(1, self.event_count)
+        self.assertEqual(point0_xy_bck, self.point0_xy, "_on_click should not change point0_xy")
+        self.assertEqual(point1_xy_bck, self.point1_xy, "_on_click should not change point1_xy")
+
+        event = Event(x=21, y=22)
+        k = 0
+        self.rect._on_drag(k, event)
+        self.assertEqual(2, self.event_count, "Event must not be triggered")
+        self.assertEqual((21, 22), self.point0_xy, "Event coordinate must pass to callback")
+        self.assertEqual((100, 100), self.point1_xy, "Event coordinate must pass to callback")
+
+        event = Event(x=31, y=32)
+        k = 1
+        self.rect._on_drag(k, event)
+        self.assertEqual(3, self.event_count, "Event must not be triggered")
+        self.assertEqual((21, 22), self.point0_xy, "Event coordinate must pass to callback")
+        self.assertEqual((31, 32), self.point1_xy, "Event coordinate must pass to callback")
+
+        event = Event(x=41, y=42)
+        point0_xy_bck = self.point0_xy
+        point1_xy_bck = self.point1_xy
+        self.rect._on_release(event)
+        self.assertEqual(4, self.event_count, "Event must not be triggered")
+        self.assertEqual(point0_xy_bck, self.point0_xy, "_on_release should not change point0_xy")
+        self.assertEqual(point1_xy_bck, self.point1_xy, "_on_release should not change point1_xy")
+
+
+    def test_none_callback(self):
+        point0_xy_bck = self.point0_xy
+        point1_xy_bck = self.point1_xy
+
+        self.rect = interactive_overlays.Rectangle(
+                canvas=self.canvas,
+                point0_xy=self.point0_xy,
+                point1_xy=self.point1_xy,
+                label="ok",
+                on_click=None,
+                on_drag=None,
+                on_release=None)
+
+        for k in range(2):
+            binds = self.canvas.tag_bind(self.rect.ipoints[k].circle_id)
+            self.assertIn(EventName.CLICK, binds, f"{EventName.CLICK} tag not binded")
+            self.assertIn(EventName.DRAG, binds, f"{EventName.DRAG} tag not binded")
+            self.assertIn(EventName.RELEASE, binds, f"{EventName.RELEASE} tag not binded")
+            self.assertIn(EventName.ENTER, binds, f"{EventName.ENTER} tag not binded")
+            self.assertIn(EventName.LEAVE, binds, f"{EventName.LEAVE} tag not binded")
+
+        self.assertEqual(0, self.event_count, "Event should not be triggered")
+        self.assertEqual(point0_xy_bck, self.point0_xy, "point0_xy should not change at Rectangle creation")
+        self.assertEqual(point1_xy_bck, self.point1_xy, "point1_xy should not change at Rectangle creation")
+
+        event = Event(123, 456)
+        self.rect._on_click(event)
+        self.rect._on_drag(0, event)
+        self.rect._on_release(event)
+
+        self.assertEqual(0, self.event_count, "Event should not be triggered")
+        self.assertEqual(point0_xy_bck, self.point0_xy, "those callbacks should not be able to change self.point0_xy_bck")
+        self.assertEqual(point1_xy_bck, self.point1_xy, "those callbacks should not be able to change self.point0_xy_bck")
+        self.assertEqual([(123, 456), (100, 100)], self.rect.point_xy_list,
+                "even with no user callback subscribed, the rectangle should still respond to mouse drag...")
+
+
+    def test_event_sequence(self):
+        self.rect = interactive_overlays.Rectangle(canvas=self.canvas, point0_xy=self.point0_xy, point1_xy=self.point1_xy, label="ok",
+                on_click=None,
+                on_drag=None,
+                on_release=None)
+        event = Event(0, 0)
+
+        for k, pt in enumerate(self.rect.ipoints):
+            self.assertEqual(interactive_overlays.Point.State.NORMAL, pt.state, f"rectangle.ipoints[{k}] must interact")
+
+            pt._on_enter(event)
+            self.assertEqual(interactive_overlays.Point.State.HOVERED, pt.state, f"rectangle.ipoints[{k}] must interact")
+
+            pt._on_click(event)
+            self.assertEqual(interactive_overlays.Point.State.DRAGGED, pt.state, f"rectangle.ipoints[{k}] must interact")
+
+            pt._on_drag(event)
+            self.assertEqual(interactive_overlays.Point.State.DRAGGED, pt.state, f"rectangle.ipoints[{k}] must interact")
+
+            pt._on_release(event)
+            self.assertEqual(interactive_overlays.Point.State.HOVERED, pt.state, f"rectangle.ipoints[{k}] must interact")
+
+            pt._on_leave(event)
+            self.assertEqual(interactive_overlays.Point.State.NORMAL, pt.state, f"rectangle.ipoints[{k}] must interact")
+
+    def test_event_raise(self):
+        self.rect = interactive_overlays.Rectangle(canvas=self.canvas, point0_xy=self.point0_xy, point1_xy=self.point1_xy, label="ok",
+                on_click=None,
+                on_drag=self.on_event_error,
+                on_release=None)
+        event = Event(0, 0)
+
+        with self.assertRaises(Exception):
+            self.rect._on_drag(0, event)
 
 
 if __name__ == '__main__':
