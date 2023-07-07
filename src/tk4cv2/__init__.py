@@ -142,6 +142,10 @@ def createInteractivePoint(windowName, point_xy, label="", on_click:CallbackPoin
 def createInteractivePolygon(windowName, point_xy_list, label="", on_click:CallbackPolygon=None, on_drag:CallbackPolygon=None, on_release:CallbackPolygon=None):
     Tk4Cv2.get_instance(windowName).image_viewer.createInteractivePolygon(point_xy_list, label, on_click, on_drag, on_release)
 
+def createInteractiveRectangle(windowName, point0_xy, point1_xy, label="", on_click:CallbackPolygon=None, on_drag:CallbackPolygon=None, on_release:CallbackPolygon=None):
+    Tk4Cv2.get_instance(windowName).image_viewer.createInteractiveRectangle(point0_xy, point1_xy, label, on_click, on_drag, on_release)
+
+
 class Tk4Cv2:
     root: tk.Tk
     is_alive: bool = False

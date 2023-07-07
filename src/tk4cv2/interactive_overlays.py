@@ -163,3 +163,117 @@ class Polygon:
     def _on_release(self, event):
         if self.on_release is not None:
             self.on_release(event, self.point_xy_list)
+
+class Rectangle:
+    def __init__(self, canvas: tk.Canvas, point0_xy: Point2D, point1_xy: Point2D, label:str="",
+                 on_click:CallbackPolygon=None,
+                 on_drag:CallbackPolygon=None,
+                 on_release:CallbackPolygon=None):
+        self.canvas = canvas
+        self.point_xy_list = [point0_xy, point1_xy]
+        self.label = label
+        self.visible: bool = True
+
+        self.on_click = on_click
+        self.on_drag = on_drag
+        self.on_release = on_release
+        N = len(self.point_xy_list)
+
+        # k_=k to fix value of k
+        on_drag_lambdas: Sequence[CallbackPoint] = [lambda event, k_=k: self._on_drag(k_, event) for k in range(N)]
+
+        self.ipoints = []
+        for k, point_xy in enumerate(self.point_xy_list):
+            # subscribe to on_click only if needed.
+            # subscribe to on_drag in any cases (to update points coordinates). Use lambda to pass point index.
+            # subscribe to on_release only if needed.
+            ipoint = Point(canvas, point_xy, label="",
+                    on_click=None if on_click is None else self._on_click,
+                    on_drag=on_drag_lambdas[k],
+                    on_release=None if on_release is None else self._on_release)
+            self.ipoints.append(ipoint)
+
+        self.lines = [self.canvas.create_line(-1, -1, -1, -1, fill="green", width=5) for i in range(4)]
+        self.update()
+
+    def _update_lines(self):
+        # draw lines
+        left = self.point_xy_list[0][0]
+        top = self.point_xy_list[0][1]
+        right = self.point_xy_list[1][0]
+        bottom = self.point_xy_list[1][1]
+
+        line_id = self.lines[0]
+        self.canvas.coords(line_id, left, top, right, top)
+        self.canvas.tag_raise(line_id)
+
+        line_id = self.lines[1]
+        self.canvas.coords(line_id, right, top, right, bottom)
+        self.canvas.tag_raise(line_id)
+
+        line_id = self.lines[2]
+        self.canvas.coords(line_id, right, bottom, left, bottom)
+        self.canvas.tag_raise(line_id)
+
+        line_id = self.lines[3]
+        self.canvas.coords(line_id, left, bottom, left, top)
+        self.canvas.tag_raise(line_id)
+
+    def _update_points(self):
+        for ipoint in self.ipoints:
+            ipoint.update()
+
+    def update(self):
+        self._update_lines()
+        self._update_points()
+
+    def _on_click(self, event):
+        if self.on_click is not None:
+            self.on_click(event, self.point_xy_list)
+
+    def _on_drag(self, i, event):
+        try:
+            self.point_xy_list[i] = (event.x, event.y)
+            self._update_lines()
+            if self.on_drag is not None:
+                self.on_drag(event, self.point_xy_list)
+        except Exception as e:
+            print(f"ERROR: {self}: self._on_drag({event}) --->", e)
+            raise e
+
+    def _on_release(self, event):
+        if self.on_release is not None:
+            self.on_release(event, self.point_xy_list)
+
+#
+# class Pomme:
+#     def __init__(self, m, n):
+#         self.m = m
+#         self.n = n
+#
+#     def printm(self):
+#         print("il y a", self.m, "trognons")
+#
+#     def printn(self):
+#         print("il y a", self.n, "pommes")
+#
+# class Poire:
+#     def __new__(cls, m, n):
+#         pm = Pomme(m, n)
+#         pm.printn = lambda: cls.printn(pm)
+#         return pm
+#
+#     @staticmethod
+#     def printn(self):
+#         print("il y a", self.n, "poires")
+#
+# def main():
+#     pr = Poire(4, 5)
+#
+#     pr.printm()
+#     pr.printn()
+#     pr.n = 10
+#     pr.printn()
+#
+# if __name__ == '__main__':
+#     main()

@@ -24,6 +24,10 @@ class DemoMVCAdvApp:
         point_xy_list  = [(300, 300), (300, 500), (500, 400), (400, 300)]
         tcv2.createInteractivePolygon(self.winname, point_xy_list, "polygon", on_drag=self.on_drag_poly)
 
+        point0_xy  = (200, 200)
+        point1_xy  = (300, 250)
+        tcv2.createInteractiveRectangle(self.winname, point0_xy, point1_xy, "rectangle", on_drag=self.on_drag_rect)
+
         self.model = DemoMVCAdvApp.Model()
         self.result = DemoMVCAdvApp.Result()
         self.is_update_needed: bool = True
@@ -60,7 +64,13 @@ class DemoMVCAdvApp:
 
     def on_drag_poly(self, event, point_xy_list):
         # print(point_xy_list)
-        self.point_xy_list = point_xy_list+[]
+        self.point_xy_list = point_xy_list + []
+        self.is_update_needed = True
+
+    def on_drag_rect(self, event, point0_xy, point1_xy):
+        # print(point_xy_list)
+        self.rect_p0_xy = point0_xy
+        self.rect_p1_xy = point1_xy
         self.is_update_needed = True
 
 if __name__ == '__main__':
