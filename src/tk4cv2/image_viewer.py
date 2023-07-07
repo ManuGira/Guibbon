@@ -1,6 +1,6 @@
 import types
 from typing import Tuple, List, Any
-from .typedef import CallbackPoint, CallbackPolygon, MouseCallback
+from .typedef import CallbackPoint, CallbackPolygon, CallbackRect, MouseCallback
 
 import dataclasses
 import enum
@@ -187,8 +187,11 @@ class ImageViewer:
         ipoint = interactive_overlays.Point(self.canvas, point_xy, label, on_click_img, on_drag_img, on_release_img)
         self.interactive_overlays.append(ipoint)
 
+    def createInteractivePolygon(self, point_xy_list, label="",
+                on_click: CallbackPolygon=None,
+                on_drag: CallbackPolygon=None,
+                on_release: CallbackPolygon=None):
 
-    def createInteractivePolygon(self, point_xy_list, label="", on_click:CallbackPolygon=None, on_drag:CallbackPolygon=None, on_release:CallbackPolygon=None):
         # Callbacks are wrapped to convert coordinate from canvas to image space.
         def on_click_img0(event, _point_xy_list):
             event.x, event.y = self.canvas2img_space(event.x, event.y)
@@ -209,6 +212,32 @@ class ImageViewer:
         on_release_img = on_release_img0 if on_release else None
 
         ipolygon = interactive_overlays.Polygon(self.canvas, point_xy_list, label, on_click_img, on_drag_img, on_release_img)
+        self.interactive_overlays.append(ipolygon)
+
+    def createInteractiveRectangle(self, point0_xy, point1_xy, label="", on_click:CallbackRect=None, on_drag:CallbackRect=None, on_release:CallbackRect=None):
+        # Callbacks are wrapped to convert coordinate from canvas to image space.
+        def on_click_img0(event, _point0_xy, _point1_xy):
+            event.x, event.y = self.canvas2img_space(event.x, event.y)
+            _point0_xy = self.canvas2img_space(*_point0_xy)
+            _point1_xy = self.canvas2img_space(*_point1_xy)
+            on_click(event, _point0_xy, _point1_xy)  # type: ignore
+        on_click_img = on_click_img0 if on_click else None
+
+        def on_drag_img0(event, _point0_xy, _point1_xy):
+            event.x, event.y = self.canvas2img_space(event.x, event.y)
+            _point0_xy = self.canvas2img_space(*_point0_xy)
+            _point1_xy = self.canvas2img_space(*_point1_xy)
+            on_drag(event, _point0_xy, _point1_xy)  # type: ignore
+        on_drag_img = on_drag_img0 if on_drag else None
+
+        def on_release_img0(event, _point0_xy, _point1_xy):
+            event.x, event.y = self.canvas2img_space(event.x, event.y)
+            _point0_xy = self.canvas2img_space(*_point0_xy)
+            _point1_xy = self.canvas2img_space(*_point1_xy)
+            on_release(event, _point0_xy, _point1_xy)  # type: ignore
+        on_release_img = on_release_img0 if on_release else None
+
+        ipolygon = interactive_overlays.Rectangle(self.canvas, point0_xy, point1_xy, label, on_click_img, on_drag_img, on_release_img)
         self.interactive_overlays.append(ipolygon)
 
     def pack(self, *args, **kwargs):
