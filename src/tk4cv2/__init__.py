@@ -1,5 +1,5 @@
 from typing import Dict, Any, Optional
-from .typedef import CallbackPoint, CallbackPolygon
+from .typedef import CallbackPoint, CallbackPolygon, CallbackRect
 
 import time
 
@@ -142,7 +142,7 @@ def createInteractivePoint(windowName, point_xy, label="", on_click:CallbackPoin
 def createInteractivePolygon(windowName, point_xy_list, label="", on_click:CallbackPolygon=None, on_drag:CallbackPolygon=None, on_release:CallbackPolygon=None):
     Tk4Cv2.get_instance(windowName).image_viewer.createInteractivePolygon(point_xy_list, label, on_click, on_drag, on_release)
 
-def createInteractiveRectangle(windowName, point0_xy, point1_xy, label="", on_click:CallbackPolygon=None, on_drag:CallbackPolygon=None, on_release:CallbackPolygon=None):
+def createInteractiveRectangle(windowName, point0_xy, point1_xy, label="", on_click:CallbackRect=None, on_drag:CallbackRect=None, on_release:CallbackRect=None):
     Tk4Cv2.get_instance(windowName).image_viewer.createInteractiveRectangle(point0_xy, point1_xy, label, on_click, on_drag, on_release)
 
 

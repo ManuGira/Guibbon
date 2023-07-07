@@ -68,7 +68,7 @@ class DemoMVCAdvApp:
         self.is_update_needed = True
 
     def on_drag_rect(self, event, point0_xy, point1_xy):
-        # print(point_xy_list)
+        print(point0_xy, point1_xy)
         self.rect_p0_xy = point0_xy
         self.rect_p1_xy = point1_xy
         self.is_update_needed = True

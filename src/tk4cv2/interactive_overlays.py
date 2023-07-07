@@ -176,9 +176,14 @@ class Rectangle(Polygon):
                 on_release:CallbackRect=None):
 
         # wrap user callback to convert signature from CallbackRect to CallbackPolygon
-        on_click_rect: CallbackPolygon = lambda event, point_list_xy: on_click(event, point_list_xy[0], point_list_xy[1])
-        on_drag_rect: CallbackPolygon = lambda event, point_list_xy: on_drag(event, point_list_xy[0], point_list_xy[1])
-        on_release_rect: CallbackPolygon = lambda event, point_list_xy: on_release(event, point_list_xy[0], point_list_xy[1])
+        lambda0 = None if on_click is None else lambda event, point_list_xy: on_click(event, point_list_xy[0], point_list_xy[1])
+        on_click_rect: CallbackPolygon = lambda0
+
+        lambda1 = None if on_drag is None else lambda event, point_list_xy:  on_drag(event, point_list_xy[0], point_list_xy[1])
+        on_drag_rect: CallbackPolygon = lambda1
+
+        lambda2 = None if on_release is None else lambda event, point_list_xy: on_release(event, point_list_xy[0], point_list_xy[1])
+        on_release_rect: CallbackPolygon = lambda2
 
         # Create a Point2DList from the 2 Point2D
         point_list_xy = [point0_xy, point1_xy]
