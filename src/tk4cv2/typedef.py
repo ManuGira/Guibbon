@@ -15,5 +15,9 @@ CallbackPoint = Optional[Callable[[tk.Event], NoReturn]]
 # foo(event, point_xy_list) -> None
 CallbackPolygon = Optional[Callable[[tk.Event, Point2DList], NoReturn]]
 
+# foo(event, point0_xy, point1_xy) -> None
+CallbackRect = Optional[Callable[[tk.Event, Point2D, Point2D], NoReturn]]
+
+
 # foo(cvevent, x, y, flag, param) -> None
 MouseCallback = Optional[Callable[[int, int, int, int, None], NoReturn]]
