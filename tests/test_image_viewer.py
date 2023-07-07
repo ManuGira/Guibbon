@@ -99,6 +99,13 @@ class TestImageViewer(unittest.TestCase):
         self.point0_xy = point0_xy
         self.point1_xy = point1_xy
 
+    def test_spaces_conversion(self):
+        x_screen, y_screen = 400, 500
+        x_img, y_img = self.image_viewer.canvas2img_space(x_screen, y_screen)
+        x_screen2, y_screen2 = self.image_viewer.img2canvas_space(x_img, y_img)
+        self.assertEqual(x_screen, x_screen2)
+        self.assertEqual(y_screen, y_screen2)
+
     def test_imshow(self):
         self.image_viewer.imshow(self.img, mode="fit")
         self.assertEqual(self.image_viewer.zoom_factor, 5)
