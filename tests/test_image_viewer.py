@@ -60,8 +60,26 @@ class TestImageViewer(unittest.TestCase):
             on_drag=self.iteractive_polygon_event,
             on_release=None)
 
+        # create 2 interactive rectangles. The second one doesnt implement all callbacks
+        self.image_viewer.createInteractiveRectangle(
+            (111, 222),
+            (333, 444),
+            "rect0",
+            on_click=self.iteractive_rect_event,
+            on_drag=self.iteractive_rect_event,
+            on_release=self.iteractive_rect_event)
+
+        self.image_viewer.createInteractiveRectangle(
+            (555, 666),
+            (777, 888),
+            "rect1",
+            on_click=None,
+            on_drag=self.iteractive_rect_event,
+            on_release=None)
+
         self.iteractive_point_event_count = 0
         self.iteractive_polygon_event_count = 0
+        self.iteractive_rect_event_count = 0
 
         self.image_viewer.imshow(self.img)
 
@@ -75,6 +93,11 @@ class TestImageViewer(unittest.TestCase):
     def iteractive_polygon_event(self, event, point_xy_list):
         self.iteractive_polygon_event_count += 1
         self.point_xy_list = point_xy_list + []
+
+    def iteractive_rect_event(self, event, point0_xy, point1_xy):
+        self.iteractive_rect_event_count += 1
+        self.point0_xy = point0_xy
+        self.point1_xy = point1_xy
 
     def test_imshow(self):
         self.image_viewer.imshow(self.img, mode="fit")
@@ -94,7 +117,7 @@ class TestImageViewer(unittest.TestCase):
         # self.assertIn(EventName.LEAVE, binds)
 
     def test_overlay_number(self):
-        self.assertEqual(4, len(self.image_viewer.interactive_overlays), "2 points and 2 polygons are 4 interactives overlays")
+        self.assertEqual(6, len(self.image_viewer.interactive_overlays), "2 points and 2 polygons and 2 rectangles are 6 interactives overlays")
 
 
     def test_createInteractivePoint(self):
@@ -126,12 +149,7 @@ class TestImageViewer(unittest.TestCase):
         self.assertNotEqual((x_screen, y_screen), self.point_xy, "Coordinate must be converted in image space")
         self.assertEqual((x_img, y_img), self.point_xy, "Coordinate must be converted in image space")
 
-
     def test_createInteractivePolygon(self):
-        """
-        Make sure the method createInteractivePolygon() correctly creates the 2 points
-        """
-        self.assertEqual(4, len(self.image_viewer.interactive_overlays), "Calling createInteractivePolygon N times should creates N interactive polygons")
 
         poly0 = self.image_viewer.interactive_overlays[2]
         poly1 = self.image_viewer.interactive_overlays[3]
@@ -157,6 +175,33 @@ class TestImageViewer(unittest.TestCase):
 
         self.assertNotEqual((x_screen, y_screen), self.point_xy_list[0], "Coordinate must be converted in image space")
         self.assertEqual((x_img, y_img), self.point_xy_list[0], "Coordinate must be converted in image space")
+
+
+    def test_createInteractiveRectangle(self):
+        rect0 = self.image_viewer.interactive_overlays[4]
+        rect1 = self.image_viewer.interactive_overlays[5]
+        x_screen = 400
+        y_screen = 500
+        x_img, y_img = self.image_viewer.canvas2img_space(x_screen, y_screen)
+
+        self.iteractive_rect_event_count = 0
+        rect0._on_click(Event(x_screen, y_screen))
+        self.assertEqual(1, self.iteractive_rect_event_count, "Callback should be triggered")
+        rect0._on_drag(0, Event(x_screen, y_screen))
+        self.assertEqual(2, self.iteractive_rect_event_count, "Callback should be triggered")
+        rect0._on_release(Event(x_screen, y_screen))
+        self.assertEqual(3, self.iteractive_rect_event_count, "Callback should be triggered")
+
+        self.iteractive_rect_event_count = 0
+        rect1._on_click(Event(x_screen, y_screen))
+        self.assertEqual(0, self.iteractive_rect_event_count, "Undefined callback should not be triggered")
+        rect1._on_drag(0, Event(x_screen, y_screen))
+        self.assertEqual(1, self.iteractive_rect_event_count, "Callback should be triggered")
+        rect1._on_release(Event(x_screen, y_screen))
+        self.assertEqual(1, self.iteractive_rect_event_count, "Undefined callback should not be triggered")
+
+        self.assertNotEqual((x_screen, y_screen), self.point0_xy, "Coordinate must be converted in image space")
+        self.assertEqual((x_img, y_img), self.point0_xy, "Coordinate must be converted in image space")
 
 
 if __name__ == '__main__':
