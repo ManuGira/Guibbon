@@ -65,6 +65,16 @@ class ImageViewer:
 
         return int(img_x + 0.5), int(img_y + 0.5)
 
+    def img2canvas_space(self, img_x, img_y):
+        canh, canw = self.canvas_shape_hw
+        img0h, img0w = self.img_shape0_hw
+        img1h, img1w = self.img_shape1_hw
+        corner_y, corner_x = (canh - img1h) / 2, (canw - img1w) / 2
+
+        can_x = img_x * img1w / img0w + corner_x
+        can_y = img_y * img1h / img0h + corner_y
+        return can_x, can_y
+
     def setMouseCallback(self, onMouse, param=None):
         if not isinstance(onMouse, types.FunctionType) and not isinstance(onMouse, types.MethodType):
             raise TypeError(f"onMouse must be a function, got {type(onMouse)} instead")
