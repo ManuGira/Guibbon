@@ -187,7 +187,11 @@ class ImageViewer:
         ipoint = interactive_overlays.Point(self.canvas, point_xy, label, on_click_img, on_drag_img, on_release_img)
         self.interactive_overlays.append(ipoint)
 
-    def createInteractivePolygon(self, point_xy_list, label="", on_click: CallbackPolygon = None, on_drag: CallbackPolygon = None, on_release: CallbackPolygon = None):
+    def createInteractivePolygon(self, point_xy_list, label="",
+                on_click: CallbackPolygon=None,
+                on_drag: CallbackPolygon=None,
+                on_release: CallbackPolygon=None):
+
         # Callbacks are wrapped to convert coordinate from canvas to image space.
         def on_click_img0(event, _point_xy_list):
             event.x, event.y = self.canvas2img_space(event.x, event.y)
