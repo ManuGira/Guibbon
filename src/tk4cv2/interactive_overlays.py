@@ -4,12 +4,13 @@ from .typedef import Point2D, Point2DList, CallbackPoint, CallbackPolygon, Callb
 import enum
 import tkinter as tk
 
-class Point:
-    class State(enum.IntEnum):
-        NORMAL = 0
-        HOVERED = 1
-        DRAGGED = 2
 
+class State(enum.IntEnum):
+    NORMAL = 0
+    HOVERED = 1
+    DRAGGED = 2
+
+class Point:
     colors = {
         State.NORMAL: '#%02x%02x%02x' % (0, 0, 255),
         State.HOVERED: '#%02x%02x%02x' % (0, 255, 255),
@@ -27,7 +28,7 @@ class Point:
                  on_drag:CallbackPoint=None,
                  on_release:CallbackPoint=None):
         self.canvas = canvas
-        self.state: Point.State = Point.State.NORMAL
+        self.state: State = State.NORMAL
         self.point_xy = point_xy
         self.label = label
         self.visible: bool = True
@@ -58,7 +59,7 @@ class Point:
 
 
     def _on_click(self, event):
-        self.state = Point.State.DRAGGED
+        self.state = State.DRAGGED
         self.update()
         if self.on_click is not None:
             self.on_click(event)
@@ -67,7 +68,7 @@ class Point:
     def _on_drag(self, event):
         try:
             self.point_xy = (event.x, event.y)
-            self.state = Point.State.DRAGGED
+            self.state = State.DRAGGED
             self.update()
             if self.on_drag is not None:
                 self.on_drag(event)
@@ -76,22 +77,27 @@ class Point:
             raise e
 
     def _on_release(self, event):
-        self.state = Point.State.HOVERED
+        self.state = State.HOVERED
         self.update()
         if self.on_release is not None:
             self.on_release(event)
 
     def _on_enter(self, event):
-        if self.state is not Point.State.DRAGGED:
-            self.state = Point.State.HOVERED
+        if self.state is not State.DRAGGED:
+            self.state = State.HOVERED
             self.update()
 
     def _on_leave(self, event):
-        self.state = Point.State.NORMAL
+        self.state = State.NORMAL
         self.update()
 
 
 class Polygon:
+    colors = {
+        State.NORMAL: '#%02x%02x%02x' % (0, 255, 0),
+        State.HOVERED: '#%02x%02x%02x' % (127, 255, 127),
+        State.DRAGGED: '#%02x%02x%02x' % (255, 255, 0),
+    }
 
     def __init__(self, canvas: tk.Canvas, point_xy_list: Point2DList, label:str="",
                  on_click:CallbackPolygon=None,
@@ -101,6 +107,7 @@ class Polygon:
         self.point_xy_list = point_xy_list + []
         self.label = label
         self.visible: bool = True
+        self.state: State = State.NORMAL
 
         self.on_click = on_click
         self.on_drag = on_drag
@@ -131,7 +138,7 @@ class Polygon:
         for i in range(N):
             i1 = i
             i2 = (i + 1) % N
-            line_id = self.canvas.create_line(-1, -1, -1, -1, fill="green", width=5)
+            line_id = self.canvas.create_line(-1, -1, -1, -1, fill=Polygon.colors[self.state], width=5)
             lines.append((i1, i2, line_id))
         return lines
 
@@ -195,7 +202,7 @@ class Rectangle(Polygon):
                 on_release=None if on_release is None else on_release_rect)
 
     def _create_lines(self):
-        return [self.canvas.create_line(-1, -1, -1, -1, fill="green", width=5) for i in range(4)]
+        return [(-1, -1, self.canvas.create_line(-1, -1, -1, -1, fill=Polygon.colors[self.state], width=5)) for i in range(4)]
 
     def _update_lines(self):
         left = self.point_xy_list[0][0]
@@ -203,18 +210,18 @@ class Rectangle(Polygon):
         right = self.point_xy_list[1][0]
         bottom = self.point_xy_list[1][1]
 
-        line_id = self.lines[0]
+        line_id = self.lines[0][2]
         self.canvas.coords(line_id, left, top, right, top)
         self.canvas.tag_raise(line_id)
 
-        line_id = self.lines[1]
+        line_id = self.lines[1][2]
         self.canvas.coords(line_id, right, top, right, bottom)
         self.canvas.tag_raise(line_id)
 
-        line_id = self.lines[2]
+        line_id = self.lines[2][2]
         self.canvas.coords(line_id, right, bottom, left, bottom)
         self.canvas.tag_raise(line_id)
 
-        line_id = self.lines[3]
+        line_id = self.lines[3][2]
         self.canvas.coords(line_id, left, bottom, left, top)
         self.canvas.tag_raise(line_id)
