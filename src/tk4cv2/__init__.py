@@ -1,5 +1,5 @@
 from typing import Dict, Any, Optional
-from .typedef import CallbackPoint, CallbackPolygon, CallbackRect
+from .typedef import CallbackPoint, CallbackPolygon, CallbackRect, Point2DList
 
 import time
 
@@ -136,8 +136,9 @@ def createColorPicker(name, windowName, values, onChange):
     Tk4Cv2.get_instance(windowName)._createColorPicker(name, values, onChange)
 
 
-def createInteractivePoint(windowName, point_xy, label="", on_click:CallbackPoint=None, on_drag:CallbackPoint=None, on_release:CallbackPoint=None):
-    Tk4Cv2.get_instance(windowName).image_viewer.createInteractivePoint(point_xy, label, on_click, on_drag, on_release)
+def createInteractivePoint(windowName, point_xy, label="",
+            on_click:CallbackPoint=None, on_drag:CallbackPoint=None, on_release:CallbackPoint=None, magnets:Point2DList=None):
+    Tk4Cv2.get_instance(windowName).image_viewer.createInteractivePoint(point_xy, label, on_click, on_drag, on_release, magnets)
 
 def createInteractivePolygon(windowName, point_xy_list, label="", on_click:CallbackPolygon=None, on_drag:CallbackPolygon=None, on_release:CallbackPolygon=None):
     Tk4Cv2.get_instance(windowName).image_viewer.createInteractivePolygon(point_xy_list, label, on_click, on_drag, on_release)

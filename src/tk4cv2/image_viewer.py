@@ -1,6 +1,6 @@
 import types
 from typing import Tuple, List, Any
-from .typedef import CallbackPoint, CallbackPolygon, CallbackRect, MouseCallback
+from .typedef import CallbackPoint, CallbackPolygon, CallbackRect, Point2DList, MouseCallback
 
 import dataclasses
 import enum
@@ -66,6 +66,7 @@ class ImageViewer:
         return int(img_x + 0.5), int(img_y + 0.5)
 
     def img2canvas_space(self, img_x, img_y):
+        print("img2canvas_space", self.img_shape0_hw, self.img_shape1_hw)
         canh, canw = self.canvas_shape_hw
         img0h, img0w = self.img_shape0_hw
         img1h, img1w = self.img_shape1_hw
@@ -177,7 +178,10 @@ class ImageViewer:
 
         self.onMouse(cvevent, x, y, flag, param)  # type: ignore
 
-    def createInteractivePoint(self, point_xy, label="", on_click:CallbackPoint=None, on_drag:CallbackPoint=None, on_release:CallbackPoint=None):
+    def createInteractivePoint(self, point_xy, label="",
+                on_click:CallbackPoint=None, on_drag:CallbackPoint=None, on_release:CallbackPoint=None,
+                magnets:Point2DList=None):
+
         # Callbacks are wrapped to convert coordinate from canvas to image space.
         def on_click_img0(event):
             event.x, event.y = self.canvas2img_space(event.x, event.y)
@@ -194,7 +198,9 @@ class ImageViewer:
             on_release(event)  # type: ignore
         on_release_img = on_release_img0 if on_release else None
 
-        ipoint = interactive_overlays.Point(self.canvas, point_xy, label, on_click_img, on_drag_img, on_release_img)
+        ipoint = interactive_overlays.Point(self.canvas, point_xy, label,
+                on_click_img, on_drag_img, on_release_img,
+                magnets, self.img2canvas_space)
         self.interactive_overlays.append(ipoint)
 
     def createInteractivePolygon(self, point_xy_list, label="",

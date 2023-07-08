@@ -1,4 +1,7 @@
 from typing import Sequence
+
+import numpy as np
+
 from .typedef import Point2D, Point2DList, CallbackPoint, CallbackPolygon, CallbackRect
 
 import enum
@@ -26,7 +29,9 @@ class Point:
     def __init__(self, canvas: tk.Canvas, point_xy: Point2D, label:str="",
                  on_click:CallbackPoint=None,
                  on_drag:CallbackPoint=None,
-                 on_release:CallbackPoint=None):
+                 on_release:CallbackPoint=None,
+                 magnets: Point2DList=None,
+                 img2canvas_space_func=None):
         self.canvas = canvas
         self.state: State = State.NORMAL
         self.point_xy = point_xy
@@ -47,6 +52,12 @@ class Point:
         self.canvas.tag_bind(self.circle_id, "<Enter>", self._on_enter)
         self.canvas.tag_bind(self.circle_id, "<Leave>", self._on_leave)
 
+        self.magnets = None
+        if magnets is not None:
+            self.magnets = np.asarray(magnets)
+        self.img2canvas_space_func = img2canvas_space_func
+
+
     def update(self):
         radius = Point.radius[self.state]
         x1 = self.point_xy[0] - radius
@@ -64,9 +75,20 @@ class Point:
         if self.on_click is not None:
             self.on_click(event)
 
+    def _find_nearest_magnet(self, x_can, y_can):
+        magnets_can = np.array([self.img2canvas_space_func(x_img, y_img) for x_img, y_img in self.magnets])
+        dists = np.array([x_can, y_can]) - magnets_can
+        dists = np.sqrt(np.sum(dists**2, axis=1))
+        ind = np.argmin(dists)
+        if dists[ind] < 50:
+            return magnets_can[ind]
+        else:
+            return x_can, y_can
 
     def _on_drag(self, event):
         try:
+            if self.magnets is not None:
+                event.x, event.y = self._find_nearest_magnet(event.x, event.y)
             self.point_xy = (event.x, event.y)
             self.state = State.DRAGGED
             self.update()
