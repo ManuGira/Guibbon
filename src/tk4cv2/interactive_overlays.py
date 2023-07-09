@@ -9,11 +9,28 @@ import tkinter as tk
 
 
 class Magnets:
+    DISTANCE_THERSHOLD = 20
+    COLOR = '#%02x%02x%02x' % (255, 0, 255)
+
     def __init__(self, canvas, point_xy_list: Point2DList, img2canvas_space_func, visible=False):
         self.canvas = canvas
         self.point_xy_list = point_xy_list
         self.img2canvas_space_func = img2canvas_space_func
         self.visible = visible
+
+        self.circle_id_list = [self.canvas.create_oval(0, 0, 1, 1, fill=Magnets.COLOR, width=0) for pt in point_xy_list]
+
+    def update(self):
+        radius = Point.radius[State.NORMAL]//2
+        for circle_id, point_xy in zip(self.circle_id_list, self.point_xy_list):
+            point_xy = self.img2canvas_space_func(*point_xy)
+            x1 = point_xy[0] - radius
+            y1 = point_xy[1] - radius
+            x2 = point_xy[0] + radius
+            y2 = point_xy[1] + radius
+            self.canvas.coords(circle_id, x1, y1, x2, y2)
+            self.canvas.itemconfig(circle_id, fill=Magnets.COLOR)
+            self.canvas.tag_raise(circle_id)
 
     def get_point_in_canvas_space(self) -> Point2DList:
         return [self.img2canvas_space_func(x_img, y_img) for x_img, y_img in self.point_xy_list]
@@ -22,14 +39,15 @@ class Magnets:
         return self.point_xy_list
 
     def find_nearest_magnet(self, x_can, y_can):
-        magnets_can = self.get_point_in_canvas_space()
+        magnets_can = np.array(self.get_point_in_canvas_space())
         dists = np.array([x_can, y_can]) - magnets_can
         dists = np.sqrt(np.sum(dists**2, axis=1))
         ind = np.argmin(dists)
-        if dists[ind] < 50:
+        if dists[ind] < Magnets.DISTANCE_THERSHOLD:
             return magnets_can[ind]
         else:
             return x_can, y_can
+
 
 
 class State(enum.IntEnum):
