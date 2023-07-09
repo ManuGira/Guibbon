@@ -180,7 +180,7 @@ class ImageViewer:
 
     def createInteractivePoint(self, point_xy, label="",
                 on_click:CallbackPoint=None, on_drag:CallbackPoint=None, on_release:CallbackPoint=None,
-                magnets:Point2DList=None):
+                magnet_points:Point2DList=None):
 
         # Callbacks are wrapped to convert coordinate from canvas to image space.
         def on_click_img0(event):
@@ -198,9 +198,13 @@ class ImageViewer:
             on_release(event)  # type: ignore
         on_release_img = on_release_img0 if on_release else None
 
+        magnets = None
+        if magnet_points is not None:
+            magnets = interactive_overlays.Magnets(self.canvas, magnet_points, self.img2canvas_space, visible=True)
+
         ipoint = interactive_overlays.Point(self.canvas, point_xy, label,
-                on_click_img, on_drag_img, on_release_img,
-                magnets, self.img2canvas_space)
+                                            on_click_img, on_drag_img, on_release_img,
+                                            magnets)
         self.interactive_overlays.append(ipoint)
 
     def createInteractivePolygon(self, point_xy_list, label="",
