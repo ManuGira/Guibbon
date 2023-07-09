@@ -213,7 +213,8 @@ class ImageViewer:
     def createInteractivePolygon(self, point_xy_list, label="",
                 on_click: CallbackPolygon=None,
                 on_drag: CallbackPolygon=None,
-                on_release: CallbackPolygon=None):
+                on_release: CallbackPolygon=None,
+                magnet_points:Point2DList=None):
 
         # Callbacks are wrapped to convert coordinate from canvas to image space.
         def on_click_img0(event, _point_xy_list):
@@ -234,10 +235,17 @@ class ImageViewer:
             on_release(event, _point_xy_list)  # type: ignore
         on_release_img = on_release_img0 if on_release else None
 
-        ipolygon = interactive_overlays.Polygon(self.canvas, point_xy_list, label, on_click_img, on_drag_img, on_release_img)
+        magnets = None
+        if magnet_points is not None:
+            magnets = interactive_overlays.Magnets(self.canvas, magnet_points, self.img2canvas_space, visible=True)
+            self.magnets_overlay_instance_list.append(magnets)
+
+        ipolygon = interactive_overlays.Polygon(self.canvas, point_xy_list, label, on_click_img, on_drag_img, on_release_img, magnets)
         self.interactive_overlay_instance_list.append(ipolygon)
 
-    def createInteractiveRectangle(self, point0_xy, point1_xy, label="", on_click:CallbackRect=None, on_drag:CallbackRect=None, on_release:CallbackRect=None):
+    def createInteractiveRectangle(self, point0_xy, point1_xy, label="",
+            on_click:CallbackRect=None, on_drag:CallbackRect=None, on_release:CallbackRect=None,
+            magnet_points:Point2DList=None):
         # Callbacks are wrapped to convert coordinate from canvas to image space.
         def on_click_img0(event, _point0_xy, _point1_xy):
             event.x, event.y = self.canvas2img_space(event.x, event.y)
@@ -260,7 +268,12 @@ class ImageViewer:
             on_release(event, _point0_xy, _point1_xy)  # type: ignore
         on_release_img = on_release_img0 if on_release else None
 
-        ipolygon = interactive_overlays.Rectangle(self.canvas, point0_xy, point1_xy, label, on_click_img, on_drag_img, on_release_img)
+        magnets = None
+        if magnet_points is not None:
+            magnets = interactive_overlays.Magnets(self.canvas, magnet_points, self.img2canvas_space, visible=True)
+            self.magnets_overlay_instance_list.append(magnets)
+
+        ipolygon = interactive_overlays.Rectangle(self.canvas, point0_xy, point1_xy, label, on_click_img, on_drag_img, on_release_img, magnets)
         self.interactive_overlay_instance_list.append(ipolygon)
 
     def pack(self, *args, **kwargs):

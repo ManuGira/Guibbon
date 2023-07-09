@@ -49,7 +49,6 @@ class Magnets:
             return x_can, y_can
 
 
-
 class State(enum.IntEnum):
     NORMAL = 0
     HOVERED = 1
@@ -153,7 +152,8 @@ class Polygon:
     def __init__(self, canvas: tk.Canvas, point_xy_list: Point2DList, label:str="",
                  on_click:CallbackPolygon=None,
                  on_drag:CallbackPolygon=None,
-                 on_release:CallbackPolygon=None):
+                 on_release:CallbackPolygon=None,
+                 magnets:Optional[Magnets]=None):
         self.canvas = canvas
         self.point_xy_list = point_xy_list + []
         self.label = label
@@ -176,11 +176,11 @@ class Polygon:
             ipoint = Point(canvas, point_xy, label="",
                     on_click=None if on_click is None else self._on_click,
                     on_drag=on_drag_lambdas[k],
-                    on_release=None if on_release is None else self._on_release)
+                    on_release=None if on_release is None else self._on_release,
+                    magnets=magnets)
             self.ipoints.append(ipoint)
 
         self.lines = self._create_lines()
-
         self.update()
 
     def _create_lines(self):
@@ -231,7 +231,8 @@ class Rectangle(Polygon):
     def __init__(self, canvas: tk.Canvas, point0_xy: Point2D, point1_xy: Point2D, label:str="",
                 on_click:CallbackRect=None,
                 on_drag:CallbackRect=None,
-                on_release:CallbackRect=None):
+                on_release:CallbackRect=None,
+                magnets:Optional[Magnets]=None):
 
         # wrap user callback to convert signature from CallbackRect to CallbackPolygon
         lambda0 = None if on_click is None else lambda event, point_list_xy: on_click(event, point_list_xy[0], point_list_xy[1])
@@ -250,7 +251,8 @@ class Rectangle(Polygon):
         super().__init__(canvas, point_list_xy, label,
                 on_click=None if on_click is None else on_click_rect,
                 on_drag=None if on_drag is None else on_drag_rect,
-                on_release=None if on_release is None else on_release_rect)
+                on_release=None if on_release is None else on_release_rect,
+                magnets=magnets)
 
     def _create_lines(self):
         return [(-1, -1, self.canvas.create_line(-1, -1, -1, -1, fill=Polygon.colors[self.state], width=5)) for i in range(4)]
