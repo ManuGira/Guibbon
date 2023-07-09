@@ -109,22 +109,22 @@ class TestPoint(unittest.TestCase):
             on_release=None)
         event = Event(0, 0)
 
-        self.assertEqual(self.pt.state, interactive_overlays.Point.State.NORMAL)
+        self.assertEqual(self.pt.state, interactive_overlays.State.NORMAL)
 
         self.pt._on_enter(event)
-        self.assertEqual(self.pt.state, interactive_overlays.Point.State.HOVERED)
+        self.assertEqual(self.pt.state, interactive_overlays.State.HOVERED)
 
         self.pt._on_click(event)
-        self.assertEqual(self.pt.state, interactive_overlays.Point.State.DRAGGED)
+        self.assertEqual(self.pt.state, interactive_overlays.State.DRAGGED)
 
         self.pt._on_drag(event)
-        self.assertEqual(self.pt.state, interactive_overlays.Point.State.DRAGGED)
+        self.assertEqual(self.pt.state, interactive_overlays.State.DRAGGED)
 
         self.pt._on_release(event)
-        self.assertEqual(self.pt.state, interactive_overlays.Point.State.HOVERED)
+        self.assertEqual(self.pt.state, interactive_overlays.State.HOVERED)
 
         self.pt._on_leave(event)
-        self.assertEqual(self.pt.state, interactive_overlays.Point.State.NORMAL)
+        self.assertEqual(self.pt.state, interactive_overlays.State.NORMAL)
 
     def test_event_raise(self):
         self.pt = interactive_overlays.Point(canvas=self.canvas, point_xy=self.point_xy, label="ok",
@@ -249,22 +249,22 @@ class TestPolygon(unittest.TestCase):
         event = Event(0, 0)
 
         for k, pt in enumerate(self.plg.ipoints):
-            self.assertEqual(interactive_overlays.Point.State.NORMAL, pt.state, f"polygon.ipoints[{k}] must interact")
+            self.assertEqual(interactive_overlays.State.NORMAL, pt.state, f"polygon.ipoints[{k}] must interact")
 
             pt._on_enter(event)
-            self.assertEqual(interactive_overlays.Point.State.HOVERED, pt.state, f"polygon.ipoints[{k}] must interact")
+            self.assertEqual(interactive_overlays.State.HOVERED, pt.state, f"polygon.ipoints[{k}] must interact")
 
             pt._on_click(event)
-            self.assertEqual(interactive_overlays.Point.State.DRAGGED, pt.state, f"polygon.ipoints[{k}] must interact")
+            self.assertEqual(interactive_overlays.State.DRAGGED, pt.state, f"polygon.ipoints[{k}] must interact")
 
             pt._on_drag(event)
-            self.assertEqual(interactive_overlays.Point.State.DRAGGED, pt.state, f"polygon.ipoints[{k}] must interact")
+            self.assertEqual(interactive_overlays.State.DRAGGED, pt.state, f"polygon.ipoints[{k}] must interact")
 
             pt._on_release(event)
-            self.assertEqual(interactive_overlays.Point.State.HOVERED, pt.state, f"polygon.ipoints[{k}] must interact")
+            self.assertEqual(interactive_overlays.State.HOVERED, pt.state, f"polygon.ipoints[{k}] must interact")
 
             pt._on_leave(event)
-            self.assertEqual(interactive_overlays.Point.State.NORMAL, pt.state, f"polygon.ipoints[{k}] must interact")
+            self.assertEqual(interactive_overlays.State.NORMAL, pt.state, f"polygon.ipoints[{k}] must interact")
 
     def test_event_raise(self):
         self.plg = interactive_overlays.Polygon(canvas=self.canvas, point_xy_list=self.point_xy_list, label="ok",
@@ -402,22 +402,22 @@ class TestRectangle(unittest.TestCase):
         event = Event(0, 0)
 
         for k, pt in enumerate(self.rect.ipoints):
-            self.assertEqual(interactive_overlays.Point.State.NORMAL, pt.state, f"rectangle.ipoints[{k}] must interact")
+            self.assertEqual(interactive_overlays.State.NORMAL, pt.state, f"rectangle.ipoints[{k}] must interact")
 
             pt._on_enter(event)
-            self.assertEqual(interactive_overlays.Point.State.HOVERED, pt.state, f"rectangle.ipoints[{k}] must interact")
+            self.assertEqual(interactive_overlays.State.HOVERED, pt.state, f"rectangle.ipoints[{k}] must interact")
 
             pt._on_click(event)
-            self.assertEqual(interactive_overlays.Point.State.DRAGGED, pt.state, f"rectangle.ipoints[{k}] must interact")
+            self.assertEqual(interactive_overlays.State.DRAGGED, pt.state, f"rectangle.ipoints[{k}] must interact")
 
             pt._on_drag(event)
-            self.assertEqual(interactive_overlays.Point.State.DRAGGED, pt.state, f"rectangle.ipoints[{k}] must interact")
+            self.assertEqual(interactive_overlays.State.DRAGGED, pt.state, f"rectangle.ipoints[{k}] must interact")
 
             pt._on_release(event)
-            self.assertEqual(interactive_overlays.Point.State.HOVERED, pt.state, f"rectangle.ipoints[{k}] must interact")
+            self.assertEqual(interactive_overlays.State.HOVERED, pt.state, f"rectangle.ipoints[{k}] must interact")
 
             pt._on_leave(event)
-            self.assertEqual(interactive_overlays.Point.State.NORMAL, pt.state, f"rectangle.ipoints[{k}] must interact")
+            self.assertEqual(interactive_overlays.State.NORMAL, pt.state, f"rectangle.ipoints[{k}] must interact")
 
     def test_event_raise(self):
         self.rect = interactive_overlays.Rectangle(canvas=self.canvas, point0_xy=self.point0_xy, point1_xy=self.point1_xy, label="ok",
