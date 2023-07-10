@@ -99,6 +99,13 @@ class TestImageViewer(unittest.TestCase):
         self.point0_xy = point0_xy
         self.point1_xy = point1_xy
 
+    def test_spaces_conversion(self):
+        x_screen, y_screen = 400, 500
+        x_img, y_img = self.image_viewer.canvas2img_space(x_screen, y_screen)
+        x_screen2, y_screen2 = self.image_viewer.img2canvas_space(x_img, y_img)
+        self.assertEqual(x_screen, x_screen2)
+        self.assertEqual(y_screen, y_screen2)
+
     def test_imshow(self):
         self.image_viewer.imshow(self.img, mode="fit")
         self.assertEqual(self.image_viewer.zoom_factor, 5)
@@ -117,15 +124,15 @@ class TestImageViewer(unittest.TestCase):
         # self.assertIn(EventName.LEAVE, binds)
 
     def test_overlay_number(self):
-        self.assertEqual(6, len(self.image_viewer.interactive_overlays), "2 points and 2 polygons and 2 rectangles are 6 interactives overlays")
+        self.assertEqual(6, len(self.image_viewer.interactive_overlay_instance_list), "2 points and 2 polygons and 2 rectangles are 6 interactives overlays")
 
 
     def test_createInteractivePoint(self):
         """
         Make sure the method createInteractivePoint() correctly creates the 2 points
         """
-        point0 = self.image_viewer.interactive_overlays[0]
-        point1 = self.image_viewer.interactive_overlays[1]
+        point0 = self.image_viewer.interactive_overlay_instance_list[0]
+        point1 = self.image_viewer.interactive_overlay_instance_list[1]
         x_screen = 400
         y_screen = 400
         x_img, y_img = self.image_viewer.canvas2img_space(x_screen, y_screen)
@@ -151,8 +158,8 @@ class TestImageViewer(unittest.TestCase):
 
     def test_createInteractivePolygon(self):
 
-        poly0 = self.image_viewer.interactive_overlays[2]
-        poly1 = self.image_viewer.interactive_overlays[3]
+        poly0 = self.image_viewer.interactive_overlay_instance_list[2]
+        poly1 = self.image_viewer.interactive_overlay_instance_list[3]
         x_screen = 400
         y_screen = 400
         x_img, y_img = self.image_viewer.canvas2img_space(x_screen, y_screen)
@@ -178,8 +185,8 @@ class TestImageViewer(unittest.TestCase):
 
 
     def test_createInteractiveRectangle(self):
-        rect0 = self.image_viewer.interactive_overlays[4]
-        rect1 = self.image_viewer.interactive_overlays[5]
+        rect0 = self.image_viewer.interactive_overlay_instance_list[4]
+        rect1 = self.image_viewer.interactive_overlay_instance_list[5]
         x_screen = 400
         y_screen = 500
         x_img, y_img = self.image_viewer.canvas2img_space(x_screen, y_screen)

@@ -1,6 +1,6 @@
 import types
-from typing import Tuple, List, Any
-from .typedef import CallbackPoint, CallbackPolygon, CallbackRect, MouseCallback
+from typing import Tuple, List, Any, Optional
+from .typedef import CallbackPoint, CallbackPolygon, CallbackRect, Point2DList, MouseCallback
 
 import dataclasses
 import enum
@@ -52,7 +52,8 @@ class ImageViewer:
         self.zoom_factor: float
         self.onMouse: MouseCallback = None
         self.modifier = ImageViewer.Modifier()
-        self.interactive_overlays: List[Any] = []
+        self.magnets_overlay_instance_list: List[Any] = []
+        self.interactive_overlay_instance_list: List[Any] = []
 
     def canvas2img_space(self, can_x, can_y):
         canh, canw = self.canvas_shape_hw
@@ -64,6 +65,17 @@ class ImageViewer:
         img_y = (can_y - corner_y) * img0h / img1h
 
         return int(img_x + 0.5), int(img_y + 0.5)
+
+    def img2canvas_space(self, img_x, img_y):
+        print("img2canvas_space", self.img_shape0_hw, self.img_shape1_hw)
+        canh, canw = self.canvas_shape_hw
+        img0h, img0w = self.img_shape0_hw
+        img1h, img1w = self.img_shape1_hw
+        corner_y, corner_x = (canh - img1h) / 2, (canw - img1w) / 2
+
+        can_x = img_x * img1w / img0w + corner_x
+        can_y = img_y * img1h / img0h + corner_y
+        return can_x, can_y
 
     def setMouseCallback(self, onMouse, param=None):
         if not isinstance(onMouse, types.FunctionType) and not isinstance(onMouse, types.MethodType):
@@ -167,7 +179,10 @@ class ImageViewer:
 
         self.onMouse(cvevent, x, y, flag, param)  # type: ignore
 
-    def createInteractivePoint(self, point_xy, label="", on_click:CallbackPoint=None, on_drag:CallbackPoint=None, on_release:CallbackPoint=None):
+    def createInteractivePoint(self, point_xy, label="",
+                on_click:CallbackPoint=None, on_drag:CallbackPoint=None, on_release:CallbackPoint=None,
+                magnet_points:Optional[Point2DList]=None):
+
         # Callbacks are wrapped to convert coordinate from canvas to image space.
         def on_click_img0(event):
             event.x, event.y = self.canvas2img_space(event.x, event.y)
@@ -184,13 +199,22 @@ class ImageViewer:
             on_release(event)  # type: ignore
         on_release_img = on_release_img0 if on_release else None
 
-        ipoint = interactive_overlays.Point(self.canvas, point_xy, label, on_click_img, on_drag_img, on_release_img)
-        self.interactive_overlays.append(ipoint)
+        magnets = None
+        if magnet_points is not None:
+            magnets = interactive_overlays.Magnets(self.canvas, magnet_points, self.img2canvas_space, visible=True)
+            self.magnets_overlay_instance_list.append(magnets)
+
+        ipoint = interactive_overlays.Point(self.canvas, point_xy, label,
+                                            on_click_img, on_drag_img, on_release_img,
+                                            magnets)
+
+        self.interactive_overlay_instance_list.append(ipoint)
 
     def createInteractivePolygon(self, point_xy_list, label="",
                 on_click: CallbackPolygon=None,
                 on_drag: CallbackPolygon=None,
-                on_release: CallbackPolygon=None):
+                on_release: CallbackPolygon=None,
+                magnet_points:Optional[Point2DList]=None):
 
         # Callbacks are wrapped to convert coordinate from canvas to image space.
         def on_click_img0(event, _point_xy_list):
@@ -211,10 +235,17 @@ class ImageViewer:
             on_release(event, _point_xy_list)  # type: ignore
         on_release_img = on_release_img0 if on_release else None
 
-        ipolygon = interactive_overlays.Polygon(self.canvas, point_xy_list, label, on_click_img, on_drag_img, on_release_img)
-        self.interactive_overlays.append(ipolygon)
+        magnets = None
+        if magnet_points is not None:
+            magnets = interactive_overlays.Magnets(self.canvas, magnet_points, self.img2canvas_space, visible=True)
+            self.magnets_overlay_instance_list.append(magnets)
 
-    def createInteractiveRectangle(self, point0_xy, point1_xy, label="", on_click:CallbackRect=None, on_drag:CallbackRect=None, on_release:CallbackRect=None):
+        ipolygon = interactive_overlays.Polygon(self.canvas, point_xy_list, label, on_click_img, on_drag_img, on_release_img, magnets)
+        self.interactive_overlay_instance_list.append(ipolygon)
+
+    def createInteractiveRectangle(self, point0_xy, point1_xy, label="",
+            on_click:CallbackRect=None, on_drag:CallbackRect=None, on_release:CallbackRect=None,
+            magnet_points:Optional[Point2DList]=None):
         # Callbacks are wrapped to convert coordinate from canvas to image space.
         def on_click_img0(event, _point0_xy, _point1_xy):
             event.x, event.y = self.canvas2img_space(event.x, event.y)
@@ -237,8 +268,13 @@ class ImageViewer:
             on_release(event, _point0_xy, _point1_xy)  # type: ignore
         on_release_img = on_release_img0 if on_release else None
 
-        ipolygon = interactive_overlays.Rectangle(self.canvas, point0_xy, point1_xy, label, on_click_img, on_drag_img, on_release_img)
-        self.interactive_overlays.append(ipolygon)
+        magnets = None
+        if magnet_points is not None:
+            magnets = interactive_overlays.Magnets(self.canvas, magnet_points, self.img2canvas_space, visible=True)
+            self.magnets_overlay_instance_list.append(magnets)
+
+        ipolygon = interactive_overlays.Rectangle(self.canvas, point0_xy, point1_xy, label, on_click_img, on_drag_img, on_release_img, magnets)
+        self.interactive_overlay_instance_list.append(ipolygon)
 
     def pack(self, *args, **kwargs):
         self.canvas.pack(*args, **kwargs)
@@ -266,7 +302,10 @@ class ImageViewer:
         self.imgtk = ImageTk.PhotoImage(image=Image.fromarray(mat))
         self.canvas.create_image(canw // 2, canh // 2, anchor=tk.CENTER, image=self.imgtk)
 
-        for overlay in self.interactive_overlays:
+        for overlay in self.magnets_overlay_instance_list:
+            overlay.update()
+
+        for overlay in self.interactive_overlay_instance_list:
             overlay.update()
 
 

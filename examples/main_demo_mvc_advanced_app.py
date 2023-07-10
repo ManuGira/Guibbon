@@ -26,7 +26,7 @@ class DemoMVCAdvApp:
 
         point0_xy  = (200, 200)
         point1_xy  = (300, 250)
-        tcv2.createInteractiveRectangle(self.winname, point0_xy, point1_xy, "rectangle", on_drag=self.on_drag_rect)
+        tcv2.createInteractiveRectangle(self.winname, point0_xy, point1_xy, "rectangle", on_drag=self.on_drag_rect, magnet_points=[(200, 220), (30, 30)])
 
         self.model = DemoMVCAdvApp.Model()
         self.result = DemoMVCAdvApp.Result()

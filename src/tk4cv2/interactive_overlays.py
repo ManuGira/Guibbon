@@ -1,15 +1,61 @@
-from typing import Sequence
+from typing import Sequence, Optional
+
+import numpy as np
+
 from .typedef import Point2D, Point2DList, CallbackPoint, CallbackPolygon, CallbackRect
 
 import enum
 import tkinter as tk
 
-class Point:
-    class State(enum.IntEnum):
-        NORMAL = 0
-        HOVERED = 1
-        DRAGGED = 2
 
+class Magnets:
+    DISTANCE_THERSHOLD = 20
+    COLOR = '#%02x%02x%02x' % (255, 0, 255)
+
+    def __init__(self, canvas, point_xy_list: Point2DList, img2canvas_space_func, visible:bool=False):
+        self.canvas = canvas
+        self.point_xy_list = point_xy_list
+        self.img2canvas_space_func = img2canvas_space_func
+        self.visible = visible
+
+        self.circle_id_list = [self.canvas.create_oval(0, 0, 1, 1, fill=Magnets.COLOR, width=0) for _ in point_xy_list]
+
+    def update(self):
+        radius = Point.radius[State.NORMAL]//2
+        item_state = 'normal' if self.visible else 'hidden'
+        for circle_id, point_xy in zip(self.circle_id_list, self.point_xy_list):
+            point_xy = self.img2canvas_space_func(*point_xy)
+            x1 = point_xy[0] - radius
+            y1 = point_xy[1] - radius
+            x2 = point_xy[0] + radius
+            y2 = point_xy[1] + radius
+            self.canvas.coords(circle_id, x1, y1, x2, y2)
+            self.canvas.itemconfig(circle_id, fill=Magnets.COLOR, state=item_state)
+            self.canvas.tag_raise(circle_id)
+
+    def get_point_in_canvas_space(self) -> Point2DList:
+        return [self.img2canvas_space_func(x_img, y_img) for x_img, y_img in self.point_xy_list]
+
+    def get_point_in_img_space(self) -> Point2DList:
+        return self.point_xy_list
+
+    def snap_to_nearest_magnet(self, x_can, y_can):
+        magnets_can = np.array(self.get_point_in_canvas_space())
+        dists = np.array([x_can, y_can]) - magnets_can
+        dists = np.sqrt(np.sum(dists**2, axis=1))
+        ind = np.argmin(dists)
+        if dists[ind] < Magnets.DISTANCE_THERSHOLD:
+            return tuple(magnets_can[ind])
+        else:
+            return x_can, y_can
+
+
+class State(enum.IntEnum):
+    NORMAL = 0
+    HOVERED = 1
+    DRAGGED = 2
+
+class Point:
     colors = {
         State.NORMAL: '#%02x%02x%02x' % (0, 0, 255),
         State.HOVERED: '#%02x%02x%02x' % (0, 255, 255),
@@ -25,9 +71,10 @@ class Point:
     def __init__(self, canvas: tk.Canvas, point_xy: Point2D, label:str="",
                  on_click:CallbackPoint=None,
                  on_drag:CallbackPoint=None,
-                 on_release:CallbackPoint=None):
+                 on_release:CallbackPoint=None,
+                 magnets: Optional[Magnets]=None):
         self.canvas = canvas
-        self.state: Point.State = Point.State.NORMAL
+        self.state: State = State.NORMAL
         self.point_xy = point_xy
         self.label = label
         self.visible: bool = True
@@ -46,6 +93,9 @@ class Point:
         self.canvas.tag_bind(self.circle_id, "<Enter>", self._on_enter)
         self.canvas.tag_bind(self.circle_id, "<Leave>", self._on_leave)
 
+        self.magnets = magnets
+
+
     def update(self):
         radius = Point.radius[self.state]
         x1 = self.point_xy[0] - radius
@@ -53,12 +103,13 @@ class Point:
         x2 = self.point_xy[0] + radius
         y2 = self.point_xy[1] + radius
         self.canvas.coords(self.circle_id, x1, y1, x2, y2)
-        self.canvas.itemconfig(self.circle_id, fill=Point.colors[self.state])
+        item_state = 'normal' if self.visible else 'hidden'
+        self.canvas.itemconfig(self.circle_id, fill=Point.colors[self.state], state=item_state)
         self.canvas.tag_raise(self.circle_id)
 
 
     def _on_click(self, event):
-        self.state = Point.State.DRAGGED
+        self.state = State.DRAGGED
         self.update()
         if self.on_click is not None:
             self.on_click(event)
@@ -66,8 +117,10 @@ class Point:
 
     def _on_drag(self, event):
         try:
+            if self.magnets is not None:
+                event.x, event.y = self.magnets.snap_to_nearest_magnet(event.x, event.y)
             self.point_xy = (event.x, event.y)
-            self.state = Point.State.DRAGGED
+            self.state = State.DRAGGED
             self.update()
             if self.on_drag is not None:
                 self.on_drag(event)
@@ -76,31 +129,38 @@ class Point:
             raise e
 
     def _on_release(self, event):
-        self.state = Point.State.HOVERED
+        self.state = State.HOVERED
         self.update()
         if self.on_release is not None:
             self.on_release(event)
 
     def _on_enter(self, event):
-        if self.state is not Point.State.DRAGGED:
-            self.state = Point.State.HOVERED
+        if self.state is not State.DRAGGED:
+            self.state = State.HOVERED
             self.update()
 
     def _on_leave(self, event):
-        self.state = Point.State.NORMAL
+        self.state = State.NORMAL
         self.update()
 
 
 class Polygon:
+    colors = {
+        State.NORMAL: '#%02x%02x%02x' % (0, 255, 0),
+        State.HOVERED: '#%02x%02x%02x' % (127, 255, 127),
+        State.DRAGGED: '#%02x%02x%02x' % (255, 255, 0),
+    }
 
     def __init__(self, canvas: tk.Canvas, point_xy_list: Point2DList, label:str="",
                  on_click:CallbackPolygon=None,
                  on_drag:CallbackPolygon=None,
-                 on_release:CallbackPolygon=None):
+                 on_release:CallbackPolygon=None,
+                 magnets:Optional[Magnets]=None):
         self.canvas = canvas
         self.point_xy_list = point_xy_list + []
         self.label = label
         self.visible: bool = True
+        self.state: State = State.NORMAL
 
         self.on_click = on_click
         self.on_drag = on_drag
@@ -118,11 +178,11 @@ class Polygon:
             ipoint = Point(canvas, point_xy, label="",
                     on_click=None if on_click is None else self._on_click,
                     on_drag=on_drag_lambdas[k],
-                    on_release=None if on_release is None else self._on_release)
+                    on_release=None if on_release is None else self._on_release,
+                    magnets=magnets)
             self.ipoints.append(ipoint)
 
         self.lines = self._create_lines()
-
         self.update()
 
     def _create_lines(self):
@@ -131,16 +191,18 @@ class Polygon:
         for i in range(N):
             i1 = i
             i2 = (i + 1) % N
-            line_id = self.canvas.create_line(-1, -1, -1, -1, fill="green", width=5)
+            line_id = self.canvas.create_line(-1, -1, -1, -1, fill=Polygon.colors[self.state], width=5)
             lines.append((i1, i2, line_id))
         return lines
 
     def _update_lines(self):
         # draw lines
+        item_state = 'normal' if self.visible else 'hidden'
         for i1, i2, line_id in self.lines:
             x1, y1 = self.point_xy_list[i1]
             x2, y2 = self.point_xy_list[i2]
             self.canvas.coords(line_id, x1, y1, x2, y2)
+            self.canvas.itemconfig(line_id, state=item_state)
             self.canvas.tag_raise(line_id)
 
     def _update_points(self):
@@ -173,7 +235,8 @@ class Rectangle(Polygon):
     def __init__(self, canvas: tk.Canvas, point0_xy: Point2D, point1_xy: Point2D, label:str="",
                 on_click:CallbackRect=None,
                 on_drag:CallbackRect=None,
-                on_release:CallbackRect=None):
+                on_release:CallbackRect=None,
+                magnets:Optional[Magnets]=None):
 
         # wrap user callback to convert signature from CallbackRect to CallbackPolygon
         lambda0 = None if on_click is None else lambda event, point_list_xy: on_click(event, point_list_xy[0], point_list_xy[1])
@@ -192,29 +255,36 @@ class Rectangle(Polygon):
         super().__init__(canvas, point_list_xy, label,
                 on_click=None if on_click is None else on_click_rect,
                 on_drag=None if on_drag is None else on_drag_rect,
-                on_release=None if on_release is None else on_release_rect)
+                on_release=None if on_release is None else on_release_rect,
+                magnets=magnets)
 
     def _create_lines(self):
-        return [self.canvas.create_line(-1, -1, -1, -1, fill="green", width=5) for i in range(4)]
+        return [(-1, -1, self.canvas.create_line(-1, -1, -1, -1, fill=Polygon.colors[self.state], width=5)) for i in range(4)]
 
     def _update_lines(self):
+        item_state = 'normal' if self.visible else 'hidden'
+
         left = self.point_xy_list[0][0]
         top = self.point_xy_list[0][1]
         right = self.point_xy_list[1][0]
         bottom = self.point_xy_list[1][1]
 
-        line_id = self.lines[0]
+        line_id = self.lines[0][2]
         self.canvas.coords(line_id, left, top, right, top)
+        self.canvas.itemconfig(line_id, state=item_state)
         self.canvas.tag_raise(line_id)
 
-        line_id = self.lines[1]
+        line_id = self.lines[1][2]
         self.canvas.coords(line_id, right, top, right, bottom)
+        self.canvas.itemconfig(line_id, state=item_state)
         self.canvas.tag_raise(line_id)
 
-        line_id = self.lines[2]
+        line_id = self.lines[2][2]
         self.canvas.coords(line_id, right, bottom, left, bottom)
+        self.canvas.itemconfig(line_id, state=item_state)
         self.canvas.tag_raise(line_id)
 
-        line_id = self.lines[3]
+        line_id = self.lines[3][2]
         self.canvas.coords(line_id, left, bottom, left, top)
+        self.canvas.itemconfig(line_id, state=item_state)
         self.canvas.tag_raise(line_id)
