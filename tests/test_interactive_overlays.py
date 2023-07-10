@@ -82,6 +82,7 @@ class TestPoint(unittest.TestCase):
         self.point_xy = (0, 0)
 
         self.canvas = tkinter.Canvas()
+        self.magnets = interactive_overlays.Magnets(self.canvas, [(1000.0, 1000.0)], (lambda x, y: (2 * x, 2 * y)))
 
     def tearDown(self) -> None:
         pass
@@ -100,7 +101,8 @@ class TestPoint(unittest.TestCase):
             label="ok",
             on_click=self.on_event,
             on_drag=self.on_event,
-            on_release=self.on_event)
+            on_release=self.on_event,
+            magnets=self.magnets)
 
         binds = self.canvas.tag_bind(self.pt.circle_id)
         self.assertIn(EventName.CLICK, binds, f"{EventName.CLICK} tag not binded")
@@ -344,6 +346,8 @@ class TestRectangle(unittest.TestCase):
         self.event = None
         self.canvas = tkinter.Canvas()
 
+        self.magnets = interactive_overlays.Magnets(self.canvas, [(110.0, 110.0)], (lambda x, y: (2*x, 2*y)))
+
     def tearDown(self) -> None:
         pass
 
@@ -366,7 +370,8 @@ class TestRectangle(unittest.TestCase):
             label="ok",
             on_click=self.on_event,
             on_drag=self.on_event,
-            on_release=self.on_event)
+            on_release=self.on_event,
+            magnets=self.magnets)
 
         self.assertEqual(2, len(self.rect.ipoints), "Rectangle must have 2 Interactive Point instances")
 
