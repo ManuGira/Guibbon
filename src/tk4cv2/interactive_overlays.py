@@ -12,16 +12,17 @@ class Magnets:
     DISTANCE_THERSHOLD = 20
     COLOR = '#%02x%02x%02x' % (255, 0, 255)
 
-    def __init__(self, canvas, point_xy_list: Point2DList, img2canvas_space_func, visible=False):
+    def __init__(self, canvas, point_xy_list: Point2DList, img2canvas_space_func, visible:bool=False):
         self.canvas = canvas
         self.point_xy_list = point_xy_list
         self.img2canvas_space_func = img2canvas_space_func
         self.visible = visible
 
-        self.circle_id_list = [self.canvas.create_oval(0, 0, 1, 1, fill=Magnets.COLOR, width=0) for pt in point_xy_list]
+        self.circle_id_list = [self.canvas.create_oval(0, 0, 1, 1, fill=Magnets.COLOR, width=0) for _ in point_xy_list]
 
     def update(self):
         radius = Point.radius[State.NORMAL]//2
+        item_state = 'normal' if self.visible else 'hidden'
         for circle_id, point_xy in zip(self.circle_id_list, self.point_xy_list):
             point_xy = self.img2canvas_space_func(*point_xy)
             x1 = point_xy[0] - radius
@@ -29,7 +30,7 @@ class Magnets:
             x2 = point_xy[0] + radius
             y2 = point_xy[1] + radius
             self.canvas.coords(circle_id, x1, y1, x2, y2)
-            self.canvas.itemconfig(circle_id, fill=Magnets.COLOR)
+            self.canvas.itemconfig(circle_id, fill=Magnets.COLOR, state=item_state)
             self.canvas.tag_raise(circle_id)
 
     def get_point_in_canvas_space(self) -> Point2DList:
@@ -102,7 +103,8 @@ class Point:
         x2 = self.point_xy[0] + radius
         y2 = self.point_xy[1] + radius
         self.canvas.coords(self.circle_id, x1, y1, x2, y2)
-        self.canvas.itemconfig(self.circle_id, fill=Point.colors[self.state])
+        item_state = 'normal' if self.visible else 'hidden'
+        self.canvas.itemconfig(self.circle_id, fill=Point.colors[self.state], state=item_state)
         self.canvas.tag_raise(self.circle_id)
 
 
@@ -195,10 +197,12 @@ class Polygon:
 
     def _update_lines(self):
         # draw lines
+        item_state = 'normal' if self.visible else 'hidden'
         for i1, i2, line_id in self.lines:
             x1, y1 = self.point_xy_list[i1]
             x2, y2 = self.point_xy_list[i2]
             self.canvas.coords(line_id, x1, y1, x2, y2)
+            self.canvas.itemconfig(line_id, state=item_state)
             self.canvas.tag_raise(line_id)
 
     def _update_points(self):
@@ -258,6 +262,8 @@ class Rectangle(Polygon):
         return [(-1, -1, self.canvas.create_line(-1, -1, -1, -1, fill=Polygon.colors[self.state], width=5)) for i in range(4)]
 
     def _update_lines(self):
+        item_state = 'normal' if self.visible else 'hidden'
+
         left = self.point_xy_list[0][0]
         top = self.point_xy_list[0][1]
         right = self.point_xy_list[1][0]
@@ -265,16 +271,20 @@ class Rectangle(Polygon):
 
         line_id = self.lines[0][2]
         self.canvas.coords(line_id, left, top, right, top)
+        self.canvas.itemconfig(line_id, state=item_state)
         self.canvas.tag_raise(line_id)
 
         line_id = self.lines[1][2]
         self.canvas.coords(line_id, right, top, right, bottom)
+        self.canvas.itemconfig(line_id, state=item_state)
         self.canvas.tag_raise(line_id)
 
         line_id = self.lines[2][2]
         self.canvas.coords(line_id, right, bottom, left, bottom)
+        self.canvas.itemconfig(line_id, state=item_state)
         self.canvas.tag_raise(line_id)
 
         line_id = self.lines[3][2]
         self.canvas.coords(line_id, left, bottom, left, top)
+        self.canvas.itemconfig(line_id, state=item_state)
         self.canvas.tag_raise(line_id)
