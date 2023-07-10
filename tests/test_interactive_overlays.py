@@ -18,6 +18,62 @@ class EventName:
     ENTER = '<Enter>'
     LEAVE = '<Leave>'
 
+class TestMagnets(unittest.TestCase):
+    def foo(self, x_img, y_img):
+        return self.val, self.val
+
+    def img2canvas_space_func(self, x_img, y_img):
+        return 2*x_img + 1, 2*y_img+1
+
+    def setUp(self) -> None:
+        self.canvas = tkinter.Canvas()
+        self.val = 0
+        self.points_img = [(10.0*k, 10.0*k) for k in range(4)]
+        self.points_canvas = [(20.0*k+1, 20.0*k+1) for k in range(4)]
+
+    def test_get_point_in_img_space(self):
+        magnets = interactive_overlays.Magnets(self.canvas, self.points_img, self.img2canvas_space_func)
+        self.assertListEqual(self.points_img, magnets.get_point_in_img_space())
+
+    def test_get_point_in_canvas_space(self):
+        magnets = interactive_overlays.Magnets(self.canvas, self.points_img, self.img2canvas_space_func)
+        self.assertListEqual(self.points_canvas, magnets.get_point_in_canvas_space())
+
+    def test_space_func_is_dynamic(self):
+        magnets = interactive_overlays.Magnets(self.canvas, [(-1, -1)], self.foo)
+        self.assertListEqual([(self.val, self.val)], magnets.get_point_in_canvas_space())
+
+        self.val += 1
+        self.assertListEqual([(self.val, self.val)], magnets.get_point_in_canvas_space())
+
+        self.val += 1
+        self.assertListEqual([(self.val, self.val)], magnets.get_point_in_canvas_space())
+
+    def test_snap_to_nearest_magnet(self):
+        thresh = interactive_overlays.Magnets.DISTANCE_THERSHOLD
+
+        magnets = interactive_overlays.Magnets(self.canvas, self.points_img, self.img2canvas_space_func)
+        x_can, x_can = magnets.get_point_in_canvas_space()[-1]
+        self.assertTupleEqual((x_can, x_can), magnets.snap_to_nearest_magnet(x_can, x_can))
+
+        self.assertTupleEqual((x_can, x_can), magnets.snap_to_nearest_magnet(x_can+thresh-1, x_can))
+
+        self.assertTupleEqual((x_can+thresh+1, x_can), magnets.snap_to_nearest_magnet(x_can+thresh+1, x_can))
+
+    def test_update(self):
+        magnets = interactive_overlays.Magnets(self.canvas, self.points_img, self.img2canvas_space_func)
+
+        self.assertEqual(len(self.points_canvas), len(magnets.circle_id_list), "Each points must have its circle on the canvas")
+
+        magnets.update()
+        for pt_xy, circle_id in zip(self.points_canvas, magnets.circle_id_list):
+            x1, y1, x2, y2 = self.canvas.coords(circle_id)
+            x = (x1 + x2)/2
+            y = (y1 + y2)/2
+            self.assertLess(abs(x-pt_xy[0]), 0.1, "Coordinates of magnet points must be accuratly played on the canvas")
+            self.assertLess(abs(y-pt_xy[1]), 0.1, "Coordinates of magnet points must be accuratly played on the canvas")
+
+
 class TestPoint(unittest.TestCase):
     def setUp(self) -> None:
         self.event_count = 0

@@ -39,13 +39,13 @@ class Magnets:
     def get_point_in_img_space(self) -> Point2DList:
         return self.point_xy_list
 
-    def find_nearest_magnet(self, x_can, y_can):
+    def snap_to_nearest_magnet(self, x_can, y_can):
         magnets_can = np.array(self.get_point_in_canvas_space())
         dists = np.array([x_can, y_can]) - magnets_can
         dists = np.sqrt(np.sum(dists**2, axis=1))
         ind = np.argmin(dists)
         if dists[ind] < Magnets.DISTANCE_THERSHOLD:
-            return magnets_can[ind]
+            return tuple(magnets_can[ind])
         else:
             return x_can, y_can
 
@@ -118,7 +118,7 @@ class Point:
     def _on_drag(self, event):
         try:
             if self.magnets is not None:
-                event.x, event.y = self.magnets.find_nearest_magnet(event.x, event.y)
+                event.x, event.y = self.magnets.snap_to_nearest_magnet(event.x, event.y)
             self.point_xy = (event.x, event.y)
             self.state = State.DRAGGED
             self.update()
