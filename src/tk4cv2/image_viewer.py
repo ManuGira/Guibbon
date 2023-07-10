@@ -1,5 +1,5 @@
 import types
-from typing import Tuple, List, Any
+from typing import Tuple, List, Any, Optional
 from .typedef import CallbackPoint, CallbackPolygon, CallbackRect, Point2DList, MouseCallback
 
 import dataclasses
@@ -181,7 +181,7 @@ class ImageViewer:
 
     def createInteractivePoint(self, point_xy, label="",
                 on_click:CallbackPoint=None, on_drag:CallbackPoint=None, on_release:CallbackPoint=None,
-                magnet_points:Point2DList=None):
+                magnet_points:Optional[Point2DList]=None):
 
         # Callbacks are wrapped to convert coordinate from canvas to image space.
         def on_click_img0(event):
@@ -214,7 +214,7 @@ class ImageViewer:
                 on_click: CallbackPolygon=None,
                 on_drag: CallbackPolygon=None,
                 on_release: CallbackPolygon=None,
-                magnet_points:Point2DList=None):
+                magnet_points:Optional[Point2DList]=None):
 
         # Callbacks are wrapped to convert coordinate from canvas to image space.
         def on_click_img0(event, _point_xy_list):
@@ -245,7 +245,7 @@ class ImageViewer:
 
     def createInteractiveRectangle(self, point0_xy, point1_xy, label="",
             on_click:CallbackRect=None, on_drag:CallbackRect=None, on_release:CallbackRect=None,
-            magnet_points:Point2DList=None):
+            magnet_points:Optional[Point2DList]=None):
         # Callbacks are wrapped to convert coordinate from canvas to image space.
         def on_click_img0(event, _point0_xy, _point1_xy):
             event.x, event.y = self.canvas2img_space(event.x, event.y)
