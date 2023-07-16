@@ -1,5 +1,5 @@
 import types
-from typing import Tuple, List, Any, Optional
+from typing import Tuple, List, Set, Any, Optional
 from .typedef import CallbackPoint, CallbackPolygon, CallbackRect, Point2DList, MouseCallback
 
 import dataclasses
@@ -52,7 +52,7 @@ class ImageViewer:
         self.zoom_factor: float
         self.onMouse: MouseCallback = None
         self.modifier = ImageViewer.Modifier()
-        self.magnets_overlay_instance_list: List[Any] = []
+        self.magnets_overlay_instance_set: Set[Any] = set()
         self.interactive_overlay_instance_list: List[Any] = []
 
     def canvas2img_space(self, can_x, can_y):
@@ -199,16 +199,14 @@ class ImageViewer:
             on_release(event)  # type: ignore
         on_release_img = on_release_img0 if on_release else None
 
-        magnets = None
-        if magnet_points is not None:
-            magnets = interactive_overlays.Magnets(self.canvas, magnet_points, self.img2canvas_space, visible=True)
-            self.magnets_overlay_instance_list.append(magnets)
-
         ipoint = interactive_overlays.Point(self.canvas, point_xy, label,
-                                            on_click_img, on_drag_img, on_release_img,
-                                            magnets)
-
+                                            on_click_img, on_drag_img, on_release_img)
         self.interactive_overlay_instance_list.append(ipoint)
+
+        if magnet_points is not None:
+            magnets = interactive_overlays.Magnets(self.canvas, magnet_points, self.img2canvas_space)
+            magnets.magnetize_overlay(ipoint)
+            self.magnets_overlay_instance_set.add(magnets)
 
     def createInteractivePolygon(self, point_xy_list, label="",
                 on_click: CallbackPolygon=None,
@@ -235,13 +233,14 @@ class ImageViewer:
             on_release(event, _point_xy_list)  # type: ignore
         on_release_img = on_release_img0 if on_release else None
 
-        magnets = None
-        if magnet_points is not None:
-            magnets = interactive_overlays.Magnets(self.canvas, magnet_points, self.img2canvas_space, visible=True)
-            self.magnets_overlay_instance_list.append(magnets)
-
-        ipolygon = interactive_overlays.Polygon(self.canvas, point_xy_list, label, on_click_img, on_drag_img, on_release_img, magnets)
+        ipolygon = interactive_overlays.Polygon(self.canvas, point_xy_list, label, on_click_img, on_drag_img, on_release_img)
         self.interactive_overlay_instance_list.append(ipolygon)
+
+        if magnet_points is not None:
+            magnets = interactive_overlays.Magnets(self.canvas, magnet_points, self.img2canvas_space)
+            for ipoint in ipolygon.ipoints:
+                magnets.magnetize_overlay(ipoint)
+            self.magnets_overlay_instance_set.add(magnets)
 
     def createInteractiveRectangle(self, point0_xy, point1_xy, label="",
             on_click:CallbackRect=None, on_drag:CallbackRect=None, on_release:CallbackRect=None,
@@ -268,13 +267,14 @@ class ImageViewer:
             on_release(event, _point0_xy, _point1_xy)  # type: ignore
         on_release_img = on_release_img0 if on_release else None
 
-        magnets = None
-        if magnet_points is not None:
-            magnets = interactive_overlays.Magnets(self.canvas, magnet_points, self.img2canvas_space, visible=True)
-            self.magnets_overlay_instance_list.append(magnets)
-
-        ipolygon = interactive_overlays.Rectangle(self.canvas, point0_xy, point1_xy, label, on_click_img, on_drag_img, on_release_img, magnets)
+        ipolygon = interactive_overlays.Rectangle(self.canvas, point0_xy, point1_xy, label, on_click_img, on_drag_img, on_release_img)
         self.interactive_overlay_instance_list.append(ipolygon)
+
+        if magnet_points is not None:
+            magnets = interactive_overlays.Magnets(self.canvas, magnet_points, self.img2canvas_space)
+            for ipoint in ipolygon.ipoints:
+                magnets.magnetize_overlay(ipoint)
+            self.magnets_overlay_instance_set.add(magnets)
 
     def pack(self, *args, **kwargs):
         self.canvas.pack(*args, **kwargs)
@@ -302,7 +302,7 @@ class ImageViewer:
         self.imgtk = ImageTk.PhotoImage(image=Image.fromarray(mat))
         self.canvas.create_image(canw // 2, canh // 2, anchor=tk.CENTER, image=self.imgtk)
 
-        for overlay in self.magnets_overlay_instance_list:
+        for overlay in self.magnets_overlay_instance_set:
             overlay.update()
 
         for overlay in self.interactive_overlay_instance_list:
