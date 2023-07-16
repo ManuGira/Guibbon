@@ -21,12 +21,12 @@ class DemoMVCAdvApp:
         tcv2.namedWindow(self.winname)
         tcv2.createInteractivePoint(self.winname, (100, 100), "point", on_drag=self.on_drag, magnet_points=[(200, 220), (30, 30)])
 
-        point_xy_list  = [(300, 300), (300, 500), (500, 400), (400, 300)]
-        tcv2.createInteractivePolygon(self.winname, point_xy_list, "polygon", on_drag=self.on_drag_poly)
+        point_xy_list = [(300, 300), (300, 500), (500, 400), (400, 300)]
+        tcv2.createInteractivePolygon(self.winname, point_xy_list, "polygon", on_drag=self.on_drag_poly, magnet_points=[(100, 300), (170, 300)])
 
         point0_xy  = (200, 200)
         point1_xy  = (300, 250)
-        tcv2.createInteractiveRectangle(self.winname, point0_xy, point1_xy, "rectangle", on_drag=self.on_drag_rect)
+        tcv2.createInteractiveRectangle(self.winname, point0_xy, point1_xy, "rectangle", on_drag=self.on_drag_rect, magnet_points=[(100, 300), (150, 300)])
 
         self.model = DemoMVCAdvApp.Model()
         self.result = DemoMVCAdvApp.Result()
