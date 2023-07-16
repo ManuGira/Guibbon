@@ -190,7 +190,6 @@ class ImageViewer:
         on_click_img = on_click_img0 if on_click else None
 
         def on_drag_img0(event):
-            print("image_viewer.on_drag_img0")
             event.x, event.y = self.canvas2img_space(event.x, event.y)
             on_drag(event)  # type: ignore
         on_drag_img = on_drag_img0 if on_drag else None

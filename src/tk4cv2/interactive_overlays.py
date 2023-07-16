@@ -71,7 +71,6 @@ class Point:
 
 
     def _on_drag(self, event):
-        print("point._on_drag")
         try:
             self.point_xy = (event.x, event.y)
             self.state = State.DRAGGED
@@ -170,7 +169,6 @@ class Polygon:
             self.on_click(event, self.point_xy_list)
 
     def _on_drag(self, i, event):
-        print("polygon._on_drag")
         try:
             self.point_xy_list[i] = (event.x, event.y)
             self._update_lines()
@@ -309,7 +307,6 @@ class Magnets:
 
         def _on_drag_magnetized_wrapper(event):
             """Wrapping function of on_drag callback to apply magnetization on mouse inputs"""
-            print("magnet._on_drag_magnetized_wrapper")
             event.x, event.y = self.snap_to_nearest_magnet(event.x, event.y)
             # use the copy of the callback to avoid recursion
             point_on_drag_copy(point, event)
