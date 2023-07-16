@@ -39,13 +39,13 @@ class Point:
         self.circle_id = self.canvas.create_oval(0, 0, 1, 1, fill=Point.colors[self.state], outline="#FFFFFF", width=2)
 
         self.on_click = on_click
-        self.canvas.tag_bind(self.circle_id, "<Button-1>", self._on_click)
+        self.canvas.tag_bind(self.circle_id, "<Button-1>", lambda event: self._on_click(event))
 
         self.on_drag = on_drag
         self.canvas.tag_bind(self.circle_id, "<B1-Motion>", lambda event: self._on_drag(event))
 
         self.on_release = on_release
-        self.canvas.tag_bind(self.circle_id, "<ButtonRelease-1>", self._on_release)
+        self.canvas.tag_bind(self.circle_id, "<ButtonRelease-1>", lambda event: self._on_release(event))
 
         self.canvas.tag_bind(self.circle_id, "<Enter>", self._on_enter)
         self.canvas.tag_bind(self.circle_id, "<Leave>", self._on_leave)
@@ -245,11 +245,12 @@ class Magnets:
     DISTANCE_THERSHOLD = 20
     COLOR = '#%02x%02x%02x' % (255, 0, 255)
 
-    def __init__(self, canvas: tk.Canvas, point_xy_list: Point2DList, img2canvas_space_func):
+    def __init__(self, canvas: tk.Canvas, point_xy_list: Point2DList, img2canvas_space_func, dist_threshold=DISTANCE_THERSHOLD):
+        self.canvas = canvas
         self.point_xy_list = point_xy_list
         self.img2canvas_space_func = img2canvas_space_func
-        self.canvas = canvas
-        self.visible = True
+        self.dist_threshold = dist_threshold
+        self.visible = False
         self.circle_id_list = [self.canvas.create_oval(0, 0, 1, 1, fill=Magnets.COLOR, width=0) for _ in point_xy_list]
 
     def update(self):
@@ -276,13 +277,16 @@ class Magnets:
         dists = np.array([x_can, y_can]) - magnets_can
         dists = np.sqrt(np.sum(dists ** 2, axis=1))
         ind = np.argmin(dists)
-        if dists[ind] < Magnets.DISTANCE_THERSHOLD:
+        if dists[ind] < self.dist_threshold:
             return tuple(magnets_can[ind])
         else:
             return x_can, y_can
 
     def magnetize_overlay(self, point: Point):
-
+        """
+        Magnetize the given overlay by wrapping its callbacks.
+        The mouse inputs are passing through magnetic function before calling the actual callback of the overlay
+        """
 
         def copy_func(f):
             """return a function with same code, globals, name, defaults and closure"""
@@ -292,13 +296,32 @@ class Magnets:
             return fn
 
         # copy callback function
+        point_on_click_copy = copy_func(point._on_click)
         point_on_drag_copy = copy_func(point._on_drag)
+        point_on_release_copy = copy_func(point._on_release)
+
+        def _on_click_magnetized_wrapper(event):
+            """Wrapping function of on_release callback"""
+            self.visible = True
+            self.update()
+            # use the copy of the callback to avoid recursion
+            point_on_click_copy(point, event)
 
         def _on_drag_magnetized_wrapper(event):
-            print("magnet._on_drag_magnetized_point")
+            """Wrapping function of on_drag callback to apply magnetization on mouse inputs"""
+            print("magnet._on_drag_magnetized_wrapper")
             event.x, event.y = self.snap_to_nearest_magnet(event.x, event.y)
             # use the copy of the callback to avoid recursion
             point_on_drag_copy(point, event)
 
-        if point._on_drag is not None:
-            setattr(point, point._on_drag.__name__, _on_drag_magnetized_wrapper)
+        def _on_release_magnetized_wrapper(event):
+            """Wrapping function of on_release callback"""
+            self.visible = False
+            self.update()
+            # use the copy of the callback to avoid recursion
+            point_on_release_copy(point, event)
+
+        # monkey patch callback methods of Point class
+        setattr(point, point._on_click.__name__, _on_click_magnetized_wrapper)
+        setattr(point, point._on_drag.__name__, _on_drag_magnetized_wrapper)
+        setattr(point, point._on_release.__name__, _on_release_magnetized_wrapper)
