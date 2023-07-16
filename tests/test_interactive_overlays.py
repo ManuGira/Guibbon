@@ -50,15 +50,19 @@ class TestMagnets(unittest.TestCase):
         self.assertListEqual([(self.val, self.val)], magnets.get_point_in_canvas_space())
 
     def test_snap_to_nearest_magnet(self):
-        thresh = interactive_overlays.Magnets.DISTANCE_THERSHOLD
+        thresh = 50
 
-        magnets = interactive_overlays.Magnets(self.canvas, self.points_img, self.img2canvas_space_func)
-        x_can, x_can = magnets.get_point_in_canvas_space()[-1]
-        self.assertTupleEqual((x_can, x_can), magnets.snap_to_nearest_magnet(x_can, x_can))
+        magnets = interactive_overlays.Magnets(self.canvas, self.points_img, self.img2canvas_space_func, dist_threshold=thresh)
+        x_can, y_can = magnets.get_point_in_canvas_space()[-1]
+        self.assertTupleEqual((x_can, y_can), magnets.snap_to_nearest_magnet(x_can, y_can))
+        self.assertTupleEqual((x_can, y_can), magnets.snap_to_nearest_magnet(x_can+thresh-1, y_can))
+        self.assertTupleEqual((x_can+thresh+1, y_can), magnets.snap_to_nearest_magnet(x_can+thresh+1, y_can))
 
-        self.assertTupleEqual((x_can, x_can), magnets.snap_to_nearest_magnet(x_can+thresh-1, x_can))
-
-        self.assertTupleEqual((x_can+thresh+1, x_can), magnets.snap_to_nearest_magnet(x_can+thresh+1, x_can))
+        thresh = 10
+        magnets.dist_threshold = thresh
+        self.assertTupleEqual((x_can, y_can), magnets.snap_to_nearest_magnet(x_can, y_can))
+        self.assertTupleEqual((x_can, y_can), magnets.snap_to_nearest_magnet(x_can + thresh - 1, y_can))
+        self.assertTupleEqual((x_can + thresh + 1, y_can), magnets.snap_to_nearest_magnet(x_can + thresh + 1, y_can))
 
     def test_update(self):
         magnets = interactive_overlays.Magnets(self.canvas, self.points_img, self.img2canvas_space_func)
@@ -101,8 +105,7 @@ class TestPoint(unittest.TestCase):
             label="ok",
             on_click=self.on_event,
             on_drag=self.on_event,
-            on_release=self.on_event,
-            magnets=self.magnets)
+            on_release=self.on_event)
 
         binds = self.canvas.tag_bind(self.pt.circle_id)
         self.assertIn(EventName.CLICK, binds, f"{EventName.CLICK} tag not binded")
@@ -346,7 +349,7 @@ class TestRectangle(unittest.TestCase):
         self.event = None
         self.canvas = tkinter.Canvas()
 
-        self.magnets = interactive_overlays.Magnets(self.canvas, [(110.0, 110.0)], (lambda x, y: (2*x, 2*y)))
+        self.magnets = interactive_overlays.Magnets(self.canvas, [(110.0, 110.0)], (lambda x, y: (2 * x, 2 * y)))
 
     def tearDown(self) -> None:
         pass
@@ -370,8 +373,7 @@ class TestRectangle(unittest.TestCase):
             label="ok",
             on_click=self.on_event,
             on_drag=self.on_event,
-            on_release=self.on_event,
-            magnets=self.magnets)
+            on_release=self.on_event)
 
         self.assertEqual(2, len(self.rect.ipoints), "Rectangle must have 2 Interactive Point instances")
 
