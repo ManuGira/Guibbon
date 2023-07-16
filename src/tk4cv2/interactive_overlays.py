@@ -1,5 +1,5 @@
 import types
-from typing import Sequence, Optional
+from typing import Sequence
 
 import numpy as np
 
