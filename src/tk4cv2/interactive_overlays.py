@@ -1,3 +1,4 @@
+import types
 from typing import Sequence, Optional
 
 import numpy as np
@@ -6,49 +7,6 @@ from .typedef import Point2D, Point2DList, CallbackPoint, CallbackPolygon, Callb
 
 import enum
 import tkinter as tk
-
-
-class Magnets:
-    DISTANCE_THERSHOLD = 20
-    COLOR = '#%02x%02x%02x' % (255, 0, 255)
-
-    def __init__(self, canvas, point_xy_list: Point2DList, img2canvas_space_func, visible:bool=False):
-        self.canvas = canvas
-        self.point_xy_list = point_xy_list
-        self.img2canvas_space_func = img2canvas_space_func
-        self.visible = visible
-
-        self.circle_id_list = [self.canvas.create_oval(0, 0, 1, 1, fill=Magnets.COLOR, width=0) for _ in point_xy_list]
-
-    def update(self):
-        radius = Point.radius[State.NORMAL]//2
-        item_state = 'normal' if self.visible else 'hidden'
-        for circle_id, point_xy in zip(self.circle_id_list, self.point_xy_list):
-            point_xy = self.img2canvas_space_func(*point_xy)
-            x1 = point_xy[0] - radius
-            y1 = point_xy[1] - radius
-            x2 = point_xy[0] + radius
-            y2 = point_xy[1] + radius
-            self.canvas.coords(circle_id, x1, y1, x2, y2)
-            self.canvas.itemconfig(circle_id, fill=Magnets.COLOR, state=item_state)
-            self.canvas.tag_raise(circle_id)
-
-    def get_point_in_canvas_space(self) -> Point2DList:
-        return [self.img2canvas_space_func(x_img, y_img) for x_img, y_img in self.point_xy_list]
-
-    def get_point_in_img_space(self) -> Point2DList:
-        return self.point_xy_list
-
-    def snap_to_nearest_magnet(self, x_can, y_can):
-        magnets_can = np.array(self.get_point_in_canvas_space())
-        dists = np.array([x_can, y_can]) - magnets_can
-        dists = np.sqrt(np.sum(dists**2, axis=1))
-        ind = np.argmin(dists)
-        if dists[ind] < Magnets.DISTANCE_THERSHOLD:
-            return tuple(magnets_can[ind])
-        else:
-            return x_can, y_can
-
 
 class State(enum.IntEnum):
     NORMAL = 0
@@ -71,8 +29,7 @@ class Point:
     def __init__(self, canvas: tk.Canvas, point_xy: Point2D, label:str="",
                  on_click:CallbackPoint=None,
                  on_drag:CallbackPoint=None,
-                 on_release:CallbackPoint=None,
-                 magnets: Optional[Magnets]=None):
+                 on_release:CallbackPoint=None):
         self.canvas = canvas
         self.state: State = State.NORMAL
         self.point_xy = point_xy
@@ -85,15 +42,13 @@ class Point:
         self.canvas.tag_bind(self.circle_id, "<Button-1>", self._on_click)
 
         self.on_drag = on_drag
-        self.canvas.tag_bind(self.circle_id, "<B1-Motion>", self._on_drag)
+        self.canvas.tag_bind(self.circle_id, "<B1-Motion>", lambda event: self._on_drag(event))
 
         self.on_release = on_release
         self.canvas.tag_bind(self.circle_id, "<ButtonRelease-1>", self._on_release)
 
         self.canvas.tag_bind(self.circle_id, "<Enter>", self._on_enter)
         self.canvas.tag_bind(self.circle_id, "<Leave>", self._on_leave)
-
-        self.magnets = magnets
 
 
     def update(self):
@@ -116,9 +71,8 @@ class Point:
 
 
     def _on_drag(self, event):
+        print("point._on_drag")
         try:
-            if self.magnets is not None:
-                event.x, event.y = self.magnets.snap_to_nearest_magnet(event.x, event.y)
             self.point_xy = (event.x, event.y)
             self.state = State.DRAGGED
             self.update()
@@ -154,8 +108,7 @@ class Polygon:
     def __init__(self, canvas: tk.Canvas, point_xy_list: Point2DList, label:str="",
                  on_click:CallbackPolygon=None,
                  on_drag:CallbackPolygon=None,
-                 on_release:CallbackPolygon=None,
-                 magnets:Optional[Magnets]=None):
+                 on_release:CallbackPolygon=None):
         self.canvas = canvas
         self.point_xy_list = point_xy_list + []
         self.label = label
@@ -178,8 +131,7 @@ class Polygon:
             ipoint = Point(canvas, point_xy, label="",
                     on_click=None if on_click is None else self._on_click,
                     on_drag=on_drag_lambdas[k],
-                    on_release=None if on_release is None else self._on_release,
-                    magnets=magnets)
+                    on_release=None if on_release is None else self._on_release)
             self.ipoints.append(ipoint)
 
         self.lines = self._create_lines()
@@ -218,6 +170,7 @@ class Polygon:
             self.on_click(event, self.point_xy_list)
 
     def _on_drag(self, i, event):
+        print("polygon._on_drag")
         try:
             self.point_xy_list[i] = (event.x, event.y)
             self._update_lines()
@@ -233,10 +186,9 @@ class Polygon:
 
 class Rectangle(Polygon):
     def __init__(self, canvas: tk.Canvas, point0_xy: Point2D, point1_xy: Point2D, label:str="",
-                on_click:CallbackRect=None,
-                on_drag:CallbackRect=None,
-                on_release:CallbackRect=None,
-                magnets:Optional[Magnets]=None):
+                 on_click:CallbackRect=None,
+                 on_drag:CallbackRect=None,
+                 on_release:CallbackRect=None):
 
         # wrap user callback to convert signature from CallbackRect to CallbackPolygon
         lambda0 = None if on_click is None else lambda event, point_list_xy: on_click(event, point_list_xy[0], point_list_xy[1])
@@ -255,8 +207,7 @@ class Rectangle(Polygon):
         super().__init__(canvas, point_list_xy, label,
                 on_click=None if on_click is None else on_click_rect,
                 on_drag=None if on_drag is None else on_drag_rect,
-                on_release=None if on_release is None else on_release_rect,
-                magnets=magnets)
+                on_release=None if on_release is None else on_release_rect)
 
     def _create_lines(self):
         return [(-1, -1, self.canvas.create_line(-1, -1, -1, -1, fill=Polygon.colors[self.state], width=5)) for i in range(4)]
@@ -288,3 +239,66 @@ class Rectangle(Polygon):
         self.canvas.coords(line_id, left, bottom, left, top)
         self.canvas.itemconfig(line_id, state=item_state)
         self.canvas.tag_raise(line_id)
+
+
+class Magnets:
+    DISTANCE_THERSHOLD = 20
+    COLOR = '#%02x%02x%02x' % (255, 0, 255)
+
+    def __init__(self, canvas: tk.Canvas, point_xy_list: Point2DList, img2canvas_space_func):
+        self.point_xy_list = point_xy_list
+        self.img2canvas_space_func = img2canvas_space_func
+        self.canvas = canvas
+        self.visible = True
+        self.circle_id_list = [self.canvas.create_oval(0, 0, 1, 1, fill=Magnets.COLOR, width=0) for _ in point_xy_list]
+
+    def update(self):
+        radius = Point.radius[State.NORMAL]//2
+        item_state = 'normal' if self.visible else 'hidden'
+        for circle_id, point_xy in zip(self.circle_id_list, self.point_xy_list):
+            point_xy = self.img2canvas_space_func(*point_xy)
+            x1 = point_xy[0] - radius
+            y1 = point_xy[1] - radius
+            x2 = point_xy[0] + radius
+            y2 = point_xy[1] + radius
+            self.canvas.coords(circle_id, x1, y1, x2, y2)
+            self.canvas.itemconfig(circle_id, fill=Magnets.COLOR, state=item_state)
+            self.canvas.tag_raise(circle_id)
+
+    def get_point_in_canvas_space(self) -> Point2DList:
+        return [self.img2canvas_space_func(x_img, y_img) for x_img, y_img in self.point_xy_list]
+
+    def get_point_in_img_space(self) -> Point2DList:
+        return self.point_xy_list
+
+    def snap_to_nearest_magnet(self, x_can, y_can):
+        magnets_can = np.array(self.get_point_in_canvas_space())
+        dists = np.array([x_can, y_can]) - magnets_can
+        dists = np.sqrt(np.sum(dists ** 2, axis=1))
+        ind = np.argmin(dists)
+        if dists[ind] < Magnets.DISTANCE_THERSHOLD:
+            return tuple(magnets_can[ind])
+        else:
+            return x_can, y_can
+
+    def magnetize_overlay(self, point: Point):
+
+
+        def copy_func(f):
+            """return a function with same code, globals, name, defaults and closure"""
+            fn = types.FunctionType(f.__code__, f.__globals__, f.__name__, f.__defaults__, f.__closure__)
+            # in case f was given attrs (note this dict is a shallow copy):
+            fn.__dict__.update(f.__dict__)
+            return fn
+
+        # copy callback function
+        point_on_drag_copy = copy_func(point._on_drag)
+
+        def _on_drag_magnetized_wrapper(event):
+            print("magnet._on_drag_magnetized_point")
+            event.x, event.y = self.snap_to_nearest_magnet(event.x, event.y)
+            # use the copy of the callback to avoid recursion
+            point_on_drag_copy(point, event)
+
+        if point._on_drag is not None:
+            setattr(point, point._on_drag.__name__, _on_drag_magnetized_wrapper)
