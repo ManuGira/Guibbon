@@ -97,7 +97,7 @@ class Point:
         self.update()
 
 
-class Polygon:
+class Polygon(InteractivePolygon):
     colors = {
         State.NORMAL: '#%02x%02x%02x' % (0, 255, 0),
         State.HOVERED: '#%02x%02x%02x' % (127, 255, 127),
@@ -181,6 +181,11 @@ class Polygon:
     def _on_release(self, event):
         if self.on_release is not None:
             self.on_release(event, self.point_xy_list)
+
+    def set_point_xy_list(self, point_xy_list: Point2DList):
+        assert len(point_xy_list) == len(self.point_xy_list)
+        self.point_xy_list = point_xy_list
+        self.update()
 
 class Rectangle(Polygon):
     def __init__(self, canvas: tk.Canvas, point0_xy: Point2D, point1_xy: Point2D, label:str="",
