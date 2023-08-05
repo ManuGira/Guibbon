@@ -1,5 +1,5 @@
 from typing import Dict, Any, Optional
-from .typedef import CallbackPoint, CallbackPolygon, CallbackRect, Point2DList
+from .typedef import CallbackPoint, CallbackPolygon, CallbackRect, Point2DList, InteractivePolygon
 
 import time
 

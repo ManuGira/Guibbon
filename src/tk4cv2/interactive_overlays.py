@@ -3,7 +3,7 @@ from typing import Sequence
 
 import numpy as np
 
-from .typedef import Point2D, Point2DList, CallbackPoint, CallbackPolygon, CallbackRect
+from .typedef import Point2D, Point2DList, CallbackPoint, CallbackPolygon, CallbackRect, InteractivePolygon, TransformMatrix
 
 import enum
 import tkinter as tk

@@ -1,6 +1,6 @@
 import types
 from typing import Tuple, List, Set, Any, Optional
-from .typedef import CallbackPoint, CallbackPolygon, CallbackRect, Point2DList, MouseCallback
+from .typedef import CallbackPoint, CallbackPolygon, CallbackRect, Point2D, Point2DList, MouseCallback, TransformMatrix
 
 import dataclasses
 import enum
