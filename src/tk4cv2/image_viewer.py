@@ -212,7 +212,7 @@ class ImageViewer:
                 on_click: CallbackPolygon=None,
                 on_drag: CallbackPolygon=None,
                 on_release: CallbackPolygon=None,
-                magnet_points:Optional[Point2DList]=None):
+                magnet_points:Optional[Point2DList]=None) -> interactive_overlays.Polygon:
 
         # Callbacks are wrapped to convert coordinate from canvas to image space.
         def on_click_img0(event, _point_xy_list):
@@ -241,6 +241,8 @@ class ImageViewer:
             for ipoint in ipolygon.ipoints:
                 magnets.magnetize_overlay(ipoint)
             self.magnets_overlay_instance_set.add(magnets)
+
+        return ipolygon
 
     def createInteractiveRectangle(self, point0_xy, point1_xy, label="",
             on_click:CallbackRect=None, on_drag:CallbackRect=None, on_release:CallbackRect=None,
