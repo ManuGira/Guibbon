@@ -1,10 +1,10 @@
-from typing import Optional, Callable, NoReturn, List, Tuple, Literal, Annotated
+from typing import Optional, Callable, NoReturn, List, Tuple, Literal, Annotated, Any
 import numpy as np
 import numpy.typing as npt
 from .typedef import Point2D, Point2DList
 
 # 3x3 matrix of a rigid transform
-TransformMatrix = Optional[Annotated[npt.NDArray[float], Literal[3, 3]]]
+TransformMatrix = Annotated[npt.NDArray[np.float64], Literal[3, 3]]
 
 def identity_matrix() -> TransformMatrix:
     return np.array([

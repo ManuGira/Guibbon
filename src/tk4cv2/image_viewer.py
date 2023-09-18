@@ -224,12 +224,14 @@ class ImageViewer:
         imgh, imgw = mat.shape[:2]
         mat = cv2.cvtColor(mat, cv2.COLOR_BGR2RGB)
 
+        img_space_matrix: TransformMatrix
+        can_space_matrix: TransformMatrix
         if mode == "fit":
-            img_space_matrix: TransformMatrix = tm.T((imgw/2, imgh/2)) @ tm.S((max(imgw, imgh), max(imgw, imgh)))
-            can_space_matrix: TransformMatrix = tm.T((canw/2, canh/2)) @ tm.S((max(canw, canh), max(canw, canh)))
+            img_space_matrix = tm.T((imgw/2, imgh/2)) @ tm.S((max(imgw, imgh), max(imgw, imgh)))
+            can_space_matrix = tm.T((canw/2, canh/2)) @ tm.S((max(canw, canh), max(canw, canh)))
         elif mode == "fill":
-            img_space_matrix: TransformMatrix = tm.T((imgw / 2, imgh / 2)) @ tm.S((min(imgw, imgh), min(imgw, imgh)))
-            can_space_matrix: TransformMatrix = tm.T((canw / 2, canh / 2)) @ tm.S((min(canw, canh), min(canw, canh)))
+            img_space_matrix = tm.T((imgw / 2, imgh / 2)) @ tm.S((min(imgw, imgh), min(imgw, imgh)))
+            can_space_matrix = tm.T((canw / 2, canh / 2)) @ tm.S((min(canw, canh), min(canw, canh)))
         else:
             raise ValueError(f"Don't know mode: \"{mode}\"")
 

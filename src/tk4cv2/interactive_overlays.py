@@ -1,5 +1,5 @@
 import types
-from typing import Sequence
+from typing import Sequence, Optional
 
 import numpy as np
 
@@ -32,13 +32,17 @@ class Point:
                  on_click:CallbackPoint=None,
                  on_drag:CallbackPoint=None,
                  on_release:CallbackPoint=None,
-                 img2can_matrix:TransformMatrix=None):
+                 img2can_matrix:Optional[TransformMatrix]=None):
+        if img2can_matrix is None:
+            img2can_matrix = tmat.identity_matrix()
+
         self.canvas = canvas
         self.state: State = State.NORMAL
         self.point_xy = point_xy  # coordinates are expressed in img space
         self.label = label
-        self.img2can_matrix: TransformMatrix = None
-        self.can2img_matrix: TransformMatrix = None
+        self.img2can_matrix: TransformMatrix
+        self.can2img_matrix: TransformMatrix
+
         self.set_img2can_matrix(img2can_matrix)
         self.visible: bool = True
 
@@ -69,8 +73,8 @@ class Point:
         self.canvas.itemconfig(self.circle_id, fill=Point.colors[self.state], state=item_state)
         self.canvas.tag_raise(self.circle_id)
 
-    def set_img2can_matrix(self, img2can_matrix: TransformMatrix=None):
-        self.img2can_matrix = tmat.identity_matrix() if img2can_matrix is None else img2can_matrix.copy()
+    def set_img2can_matrix(self, img2can_matrix: TransformMatrix):
+        self.img2can_matrix = img2can_matrix.copy()
         self.can2img_matrix = np.linalg.inv(self.img2can_matrix)
 
     def get_img_point_xy(self) -> Point2D:
@@ -132,7 +136,7 @@ class Polygon(InteractivePolygon):
                  on_click:CallbackPolygon=None,
                  on_drag:CallbackPolygon=None,
                  on_release:CallbackPolygon=None,
-                 img2can_matrix:TransformMatrix=None):
+                 img2can_matrix:Optional[TransformMatrix]=None):
         self.canvas = canvas
         self.label = label
         self.visible: bool = True
@@ -211,7 +215,7 @@ class Polygon(InteractivePolygon):
             point_xy_list = [ipoint.get_img_point_xy() for ipoint in self.ipoints]
             self.on_release(event, point_xy_list)
 
-    def set_img2can_matrix(self, img2can_matrix: TransformMatrix=None):
+    def set_img2can_matrix(self, img2can_matrix: TransformMatrix):
         for ipoint in self.ipoints:
             ipoint.set_img2can_matrix(img2can_matrix)
 
@@ -226,7 +230,7 @@ class Rectangle(Polygon):
                  on_click:CallbackRect=None,
                  on_drag:CallbackRect=None,
                  on_release:CallbackRect=None,
-                 img2can_matrix=None):
+                 img2can_matrix:Optional[TransformMatrix]=None):
 
         # wrap user callback to convert signature from CallbackRect to CallbackPolygon
         lambda0 = None if on_click is None else lambda event, point_list_xy: on_click(event, point_list_xy[0], point_list_xy[1])
@@ -287,20 +291,24 @@ class Magnets:
     DISTANCE_THERSHOLD = 20
     COLOR = '#%02x%02x%02x' % (255, 0, 255)
 
-    def __init__(self, canvas: tk.Canvas, point_xy_list: Point2DList, img2can_matrix: TransformMatrix=None, dist_threshold=DISTANCE_THERSHOLD):
+    def __init__(self, canvas: tk.Canvas, point_xy_list: Point2DList,
+                 img2can_matrix: Optional[TransformMatrix]=None,
+                 dist_threshold=DISTANCE_THERSHOLD):
         self.canvas = canvas
         self.point_xy_list = point_xy_list
+        if img2can_matrix is None:
+            img2can_matrix = tmat.identity_matrix()
 
-        self.img2can_matrix: TransformMatrix = None
-        self.can2img_matrix: TransformMatrix = None
+        self.img2can_matrix: TransformMatrix
+        self.can2img_matrix: TransformMatrix
         self.set_img2can_matrix(img2can_matrix)
 
         self.dist_threshold = dist_threshold
         self.visible = False
         self.circle_id_list = [self.canvas.create_oval(0, 0, 1, 1, fill=Magnets.COLOR, width=0) for _ in point_xy_list]
 
-    def set_img2can_matrix(self, img2can_matrix: TransformMatrix=None):
-        self.img2can_matrix = tmat.identity_matrix() if img2can_matrix is None else img2can_matrix.copy()
+    def set_img2can_matrix(self, img2can_matrix: TransformMatrix):
+        self.img2can_matrix = img2can_matrix.copy()
         self.can2img_matrix = np.linalg.inv(self.img2can_matrix)
 
     def update(self):
