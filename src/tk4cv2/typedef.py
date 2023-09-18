@@ -22,9 +22,6 @@ CallbackRect = Optional[Callable[[tk.Event, Point2D, Point2D], NoReturn]]
 # foo(cvevent, x, y, flag, param) -> None
 MouseCallback = Optional[Callable[[int, int, int, int, None], NoReturn]]
 
-# 3x3 matrix of a rigid transform
-TransformMatrix = Optional[Annotated[npt.NDArray[float], Literal[3, 3]]]
-
 class InteractivePolygon(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def update(self):
