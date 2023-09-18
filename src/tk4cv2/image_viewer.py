@@ -51,7 +51,6 @@ class ImageViewer:
         self.imgtk = None
         self.onMouse: MouseCallback = None
         self.modifier = ImageViewer.Modifier()
-        self.magnets_overlay_instance_set: Set[Any] = set()
         self.interactive_overlay_instance_list: List[Any] = []
         self.img2can_matrix: TransformMatrix
         self.can2img_matrix: TransformMatrix
@@ -167,15 +166,14 @@ class ImageViewer:
                 on_click:CallbackPoint=None, on_drag:CallbackPoint=None, on_release:CallbackPoint=None,
                 magnet_points:Optional[Point2DList]=None):
 
+        magnets = None
+        if magnet_points is not None:
+            magnets = interactive_overlays.Magnets(self.canvas, magnet_points)
+
         ipoint = interactive_overlays.Point(self.canvas, point_xy, label,
                                             on_click, on_drag, on_release,
-                                            img2can_matrix=self.img2can_matrix)
+                                            magnets=magnets)
         self.interactive_overlay_instance_list.append(ipoint)
-
-        if magnet_points is not None:
-            magnets = interactive_overlays.Magnets(self.canvas, magnet_points, self.img2can_matrix)
-            magnets.magnetize_overlay(ipoint)
-            self.magnets_overlay_instance_set.add(magnets)
 
     def createInteractivePolygon(self, point_xy_list, label="",
                 on_click: CallbackPolygon=None,
@@ -183,33 +181,29 @@ class ImageViewer:
                 on_release: CallbackPolygon=None,
                 magnet_points:Optional[Point2DList]=None) -> interactive_overlays.Polygon:
 
+        magnets = None
+        if magnet_points is not None:
+            magnets = interactive_overlays.Magnets(self.canvas, magnet_points)
+
         ipolygon = interactive_overlays.Polygon(self.canvas, point_xy_list, label,
                                                 on_click, on_drag, on_release,
-                                                img2can_matrix=self.img2can_matrix)
+                                                magnets=magnets)
         self.interactive_overlay_instance_list.append(ipolygon)
-
-        if magnet_points is not None:
-            magnets = interactive_overlays.Magnets(self.canvas, magnet_points, self.img2can_matrix)
-            for ipoint in ipolygon.ipoints:
-                magnets.magnetize_overlay(ipoint)
-            self.magnets_overlay_instance_set.add(magnets)
-
         return ipolygon
 
     def createInteractiveRectangle(self, point0_xy, point1_xy, label="",
             on_click:CallbackRect=None, on_drag:CallbackRect=None, on_release:CallbackRect=None,
             magnet_points:Optional[Point2DList]=None):
 
+        magnets = None
+        if magnet_points is not None:
+            magnets = interactive_overlays.Magnets(self.canvas, magnet_points)
+
         ipolygon = interactive_overlays.Rectangle(self.canvas, point0_xy, point1_xy, label,
                                                   on_click, on_drag, on_release,
-                                                  img2can_matrix=self.img2can_matrix)
+                                                  magnets=magnets)
         self.interactive_overlay_instance_list.append(ipolygon)
 
-        if magnet_points is not None:
-            magnets = interactive_overlays.Magnets(self.canvas, magnet_points, self.img2can_matrix)
-            for ipoint in ipolygon.ipoints:
-                magnets.magnetize_overlay(ipoint)
-            self.magnets_overlay_instance_set.add(magnets)
 
     def pack(self, *args, **kwargs):
         self.canvas.pack(*args, **kwargs)
@@ -240,10 +234,6 @@ class ImageViewer:
 
         self.imgtk = ImageTk.PhotoImage(image=Image.fromarray(mat))
         self.canvas.create_image(canw // 2, canh // 2, anchor=tk.CENTER, image=self.imgtk)
-
-        for overlay in self.magnets_overlay_instance_set:
-            overlay.set_img2can_matrix(self.img2can_matrix)
-            overlay.update()
 
         for overlay in self.interactive_overlay_instance_list:
             overlay.set_img2can_matrix(self.img2can_matrix)

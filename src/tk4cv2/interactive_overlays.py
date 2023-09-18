@@ -32,7 +32,8 @@ class Point:
                  on_click:CallbackPoint=None,
                  on_drag:CallbackPoint=None,
                  on_release:CallbackPoint=None,
-                 img2can_matrix:Optional[TransformMatrix]=None):
+                 img2can_matrix:Optional[TransformMatrix]=None,
+                 magnets=None):
         if img2can_matrix is None:
             img2can_matrix = tmat.identity_matrix()
 
@@ -42,8 +43,9 @@ class Point:
         self.label = label
         self.img2can_matrix: TransformMatrix
         self.can2img_matrix: TransformMatrix
-
         self.set_img2can_matrix(img2can_matrix)
+        self.magnets = magnets
+
         self.visible: bool = True
 
         self.circle_id = self.canvas.create_oval(0, 0, 1, 1, fill=Point.colors[self.state], outline="#FFFFFF", width=2)
@@ -62,6 +64,7 @@ class Point:
 
 
     def update(self):
+        self.update_magnets()
         radius = Point.radius[self.state]
         can_x, can_y = tmat.apply(self.img2can_matrix, self.point_xy)
         x1 = can_x - radius
@@ -89,20 +92,35 @@ class Point:
     def set_can_point_xy(self, can_point_xy: Point2D):
         self.point_xy = tmat.apply(self.can2img_matrix, can_point_xy)
 
+    def update_magnets(self):
+        if self.magnets is not None:
+            self.magnets.visible = self.state in [State.HOVERED, State.DRAGGED]
+            self.magnets.set_img2can_matrix(self.img2can_matrix)
+            self.magnets.update()
+
     def _on_click(self, event):
         self.state = State.DRAGGED
         self.update()
         if self.on_click is not None:
-            event.x, event.y = tmat.apply(self.can2img_matrix, (event.x, event.y))
+            p_xy = event.x, event.y
+            p_xy = tmat.apply(self.can2img_matrix, p_xy)
+            if self.magnets is not None:
+                p_xy = self.magnets.snap_to_nearest_magnet(p_xy)
+            event.x, event.y = p_xy
             self.on_click(event)
 
     def _on_drag(self, event):
         try:
-            self.set_can_point_xy((event.x, event.y))
+            can_xy = event.x, event.y
+            img_xy = tmat.apply(self.can2img_matrix, can_xy)
+            if self.magnets is not None:
+                img_xy = self.magnets.snap_to_nearest_magnet(img_xy)
+            self.set_img_point_xy(img_xy)
+
             self.state = State.DRAGGED
             self.update()
             if self.on_drag is not None:
-                event.x, event.y = tmat.apply(self.can2img_matrix, (event.x, event.y))
+                event.x, event.y = img_xy
                 self.on_drag(event)
         except Exception as e:
             print(f"ERROR: {self}: self._on_drag({event}) --->", e)
@@ -112,7 +130,11 @@ class Point:
         self.state = State.HOVERED
         self.update()
         if self.on_release is not None:
-            event.x, event.y = tmat.apply(self.can2img_matrix, (event.x, event.y))
+            can_xy = event.x, event.y
+            img_xy = tmat.apply(self.can2img_matrix, can_xy)
+            if self.magnets is not None:
+                img_xy = self.magnets.snap_to_nearest_magnet(img_xy)
+            event.x, event.y = img_xy
             self.on_release(event)
 
     def _on_enter(self, event):
@@ -121,7 +143,8 @@ class Point:
             self.update()
 
     def _on_leave(self, event):
-        self.state = State.NORMAL
+        if self.state is not State.DRAGGED:
+            self.state = State.NORMAL
         self.update()
 
 
@@ -136,7 +159,8 @@ class Polygon(InteractivePolygon):
                  on_click:CallbackPolygon=None,
                  on_drag:CallbackPolygon=None,
                  on_release:CallbackPolygon=None,
-                 img2can_matrix:Optional[TransformMatrix]=None):
+                 img2can_matrix:Optional[TransformMatrix]=None,
+                 magnets=None):
         self.canvas = canvas
         self.label = label
         self.visible: bool = True
@@ -159,7 +183,8 @@ class Polygon(InteractivePolygon):
                            on_click=None if on_click is None else self._on_click,
                            on_drag=on_drag_lambdas[k],
                            on_release=None if on_release is None else self._on_release,
-                           img2can_matrix=img2can_matrix)
+                           img2can_matrix=img2can_matrix,
+                           magnets=magnets)
             self.ipoints.append(ipoint)
 
         self.lines = self._create_lines()
@@ -230,7 +255,8 @@ class Rectangle(Polygon):
                  on_click:CallbackRect=None,
                  on_drag:CallbackRect=None,
                  on_release:CallbackRect=None,
-                 img2can_matrix:Optional[TransformMatrix]=None):
+                 img2can_matrix:Optional[TransformMatrix]=None,
+                 magnets=None):
 
         # wrap user callback to convert signature from CallbackRect to CallbackPolygon
         lambda0 = None if on_click is None else lambda event, point_list_xy: on_click(event, point_list_xy[0], point_list_xy[1])
@@ -250,7 +276,8 @@ class Rectangle(Polygon):
                 on_click=None if on_click is None else on_click_rect,
                 on_drag=None if on_drag is None else on_drag_rect,
                 on_release=None if on_release is None else on_release_rect,
-                img2can_matrix=img2can_matrix)
+                img2can_matrix=img2can_matrix,
+                magnets=magnets)
 
     def _create_lines(self):
         return [(-1, -1, self.canvas.create_line(-1, -1, -1, -1, fill=Polygon.colors[self.state], width=5)) for i in range(4)]
@@ -288,28 +315,21 @@ class Rectangle(Polygon):
 
 
 class Magnets:
-    DISTANCE_THERSHOLD = 20
+    DISTANCE_THERSHOLD = 20  # distance on img space
     COLOR = '#%02x%02x%02x' % (255, 0, 255)
 
     def __init__(self, canvas: tk.Canvas, point_xy_list: Point2DList,
-                 img2can_matrix: Optional[TransformMatrix]=None,
                  dist_threshold=DISTANCE_THERSHOLD):
         self.canvas = canvas
         self.point_xy_list = point_xy_list
-        if img2can_matrix is None:
-            img2can_matrix = tmat.identity_matrix()
-
-        self.img2can_matrix: TransformMatrix
-        self.can2img_matrix: TransformMatrix
-        self.set_img2can_matrix(img2can_matrix)
 
         self.dist_threshold = dist_threshold
         self.visible = False
         self.circle_id_list = [self.canvas.create_oval(0, 0, 1, 1, fill=Magnets.COLOR, width=0) for _ in point_xy_list]
 
-    def set_img2can_matrix(self, img2can_matrix: TransformMatrix):
-        self.img2can_matrix = img2can_matrix.copy()
-        self.can2img_matrix = np.linalg.inv(self.img2can_matrix)
+        self.img2can_matrix: TransformMatrix = tmat.identity_matrix()
+        self.can2img_matrix: TransformMatrix = tmat.identity_matrix()
+
 
     def update(self):
         radius = Point.radius[State.NORMAL]//2
@@ -325,61 +345,15 @@ class Magnets:
             self.canvas.itemconfig(circle_id, fill=Magnets.COLOR, state=item_state)
             self.canvas.tag_raise(circle_id)
 
-    def get_point_in_canvas_space(self) -> Point2DList:
-        return [tmat.apply(self.img2can_matrix, point_xy) for point_xy in self.point_xy_list]
-
-    def get_point_in_img_space(self) -> Point2DList:
-        return self.point_xy_list
-
-    def snap_to_nearest_magnet(self, x_can, y_can):
-        magnets_can = np.array(self.get_point_in_canvas_space())
-        dists = np.array([x_can, y_can]) - magnets_can
-        dists = np.sqrt(np.sum(dists ** 2, axis=1))
-        ind = np.argmin(dists)
-        if dists[ind] < self.dist_threshold:
-            return tuple(magnets_can[ind])
+    def snap_to_nearest_magnet(self, point_xy_img: Point2D) -> Point2D:
+        dists2 = np.array(point_xy_img) - np.array(self.point_xy_list)
+        dists2 = np.sum(dists2 ** 2, axis=1)
+        ind = np.argmin(dists2)
+        if dists2[ind] < self.dist_threshold**2:
+            return self.point_xy_list[ind]
         else:
-            return x_can, y_can
+            return point_xy_img
 
-    def magnetize_overlay(self, point: Point):
-        """
-        Magnetize the given overlay by wrapping its callbacks.
-        The mouse inputs are passing through magnetic function before calling the actual callback of the overlay
-        """
-
-        def copy_func(f):
-            """return a function with same code, globals, name, defaults and closure"""
-            fn = types.FunctionType(f.__code__, f.__globals__, f.__name__, f.__defaults__, f.__closure__)
-            # in case f was given attrs (note this dict is a shallow copy):
-            fn.__dict__.update(f.__dict__)
-            return fn
-
-        # copy callback function
-        point_on_click_copy = copy_func(point._on_click)
-        point_on_drag_copy = copy_func(point._on_drag)
-        point_on_release_copy = copy_func(point._on_release)
-
-        def _on_click_magnetized_wrapper(event):
-            """Wrapping function of on_release callback"""
-            self.visible = True
-            self.update()
-            # use the copy of the callback to avoid recursion
-            point_on_click_copy(point, event)
-
-        def _on_drag_magnetized_wrapper(event):
-            """Wrapping function of on_drag callback to apply magnetization on mouse inputs"""
-            event.x, event.y = self.snap_to_nearest_magnet(event.x, event.y)
-            # use the copy of the callback to avoid recursion
-            point_on_drag_copy(point, event)
-
-        def _on_release_magnetized_wrapper(event):
-            """Wrapping function of on_release callback"""
-            self.visible = False
-            self.update()
-            # use the copy of the callback to avoid recursion
-            point_on_release_copy(point, event)
-
-        # monkey patch callback methods of Point class
-        setattr(point, point._on_click.__name__, _on_click_magnetized_wrapper)
-        setattr(point, point._on_drag.__name__, _on_drag_magnetized_wrapper)
-        setattr(point, point._on_release.__name__, _on_release_magnetized_wrapper)
+    def set_img2can_matrix(self, img2can_matrix: TransformMatrix):
+        self.img2can_matrix = img2can_matrix.copy()
+        self.can2img_matrix = np.linalg.inv(self.img2can_matrix)
