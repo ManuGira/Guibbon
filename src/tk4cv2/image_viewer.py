@@ -53,7 +53,9 @@ class ImageViewer:
         self.modifier = ImageViewer.Modifier()
         self.magnets_overlay_instance_set: Set[Any] = set()
         self.interactive_overlay_instance_list: List[Any] = []
-        self.img2canvas_matrix = tm.identity_matrix()
+        self.img2can_matrix: TransformMatrix
+        self.can2img_matrix: TransformMatrix
+        self.set_img2can_matrix(tm.identity_matrix())
 
     def setMouseCallback(self, onMouse, param=None):
         if not isinstance(onMouse, types.FunctionType) and not isinstance(onMouse, types.MethodType):
@@ -152,10 +154,14 @@ class ImageViewer:
         flag += cv2.EVENT_FLAG_CTRLKEY if self.modifier.CONTROL else 0
         flag += cv2.EVENT_FLAG_SHIFTKEY if self.modifier.SHIFT else 0
 
-        x, y = self.canvas2img_space(event.x, event.y)
+        x, y = tm.apply(self.can2img_matrix, (event.x, event.y))
         param = None
 
         self.onMouse(cvevent, x, y, flag, param)  # type: ignore
+
+    def set_img2can_matrix(self, img2can_matrix: TransformMatrix):
+        self.img2can_matrix = img2can_matrix.copy()
+        self.can2img_matrix = np.linalg.inv(self.img2can_matrix)
 
     def createInteractivePoint(self, point_xy, label="",
                 on_click:CallbackPoint=None, on_drag:CallbackPoint=None, on_release:CallbackPoint=None,
@@ -163,11 +169,11 @@ class ImageViewer:
 
         ipoint = interactive_overlays.Point(self.canvas, point_xy, label,
                                             on_click, on_drag, on_release,
-                                            img2can_matrix=self.img2canvas_matrix)
+                                            img2can_matrix=self.img2can_matrix)
         self.interactive_overlay_instance_list.append(ipoint)
 
         if magnet_points is not None:
-            magnets = interactive_overlays.Magnets(self.canvas, magnet_points, self.img2canvas_matrix)
+            magnets = interactive_overlays.Magnets(self.canvas, magnet_points, self.img2can_matrix)
             magnets.magnetize_overlay(ipoint)
             self.magnets_overlay_instance_set.add(magnets)
 
@@ -179,11 +185,11 @@ class ImageViewer:
 
         ipolygon = interactive_overlays.Polygon(self.canvas, point_xy_list, label,
                                                 on_click, on_drag, on_release,
-                                                img2can_matrix=self.img2canvas_matrix)
+                                                img2can_matrix=self.img2can_matrix)
         self.interactive_overlay_instance_list.append(ipolygon)
 
         if magnet_points is not None:
-            magnets = interactive_overlays.Magnets(self.canvas, magnet_points, self.img2canvas_matrix)
+            magnets = interactive_overlays.Magnets(self.canvas, magnet_points, self.img2can_matrix)
             for ipoint in ipolygon.ipoints:
                 magnets.magnetize_overlay(ipoint)
             self.magnets_overlay_instance_set.add(magnets)
@@ -196,11 +202,11 @@ class ImageViewer:
 
         ipolygon = interactive_overlays.Rectangle(self.canvas, point0_xy, point1_xy, label,
                                                   on_click, on_drag, on_release,
-                                                  img2can_matrix=self.img2canvas_matrix)
+                                                  img2can_matrix=self.img2can_matrix)
         self.interactive_overlay_instance_list.append(ipolygon)
 
         if magnet_points is not None:
-            magnets = interactive_overlays.Magnets(self.canvas, magnet_points, self.img2canvas_matrix)
+            magnets = interactive_overlays.Magnets(self.canvas, magnet_points, self.img2can_matrix)
             for ipoint in ipolygon.ipoints:
                 magnets.magnetize_overlay(ipoint)
             self.magnets_overlay_instance_set.add(magnets)
@@ -227,18 +233,18 @@ class ImageViewer:
         else:
             raise ValueError(f"Don't know mode: \"{mode}\"")
 
-        self.img2canvas_matrix: TransformMatrix = can_space_matrix @ np.linalg.inv(img_space_matrix)
-        mat = cv2.warpPerspective(mat, self.img2canvas_matrix, dsize=(canh, canw))
+        self.set_img2can_matrix(can_space_matrix @ np.linalg.inv(img_space_matrix))
+        mat = cv2.warpPerspective(mat, self.img2can_matrix, dsize=(canh, canw))
 
         self.imgtk = ImageTk.PhotoImage(image=Image.fromarray(mat))
         self.canvas.create_image(canw // 2, canh // 2, anchor=tk.CENTER, image=self.imgtk)
 
         for overlay in self.magnets_overlay_instance_set:
-            overlay.set_img2can_matrix(self.img2canvas_matrix)
+            overlay.set_img2can_matrix(self.img2can_matrix)
             overlay.update()
 
         for overlay in self.interactive_overlay_instance_list:
-            overlay.set_img2can_matrix(self.img2canvas_matrix)
+            overlay.set_img2can_matrix(self.img2can_matrix)
             overlay.update()
 
 
