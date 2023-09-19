@@ -47,6 +47,9 @@ class Magnets:
             self.canvas.tag_raise(circle_id)
 
     def snap_to_nearest_magnet(self, point_xy_img: Point2D) -> Point2D:
+        if len(self.point_xy_list) == 0:
+            return point_xy_img
+
         dists2 = np.array(point_xy_img) - np.array(self.point_xy_list)
         dists2 = np.sum(dists2 ** 2, axis=1)
         ind = np.argmin(dists2)
