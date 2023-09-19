@@ -30,7 +30,6 @@ class Magnets:
         self.circle_id_list = [self.canvas.create_oval(0, 0, 1, 1, fill=Magnets.COLOR, width=0) for _ in point_xy_list]
 
         self.img2can_matrix: TransformMatrix = tmat.identity_matrix()
-        self.can2img_matrix: TransformMatrix = tmat.identity_matrix()
 
 
     def update(self):
@@ -58,7 +57,6 @@ class Magnets:
 
     def set_img2can_matrix(self, img2can_matrix: TransformMatrix):
         self.img2can_matrix = img2can_matrix.copy()
-        self.can2img_matrix = np.linalg.inv(self.img2can_matrix)
 
 class Point:
     colors = {
