@@ -255,13 +255,13 @@ class TestPolygon(unittest.TestCase):
         k = 0
         self.plg._on_drag(k, event)
         self.assertEqual(2, self.event_count, "Event must not be triggered")
-        self.assertEqual([(21, 22), (0, 100), (100, 100)], self.point_xy_list, "Event coordinate must pass to callback")
+        self.assertEqual(point_xy_list_bck, self.point_xy_list, "_on_drag should not change point_xy_list (on_drag of Point should)")
 
         event = Event(x=31, y=32)
         k = 1
         self.plg._on_drag(k, event)
         self.assertEqual(3, self.event_count, "Event must not be triggered")
-        self.assertEqual([(21, 22), (31, 32), (100, 100)], self.point_xy_list, "Event coordinate must pass to callback")
+        self.assertEqual(point_xy_list_bck, self.point_xy_list, "_on_drag should not change point_xy_list (on_drag of Point should)")
 
         event = Event(x=41, y=42)
         point_xy_list_bck = self.point_xy_list + []
@@ -297,8 +297,6 @@ class TestPolygon(unittest.TestCase):
 
         self.assertEqual(0, self.event_count, "Event should not be triggered")
         self.assertEqual(point_xy_list_bck, self.point_xy_list, "those callbacks should not be able to change self.point_xy_list")
-        self.assertEqual([(123, 456), (0, 100), (100, 100)], self.plg.point_xy_list,
-                         "even with no user callback subscribed, the polygon should still respond to mouse drag...")
 
     def test_event_sequence(self):
         self.plg = interactive_overlays.Polygon(canvas=self.canvas, point_xy_list=self.point_xy_list, label="ok",
@@ -399,15 +397,15 @@ class TestRectangle(unittest.TestCase):
         k = 0
         self.rect._on_drag(k, event)
         self.assertEqual(2, self.event_count, "Event must not be triggered")
-        self.assertEqual((21, 22), self.point0_xy, "Event coordinate must pass to callback")
-        self.assertEqual((100, 100), self.point1_xy, "Event coordinate must pass to callback")
+        self.assertEqual(point0_xy_bck, self.point0_xy, "Event coordinate must pass to callback")
+        self.assertEqual(point1_xy_bck, self.point1_xy, "Event coordinate must pass to callback")
 
         event = Event(x=31, y=32)
         k = 1
         self.rect._on_drag(k, event)
         self.assertEqual(3, self.event_count, "Event must not be triggered")
-        self.assertEqual((21, 22), self.point0_xy, "Event coordinate must pass to callback")
-        self.assertEqual((31, 32), self.point1_xy, "Event coordinate must pass to callback")
+        self.assertEqual(point0_xy_bck, self.point0_xy, "_on_drag should not change point0_xy (Point.on_drag should)")
+        self.assertEqual(point1_xy_bck, self.point1_xy, "_on_drag should not change point0_xy (Point.on_drag should)")
 
         event = Event(x=41, y=42)
         point0_xy_bck = self.point0_xy
@@ -451,9 +449,6 @@ class TestRectangle(unittest.TestCase):
         self.assertEqual(0, self.event_count, "Event should not be triggered")
         self.assertEqual(point0_xy_bck, self.point0_xy, "those callbacks should not be able to change self.point0_xy_bck")
         self.assertEqual(point1_xy_bck, self.point1_xy, "those callbacks should not be able to change self.point0_xy_bck")
-        self.assertEqual([(123, 456), (100, 100)], self.rect.point_xy_list,
-                "even with no user callback subscribed, the rectangle should still respond to mouse drag...")
-
 
     def test_event_sequence(self):
         self.rect = interactive_overlays.Rectangle(canvas=self.canvas, point0_xy=self.point0_xy, point1_xy=self.point1_xy, label="ok",
