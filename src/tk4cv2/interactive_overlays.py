@@ -15,6 +15,51 @@ class State(enum.IntEnum):
     HOVERED = 1
     DRAGGED = 2
 
+
+class Magnets:
+    DISTANCE_THERSHOLD = 20  # distance on img space
+    COLOR = '#%02x%02x%02x' % (255, 0, 255)
+
+    def __init__(self, canvas: tk.Canvas, point_xy_list: Point2DList,
+                 dist_threshold=DISTANCE_THERSHOLD):
+        self.canvas = canvas
+        self.point_xy_list = point_xy_list
+
+        self.dist_threshold = dist_threshold
+        self.visible = False
+        self.circle_id_list = [self.canvas.create_oval(0, 0, 1, 1, fill=Magnets.COLOR, width=0) for _ in point_xy_list]
+
+        self.img2can_matrix: TransformMatrix = tmat.identity_matrix()
+        self.can2img_matrix: TransformMatrix = tmat.identity_matrix()
+
+
+    def update(self):
+        radius = Point.radius[State.NORMAL]//2
+        item_state = 'normal' if self.visible else 'hidden'
+        for circle_id, point_xy in zip(self.circle_id_list, self.point_xy_list):
+            point_xy = tmat.apply(self.img2can_matrix, point_xy)
+            point_xy = (int(round(point_xy[0])), int(round(point_xy[1])))
+            x1 = point_xy[0] - radius
+            y1 = point_xy[1] - radius
+            x2 = point_xy[0] + radius
+            y2 = point_xy[1] + radius
+            self.canvas.coords(circle_id, x1, y1, x2, y2)
+            self.canvas.itemconfig(circle_id, fill=Magnets.COLOR, state=item_state)
+            self.canvas.tag_raise(circle_id)
+
+    def snap_to_nearest_magnet(self, point_xy_img: Point2D) -> Point2D:
+        dists2 = np.array(point_xy_img) - np.array(self.point_xy_list)
+        dists2 = np.sum(dists2 ** 2, axis=1)
+        ind = np.argmin(dists2)
+        if dists2[ind] < self.dist_threshold**2:
+            return self.point_xy_list[ind]
+        else:
+            return point_xy_img
+
+    def set_img2can_matrix(self, img2can_matrix: TransformMatrix):
+        self.img2can_matrix = img2can_matrix.copy()
+        self.can2img_matrix = np.linalg.inv(self.img2can_matrix)
+
 class Point:
     colors = {
         State.NORMAL: '#%02x%02x%02x' % (0, 0, 255),
@@ -33,7 +78,7 @@ class Point:
                  on_drag:CallbackPoint=None,
                  on_release:CallbackPoint=None,
                  img2can_matrix:Optional[TransformMatrix]=None,
-                 magnets=None):
+                 magnets: Optional[Magnets]=None):
         if img2can_matrix is None:
             img2can_matrix = tmat.identity_matrix()
 
@@ -160,7 +205,7 @@ class Polygon(InteractivePolygon):
                  on_drag:CallbackPolygon=None,
                  on_release:CallbackPolygon=None,
                  img2can_matrix:Optional[TransformMatrix]=None,
-                 magnets=None):
+                 magnets: Optional[Magnets]=None):
         self.canvas = canvas
         self.label = label
         self.visible: bool = True
@@ -256,7 +301,7 @@ class Rectangle(Polygon):
                  on_drag:CallbackRect=None,
                  on_release:CallbackRect=None,
                  img2can_matrix:Optional[TransformMatrix]=None,
-                 magnets=None):
+                 magnets: Optional[Magnets]=None):
 
         # wrap user callback to convert signature from CallbackRect to CallbackPolygon
         lambda0 = None if on_click is None else lambda event, point_list_xy: on_click(event, point_list_xy[0], point_list_xy[1])
@@ -312,48 +357,3 @@ class Rectangle(Polygon):
         self.canvas.coords(line_id, left, bottom, left, top)
         self.canvas.itemconfig(line_id, state=item_state)
         self.canvas.tag_raise(line_id)
-
-
-class Magnets:
-    DISTANCE_THERSHOLD = 20  # distance on img space
-    COLOR = '#%02x%02x%02x' % (255, 0, 255)
-
-    def __init__(self, canvas: tk.Canvas, point_xy_list: Point2DList,
-                 dist_threshold=DISTANCE_THERSHOLD):
-        self.canvas = canvas
-        self.point_xy_list = point_xy_list
-
-        self.dist_threshold = dist_threshold
-        self.visible = False
-        self.circle_id_list = [self.canvas.create_oval(0, 0, 1, 1, fill=Magnets.COLOR, width=0) for _ in point_xy_list]
-
-        self.img2can_matrix: TransformMatrix = tmat.identity_matrix()
-        self.can2img_matrix: TransformMatrix = tmat.identity_matrix()
-
-
-    def update(self):
-        radius = Point.radius[State.NORMAL]//2
-        item_state = 'normal' if self.visible else 'hidden'
-        for circle_id, point_xy in zip(self.circle_id_list, self.point_xy_list):
-            point_xy = tmat.apply(self.img2can_matrix, point_xy)
-            point_xy = (int(round(point_xy[0])), int(round(point_xy[1])))
-            x1 = point_xy[0] - radius
-            y1 = point_xy[1] - radius
-            x2 = point_xy[0] + radius
-            y2 = point_xy[1] + radius
-            self.canvas.coords(circle_id, x1, y1, x2, y2)
-            self.canvas.itemconfig(circle_id, fill=Magnets.COLOR, state=item_state)
-            self.canvas.tag_raise(circle_id)
-
-    def snap_to_nearest_magnet(self, point_xy_img: Point2D) -> Point2D:
-        dists2 = np.array(point_xy_img) - np.array(self.point_xy_list)
-        dists2 = np.sum(dists2 ** 2, axis=1)
-        ind = np.argmin(dists2)
-        if dists2[ind] < self.dist_threshold**2:
-            return self.point_xy_list[ind]
-        else:
-            return point_xy_img
-
-    def set_img2can_matrix(self, img2can_matrix: TransformMatrix):
-        self.img2can_matrix = img2can_matrix.copy()
-        self.can2img_matrix = np.linalg.inv(self.img2can_matrix)
