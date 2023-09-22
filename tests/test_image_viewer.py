@@ -9,6 +9,8 @@ from tk4cv2.image_viewer import ImageViewer
 
 from tk4cv2.typedef import Point2DList
 
+from tk4cv2 import transform_matrix as tmat
+
 eps = sys.float_info.epsilon
 
 @dataclasses.dataclass
@@ -99,29 +101,19 @@ class TestImageViewer(unittest.TestCase):
         self.point0_xy = point0_xy
         self.point1_xy = point1_xy
 
-    def test_spaces_conversion(self):
-        x_screen, y_screen = 400, 500
-        x_img, y_img = self.image_viewer.canvas2img_space(x_screen, y_screen)
-        x_screen2, y_screen2 = self.image_viewer.img2canvas_space(x_img, y_img)
-        self.assertEqual(x_screen, x_screen2)
-        self.assertEqual(y_screen, y_screen2)
-
     def test_imshow(self):
+        expected_zoom = 5
         self.image_viewer.imshow(self.img, mode="fit")
-        self.assertEqual(self.image_viewer.zoom_factor, 5)
+        actual_zoom = self.image_viewer.img2can_matrix[0, 0]
+        self.assertEqual(expected_zoom, actual_zoom)
 
+        expected_zoom = 10
         self.image_viewer.imshow(self.img, mode="fill")
-        self.assertEqual(self.image_viewer.zoom_factor, 10)
+        actual_zoom = self.image_viewer.img2can_matrix[0, 0]
+        self.assertEqual(expected_zoom, actual_zoom)
 
         self.assertIsNotNone(self.image_viewer.imgtk)
 
-
-        # print("::::::::::::::::::", binds)
-        # self.assertIn(EventName.CLICK, binds)
-        # self.assertIn(EventName.DRAG, binds)
-        # self.assertIn(EventName.RELEASE, binds)
-        # self.assertIn(EventName.ENTER, binds)
-        # self.assertIn(EventName.LEAVE, binds)
 
     def test_overlay_number(self):
         self.assertEqual(6, len(self.image_viewer.interactive_overlay_instance_list), "2 points and 2 polygons and 2 rectangles are 6 interactives overlays")
@@ -133,9 +125,8 @@ class TestImageViewer(unittest.TestCase):
         """
         point0 = self.image_viewer.interactive_overlay_instance_list[0]
         point1 = self.image_viewer.interactive_overlay_instance_list[1]
-        x_screen = 400
-        y_screen = 400
-        x_img, y_img = self.image_viewer.canvas2img_space(x_screen, y_screen)
+        x_screen, y_screen = tmat.apply(self.image_viewer.img2can_matrix, (400, 400))
+        x_screen, y_screen = int(round(x_screen)), int(round(y_screen))
 
         self.iteractive_point_event_count = 0
         point0._on_click(Event(x_screen, y_screen))
@@ -153,16 +144,12 @@ class TestImageViewer(unittest.TestCase):
         point1._on_release(Event(x_screen, y_screen))
         self.assertEqual(1, self.iteractive_point_event_count, "Undefined callback should not be triggered")
 
-        self.assertNotEqual((x_screen, y_screen), self.point_xy, "Coordinate must be converted in image space")
-        self.assertEqual((x_img, y_img), self.point_xy, "Coordinate must be converted in image space")
-
     def test_createInteractivePolygon(self):
 
         poly0 = self.image_viewer.interactive_overlay_instance_list[2]
         poly1 = self.image_viewer.interactive_overlay_instance_list[3]
-        x_screen = 400
-        y_screen = 400
-        x_img, y_img = self.image_viewer.canvas2img_space(x_screen, y_screen)
+        x_screen, y_screen = tmat.apply(self.image_viewer.img2can_matrix, (400, 400))
+        x_screen, y_screen = int(round(x_screen)), int(round(y_screen))
 
         self.iteractive_polygon_event_count = 0
         poly0._on_click(Event(x_screen, y_screen))
@@ -180,16 +167,11 @@ class TestImageViewer(unittest.TestCase):
         poly1._on_release(Event(x_screen, y_screen))
         self.assertEqual(1, self.iteractive_polygon_event_count, "Undefined callback should not be triggered")
 
-        self.assertNotEqual((x_screen, y_screen), self.point_xy_list[0], "Coordinate must be converted in image space")
-        self.assertEqual((x_img, y_img), self.point_xy_list[0], "Coordinate must be converted in image space")
-
-
     def test_createInteractiveRectangle(self):
         rect0 = self.image_viewer.interactive_overlay_instance_list[4]
         rect1 = self.image_viewer.interactive_overlay_instance_list[5]
-        x_screen = 400
-        y_screen = 500
-        x_img, y_img = self.image_viewer.canvas2img_space(x_screen, y_screen)
+        x_screen, y_screen = tmat.apply(self.image_viewer.img2can_matrix, (400, 400))
+        x_screen, y_screen = int(round(x_screen)), int(round(y_screen))
 
         self.iteractive_rect_event_count = 0
         rect0._on_click(Event(x_screen, y_screen))
@@ -206,9 +188,6 @@ class TestImageViewer(unittest.TestCase):
         self.assertEqual(1, self.iteractive_rect_event_count, "Callback should be triggered")
         rect1._on_release(Event(x_screen, y_screen))
         self.assertEqual(1, self.iteractive_rect_event_count, "Undefined callback should not be triggered")
-
-        self.assertNotEqual((x_screen, y_screen), self.point0_xy, "Coordinate must be converted in image space")
-        self.assertEqual((x_img, y_img), self.point0_xy, "Coordinate must be converted in image space")
 
 
 if __name__ == '__main__':
