@@ -1,7 +1,7 @@
-from typing import Optional, Callable, NoReturn, List, Tuple, Literal, Annotated, Any
+from typing import Literal, Annotated
 import numpy as np
 import numpy.typing as npt
-from .typedef import Point2D, Point2DList
+from .typedef import Point2D
 
 # 3x3 matrix of a rigid transform
 TransformMatrix = Annotated[npt.NDArray[np.float64], Literal[3, 3]]

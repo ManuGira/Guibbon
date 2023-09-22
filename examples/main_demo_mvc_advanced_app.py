@@ -25,7 +25,7 @@ class DemoMVCAdvApp:
         tcv2.createInteractivePoint(self.winname, (100, 100), "point", on_drag=self.on_drag, magnet_points=[(200, 220), (30, 30)])
 
         point_xy_list = [(300, 300), (300, 500), (500, 400), (400, 300)]
-        polygon = tcv2.createInteractivePolygon(self.winname, point_xy_list, "polygon", on_drag=self.on_drag_poly, magnet_points=[(100, 300), (170, 300)])
+        tcv2.createInteractivePolygon(self.winname, point_xy_list, "polygon", on_drag=self.on_drag_poly, magnet_points=[(100, 300), (170, 300)])
 
         point0_xy  = (200, 200)
         point1_xy  = (300, 250)

@@ -1,4 +1,3 @@
-import types
 from typing import Sequence, Optional
 
 import numpy as np

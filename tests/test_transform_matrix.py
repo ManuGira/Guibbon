@@ -1,9 +1,6 @@
-import dataclasses
-import sys
 import unittest
 
 import numpy as np
-from tk4cv2.typedef import Point2D
 
 from tk4cv2 import transform_matrix as tmat
 

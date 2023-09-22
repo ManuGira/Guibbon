@@ -3,7 +3,7 @@ import enum
 import math
 import tkinter as tk
 import types
-from typing import Tuple, List, Set, Any, Optional
+from typing import List, Any, Optional
 
 import cv2
 import numpy as np
@@ -12,7 +12,7 @@ from PIL import Image, ImageTk
 from . import interactive_overlays
 from . import transform_matrix as tm
 from .transform_matrix import TransformMatrix
-from .typedef import CallbackPoint, CallbackPolygon, CallbackRect, Point2D, Point2DList, MouseCallback
+from .typedef import CallbackPoint, CallbackPolygon, CallbackRect, Point2DList, MouseCallback
 
 
 class ImageViewer:

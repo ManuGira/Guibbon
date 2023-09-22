@@ -1,4 +1,4 @@
-from typing import Optional, Callable, NoReturn, List, Tuple, Literal, Annotated
+from typing import Optional, Callable, NoReturn, List, Tuple
 import numpy as np
 import numpy.typing as npt
 import tkinter as tk
