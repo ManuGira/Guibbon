@@ -13,7 +13,7 @@ def identity_matrix() -> TransformMatrix:
         [0, 0, 1],
     ], dtype=float)
 
-def I() -> TransformMatrix:
+def I() -> TransformMatrix:  # noqa: E743 (ruff allows ambiguous function name)
     return identity_matrix()
 
 def scale_matrix(scale_xy: Point2D) -> TransformMatrix:
