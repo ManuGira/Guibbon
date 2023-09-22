@@ -8,8 +8,9 @@ from tk4cv2.typedef import Point2D
 from tk4cv2 import transform_matrix as tmat
 
 def maxdiff(arr1, arr2):
-    return np.max(abs(arr1-arr2).flatten())
+    return np.max(np.abs(np.array(arr1)-np.array(arr2)).flatten())
 
+eps = 1e-15
 
 class TestTransformMatrix(unittest.TestCase):
     def test_identity_matrix(self):
@@ -24,7 +25,7 @@ class TestTransformMatrix(unittest.TestCase):
         for mat in [mat1, mat2]:
             self.assertTrue(mat.dtype == float)
             self.assertTupleEqual(mat.shape, (3, 3))
-            self.assertLess(maxdiff(mat, expected), 1e-6)
+            self.assertLess(maxdiff(mat, expected), eps)
 
     def test_translation_matrix(self):
         trans_list = [(0, 0), (1.1, 2.2), (-3, 19.2)]
@@ -40,9 +41,9 @@ class TestTransformMatrix(unittest.TestCase):
             for mat in [mat1, mat2]:
                 self.assertTrue(mat.dtype == float)
                 self.assertTupleEqual(mat.shape, (3, 3))
-                self.assertLess(maxdiff(mat, expected), 1e-6)
+                self.assertLess(maxdiff(mat, expected), eps)
 
-        self.assertLess(maxdiff(tmat.T((0, 0)), tmat.I()), 1e-6)
+        self.assertLess(maxdiff(tmat.T((0, 0)), tmat.I()), eps)
 
     def test_scale_matrix(self):
         scale_list = [(0, 0), (1, 1), (-1, -1), (1.0, 2.3)]
@@ -58,9 +59,9 @@ class TestTransformMatrix(unittest.TestCase):
             for mat in [mat1, mat2]:
                 self.assertTrue(mat.dtype == float)
                 self.assertTupleEqual(mat.shape, (3, 3))
-                self.assertLess(maxdiff(mat, expected), 1e-6)
+                self.assertLess(maxdiff(mat, expected), eps)
 
-        self.assertLess(maxdiff(tmat.S((1, 1)), tmat.I()), 1e-6)
+        self.assertLess(maxdiff(tmat.S((1, 1)), tmat.I()), eps)
 
 
     def test_rotation_matrix(self):
@@ -78,10 +79,36 @@ class TestTransformMatrix(unittest.TestCase):
             for mat in [mat1, mat2]:
                 self.assertTrue(mat.dtype == float)
                 self.assertTupleEqual(mat.shape, (3, 3))
-                self.assertLess(maxdiff(mat, expected), 1e-6)
+                self.assertLess(maxdiff(mat, expected), eps)
 
-        self.assertLess(maxdiff(tmat.R(0), tmat.I()), 1e-6)
-        self.assertLess(maxdiff(tmat.R(np.pi*2), tmat.I()), 1e-6)
+        self.assertLess(maxdiff(tmat.R(0), tmat.I()), eps)
+        self.assertLess(maxdiff(tmat.R(np.pi*2), tmat.I()), eps)
+
+
+    def test_apply(self):
+
+        def assertIsPoint2D(point_xy):
+            self.assertTrue(isinstance(point_xy, tuple), f'Point2D must be a tuple, got {type(point_xy)} instead')
+            self.assertEqual(len(point_xy), 2, "Point2D must be of size 2")
+            for val in point_xy:
+                self.assertTrue(isinstance(val, int) or isinstance(val, float), "Point2D must contains numeric values (either int or float)")
+
+        for point_xy in [(0, 0), (0.0, 0.0)]:
+            point_res = tmat.apply(tmat.I(), point_xy)
+            assertIsPoint2D(point_res)
+
+
+        point_xy_list = [(0, 0), (1, 1), (-1, -1), (1.0, 2.3)]
+        tx, ty = 10, -20.5
+        sx, sy = 2, -2.3
+        mat = tmat.T((tx, ty)) @ tmat.S((sx, sy))
+        for x, y in point_xy_list:
+            x_expected = x*sx + tx
+            y_expected = y*sy + ty
+            point_expected = x_expected, y_expected
+            point_res = tmat.apply(mat, (x, y))
+            assertIsPoint2D(point_res)
+            self.assertLess(maxdiff(point_res, point_expected), eps)
 
 if __name__ == '__main__':
     unittest.main()
