@@ -1,10 +1,12 @@
-from typing import Literal, Annotated
 import numpy as np
 import numpy.typing as npt
 from .typedef import Point2D
 
-# 3x3 matrix of a rigid transform
-TransformMatrix = Annotated[npt.NDArray[np.float64], Literal[3, 3]]
+# 3x3 matrix
+TransformMatrix = npt.NDArray[np.float64]
+
+def isTransformMatrix(mat: TransformMatrix):
+    return (mat.dtype == np.float64) and (mat.shape == (3, 3))
 
 def identity_matrix() -> TransformMatrix:
     return np.array([
@@ -49,6 +51,9 @@ def R(theta_rad: float) -> TransformMatrix:
     return rotation_matrix(theta_rad)
 
 def apply(mat: TransformMatrix, point_xy: Point2D) -> Point2D:
+    if not isTransformMatrix(mat):
+        raise TypeError("Transform Matrix 'mat' must be a numpy array of shape=(3, 3) and dtype=float")
+
     point_xyw = np.array([[point_xy[0]], [point_xy[1]], [1]], dtype=float)
     point_xyw = mat @ point_xyw
     point_xyw /= point_xyw[2]

@@ -10,6 +10,16 @@ def maxdiff(arr1, arr2):
 eps = 1e-15
 
 class TestTransformMatrix(unittest.TestCase):
+    def test_IsTransformMatrix(self):
+        self.assertTrue(tmat.isTransformMatrix(np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]], dtype=np.float64)))
+        self.assertTrue(tmat.isTransformMatrix(np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]], dtype=float)))
+        self.assertFalse(tmat.isTransformMatrix(np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]], dtype=np.float32)))
+        self.assertFalse(tmat.isTransformMatrix(np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]], dtype=np.int32)))
+        self.assertFalse(tmat.isTransformMatrix(np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]], dtype=np.int64)))
+        self.assertFalse(tmat.isTransformMatrix(np.array([[1, 0, 0], [0, 1, 0]], dtype=np.float64)))
+        self.assertFalse(tmat.isTransformMatrix(np.array([[1, 0], [0, 1], [0, 0]], dtype=np.float64)))
+
+
     def test_identity_matrix(self):
         expected = np.array([
             [1, 0, 0],
@@ -106,6 +116,9 @@ class TestTransformMatrix(unittest.TestCase):
             point_res = tmat.apply(mat, (x, y))
             assertIsPoint2D(point_res)
             self.assertLess(maxdiff(point_res, point_expected), eps)
+
+        with self.assertRaises(TypeError):
+            tmat.apply(np.array([1]), (0, 0))
 
 if __name__ == '__main__':
     unittest.main()
