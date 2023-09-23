@@ -11,7 +11,7 @@ class DemoMVCAdvApp:
     class Model:
         x: int = 0
         y: int = 0
-        cross_xy: tuple = (0, 0)
+        cross_xy = (0, 0)
 
     @dataclasses.dataclass
     class Result:
