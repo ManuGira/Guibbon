@@ -3,6 +3,7 @@ import sys
 import tkinter
 import unittest
 from tk4cv2 import interactive_overlays
+from tk4cv2 import transform_matrix as tmat
 
 eps = sys.float_info.epsilon
 
@@ -22,60 +23,57 @@ class TestMagnets(unittest.TestCase):
     def foo(self, x_img, y_img):
         return self.val, self.val
 
-    def img2canvas_space_func(self, x_img, y_img):
-        return 2*x_img + 1, 2*y_img+1
-
     def setUp(self) -> None:
         self.canvas = tkinter.Canvas()
         self.val = 0
-        self.points_img = [(10.0*k, 10.0*k) for k in range(4)]
-        self.points_canvas = [(20.0*k+1, 20.0*k+1) for k in range(4)]
+        self.points_img = [(10.1*k, 10.1*k) for k in range(4)]
+        self.img2can_matrix = tmat.T((123, 456)) @ tmat.S((100, 200))
 
-    def test_get_point_in_img_space(self):
-        magnets = interactive_overlays.Magnets(self.canvas, self.points_img, self.img2canvas_space_func)
-        self.assertListEqual(self.points_img, magnets.get_point_in_img_space())
+    def test_magnets_creation(self):
+        magnets = interactive_overlays.Magnets(self.canvas, self.points_img)
+        self.assertListEqual(tmat.I().tolist(), magnets.img2can_matrix.tolist(), "Default img2can_matrix must be indentity")
+        magnets.set_img2can_matrix(self.img2can_matrix)
+        self.assertListEqual(self.img2can_matrix.tolist(), magnets.img2can_matrix.tolist(), "img2can_matrix must be settable")
+        self.assertNotEqual(id(self.img2can_matrix), id(magnets.img2can_matrix), "set_img2can_matrix must deeply copy the matrix")
 
-    def test_get_point_in_canvas_space(self):
-        magnets = interactive_overlays.Magnets(self.canvas, self.points_img, self.img2canvas_space_func)
-        self.assertListEqual(self.points_canvas, magnets.get_point_in_canvas_space())
+        # giving empty Point2DList should not raise any exception
+        interactive_overlays.Magnets(self.canvas, [])
 
-    def test_space_func_is_dynamic(self):
-        magnets = interactive_overlays.Magnets(self.canvas, [(-1, -1)], self.foo)
-        self.assertListEqual([(self.val, self.val)], magnets.get_point_in_canvas_space())
+        # default threshold is bigger than 0
+        self.assertTrue(magnets.dist_threshold > 0)
 
-        self.val += 1
-        self.assertListEqual([(self.val, self.val)], magnets.get_point_in_canvas_space())
-
-        self.val += 1
-        self.assertListEqual([(self.val, self.val)], magnets.get_point_in_canvas_space())
 
     def test_snap_to_nearest_magnet(self):
-        thresh = 50
+        empty_magnet = interactive_overlays.Magnets(self.canvas, [])
+        for point_xy in [(0, 0), (10, 20), (300, 400), (-10.2, -12.2)]:
+            self.assertTupleEqual(point_xy, empty_magnet.snap_to_nearest_magnet(point_xy), "empty magnet should not snap")
 
-        magnets = interactive_overlays.Magnets(self.canvas, self.points_img, self.img2canvas_space_func, dist_threshold=thresh)
-        x_can, y_can = magnets.get_point_in_canvas_space()[-1]
-        self.assertTupleEqual((x_can, y_can), magnets.snap_to_nearest_magnet(x_can, y_can))
-        self.assertTupleEqual((x_can, y_can), magnets.snap_to_nearest_magnet(x_can+thresh-1, y_can))
-        self.assertTupleEqual((x_can+thresh+1, y_can), magnets.snap_to_nearest_magnet(x_can+thresh+1, y_can))
+        magnets = interactive_overlays.Magnets(self.canvas, self.points_img)
+        x, y = self.points_img[-1]
+        for thresh in [10, 50]:
+            magnets.dist_threshold = thresh
+            self.assertTupleEqual((x, y), magnets.snap_to_nearest_magnet((x, y)))
+            self.assertTupleEqual((x, y), magnets.snap_to_nearest_magnet((x+thresh-1, y)))
+            self.assertTupleEqual((x+thresh+1, y), magnets.snap_to_nearest_magnet((x+thresh+1, y)))
 
-        thresh = 10
-        magnets.dist_threshold = thresh
-        self.assertTupleEqual((x_can, y_can), magnets.snap_to_nearest_magnet(x_can, y_can))
-        self.assertTupleEqual((x_can, y_can), magnets.snap_to_nearest_magnet(x_can + thresh - 1, y_can))
-        self.assertTupleEqual((x_can + thresh + 1, y_can), magnets.snap_to_nearest_magnet(x_can + thresh + 1, y_can))
+        magnets.dist_threshold = 50
+        self.assertTupleEqual((10.1, 10.1), magnets.snap_to_nearest_magnet((14, 14)))
+        self.assertTupleEqual((20.2, 20.2), magnets.snap_to_nearest_magnet((16, 16)))
 
     def test_update(self):
-        magnets = interactive_overlays.Magnets(self.canvas, self.points_img, self.img2canvas_space_func)
+        magnets = interactive_overlays.Magnets(self.canvas, self.points_img)
+        magnets.set_img2can_matrix(self.img2can_matrix)
 
-        self.assertEqual(len(self.points_canvas), len(magnets.circle_id_list), "Each points must have its circle on the canvas")
+        self.assertEqual(len(self.points_img), len(magnets.circle_id_list), "Each points must have its circle on the canvas")
 
         magnets.update()
-        for pt_xy, circle_id in zip(self.points_canvas, magnets.circle_id_list):
+        for point_img_xy, circle_id in zip(self.points_img, magnets.circle_id_list):
+            x_can_expected, y_can_expected = tmat.apply(self.img2can_matrix, point_img_xy)
             x1, y1, x2, y2 = self.canvas.coords(circle_id)
-            x = (x1 + x2)/2
-            y = (y1 + y2)/2
-            self.assertLess(abs(x-pt_xy[0]), 0.1, "Coordinates of magnet points must be accuratly played on the canvas")
-            self.assertLess(abs(y-pt_xy[1]), 0.1, "Coordinates of magnet points must be accuratly played on the canvas")
+            x = round((x1 + x2)/2)
+            y = round((y1 + y2)/2)
+            self.assertLess(abs(x-x_can_expected), 0.1, "Coordinates of magnet points must be accurately placed on the canvas")
+            self.assertLess(abs(y-y_can_expected), 0.1, "Coordinates of magnet points must be accurately placed on the canvas")
 
 
 class TestPoint(unittest.TestCase):
@@ -257,13 +255,13 @@ class TestPolygon(unittest.TestCase):
         k = 0
         self.plg._on_drag(k, event)
         self.assertEqual(2, self.event_count, "Event must not be triggered")
-        self.assertEqual([(21, 22), (0, 100), (100, 100)], self.point_xy_list, "Event coordinate must pass to callback")
+        self.assertEqual(point_xy_list_bck, self.point_xy_list, "_on_drag should not change point_xy_list (on_drag of Point should)")
 
         event = Event(x=31, y=32)
         k = 1
         self.plg._on_drag(k, event)
         self.assertEqual(3, self.event_count, "Event must not be triggered")
-        self.assertEqual([(21, 22), (31, 32), (100, 100)], self.point_xy_list, "Event coordinate must pass to callback")
+        self.assertEqual(point_xy_list_bck, self.point_xy_list, "_on_drag should not change point_xy_list (on_drag of Point should)")
 
         event = Event(x=41, y=42)
         point_xy_list_bck = self.point_xy_list + []
@@ -299,8 +297,6 @@ class TestPolygon(unittest.TestCase):
 
         self.assertEqual(0, self.event_count, "Event should not be triggered")
         self.assertEqual(point_xy_list_bck, self.point_xy_list, "those callbacks should not be able to change self.point_xy_list")
-        self.assertEqual([(123, 456), (0, 100), (100, 100)], self.plg.point_xy_list,
-                         "even with no user callback subscribed, the polygon should still respond to mouse drag...")
 
     def test_event_sequence(self):
         self.plg = interactive_overlays.Polygon(canvas=self.canvas, point_xy_list=self.point_xy_list, label="ok",
@@ -401,15 +397,15 @@ class TestRectangle(unittest.TestCase):
         k = 0
         self.rect._on_drag(k, event)
         self.assertEqual(2, self.event_count, "Event must not be triggered")
-        self.assertEqual((21, 22), self.point0_xy, "Event coordinate must pass to callback")
-        self.assertEqual((100, 100), self.point1_xy, "Event coordinate must pass to callback")
+        self.assertEqual(point0_xy_bck, self.point0_xy, "Event coordinate must pass to callback")
+        self.assertEqual(point1_xy_bck, self.point1_xy, "Event coordinate must pass to callback")
 
         event = Event(x=31, y=32)
         k = 1
         self.rect._on_drag(k, event)
         self.assertEqual(3, self.event_count, "Event must not be triggered")
-        self.assertEqual((21, 22), self.point0_xy, "Event coordinate must pass to callback")
-        self.assertEqual((31, 32), self.point1_xy, "Event coordinate must pass to callback")
+        self.assertEqual(point0_xy_bck, self.point0_xy, "_on_drag should not change point0_xy (Point.on_drag should)")
+        self.assertEqual(point1_xy_bck, self.point1_xy, "_on_drag should not change point0_xy (Point.on_drag should)")
 
         event = Event(x=41, y=42)
         point0_xy_bck = self.point0_xy
@@ -453,9 +449,6 @@ class TestRectangle(unittest.TestCase):
         self.assertEqual(0, self.event_count, "Event should not be triggered")
         self.assertEqual(point0_xy_bck, self.point0_xy, "those callbacks should not be able to change self.point0_xy_bck")
         self.assertEqual(point1_xy_bck, self.point1_xy, "those callbacks should not be able to change self.point0_xy_bck")
-        self.assertEqual([(123, 456), (100, 100)], self.rect.point_xy_list,
-                "even with no user callback subscribed, the rectangle should still respond to mouse drag...")
-
 
     def test_event_sequence(self):
         self.rect = interactive_overlays.Rectangle(canvas=self.canvas, point0_xy=self.point0_xy, point1_xy=self.point1_xy, label="ok",

@@ -1,16 +1,18 @@
-import types
-from typing import Tuple, List, Set, Any, Optional
-from .typedef import CallbackPoint, CallbackPolygon, CallbackRect, Point2DList, MouseCallback
-
 import dataclasses
 import enum
 import math
 import tkinter as tk
+import types
+from typing import List, Any, Optional
 
 import cv2
+import numpy as np
 from PIL import Image, ImageTk
 
 from . import interactive_overlays
+from . import transform_matrix as tm
+from .transform_matrix import TransformMatrix
+from .typedef import CallbackPoint, CallbackPolygon, CallbackRect, Point2DList, MouseCallback
 
 
 class ImageViewer:
@@ -47,35 +49,12 @@ class ImageViewer:
         self.canvas_shape_hw = (height, width)
 
         self.imgtk = None
-        self.img_shape0_hw: Tuple[int, int]
-        self.img_shape1_hw: Tuple[int, int]
-        self.zoom_factor: float
         self.onMouse: MouseCallback = None
         self.modifier = ImageViewer.Modifier()
-        self.magnets_overlay_instance_set: Set[Any] = set()
         self.interactive_overlay_instance_list: List[Any] = []
-
-    def canvas2img_space(self, can_x, can_y):
-        canh, canw = self.canvas_shape_hw
-        img0h, img0w = self.img_shape0_hw
-        img1h, img1w = self.img_shape1_hw
-        corner_y, corner_x = (canh - img1h) / 2, (canw - img1w) / 2
-
-        img_x = (can_x - corner_x) * img0w / img1w
-        img_y = (can_y - corner_y) * img0h / img1h
-
-        return int(img_x + 0.5), int(img_y + 0.5)
-
-    def img2canvas_space(self, img_x, img_y):
-        print("img2canvas_space", self.img_shape0_hw, self.img_shape1_hw)
-        canh, canw = self.canvas_shape_hw
-        img0h, img0w = self.img_shape0_hw
-        img1h, img1w = self.img_shape1_hw
-        corner_y, corner_x = (canh - img1h) / 2, (canw - img1w) / 2
-
-        can_x = img_x * img1w / img0w + corner_x
-        can_y = img_y * img1h / img0h + corner_y
-        return can_x, can_y
+        self.img2can_matrix: TransformMatrix
+        self.can2img_matrix: TransformMatrix
+        self.set_img2can_matrix(tm.identity_matrix())
 
     def setMouseCallback(self, onMouse, param=None):
         if not isinstance(onMouse, types.FunctionType) and not isinstance(onMouse, types.MethodType):
@@ -174,107 +153,57 @@ class ImageViewer:
         flag += cv2.EVENT_FLAG_CTRLKEY if self.modifier.CONTROL else 0
         flag += cv2.EVENT_FLAG_SHIFTKEY if self.modifier.SHIFT else 0
 
-        x, y = self.canvas2img_space(event.x, event.y)
+        x, y = tm.apply(self.can2img_matrix, (event.x, event.y))
         param = None
 
         self.onMouse(cvevent, x, y, flag, param)  # type: ignore
+
+    def set_img2can_matrix(self, img2can_matrix: TransformMatrix):
+        self.img2can_matrix = img2can_matrix.copy()
+        self.can2img_matrix = np.linalg.inv(self.img2can_matrix)
 
     def createInteractivePoint(self, point_xy, label="",
                 on_click:CallbackPoint=None, on_drag:CallbackPoint=None, on_release:CallbackPoint=None,
                 magnet_points:Optional[Point2DList]=None):
 
-        # Callbacks are wrapped to convert coordinate from canvas to image space.
-        def on_click_img0(event):
-            event.x, event.y = self.canvas2img_space(event.x, event.y)
-            on_click(event)  # type: ignore
-        on_click_img = on_click_img0 if on_click else None
-
-        def on_drag_img0(event):
-            event.x, event.y = self.canvas2img_space(event.x, event.y)
-            on_drag(event)  # type: ignore
-        on_drag_img = on_drag_img0 if on_drag else None
-
-        def on_release_img0(event):
-            event.x, event.y = self.canvas2img_space(event.x, event.y)
-            on_release(event)  # type: ignore
-        on_release_img = on_release_img0 if on_release else None
+        magnets = None
+        if magnet_points is not None:
+            magnets = interactive_overlays.Magnets(self.canvas, magnet_points)
 
         ipoint = interactive_overlays.Point(self.canvas, point_xy, label,
-                                            on_click_img, on_drag_img, on_release_img)
+                                            on_click, on_drag, on_release,
+                                            magnets=magnets)
         self.interactive_overlay_instance_list.append(ipoint)
-
-        if magnet_points is not None:
-            magnets = interactive_overlays.Magnets(self.canvas, magnet_points, self.img2canvas_space)
-            magnets.magnetize_overlay(ipoint)
-            self.magnets_overlay_instance_set.add(magnets)
 
     def createInteractivePolygon(self, point_xy_list, label="",
                 on_click: CallbackPolygon=None,
                 on_drag: CallbackPolygon=None,
                 on_release: CallbackPolygon=None,
-                magnet_points:Optional[Point2DList]=None):
+                magnet_points:Optional[Point2DList]=None) -> interactive_overlays.Polygon:
 
-        # Callbacks are wrapped to convert coordinate from canvas to image space.
-        def on_click_img0(event, _point_xy_list):
-            event.x, event.y = self.canvas2img_space(event.x, event.y)
-            _point_xy_list = [self.canvas2img_space(*pt) for pt in _point_xy_list]
-            on_click(event, _point_xy_list)  # type: ignore
-        on_click_img = on_click_img0 if on_click else None
-
-        def on_drag_img0(event, _point_xy_list):
-            event.x, event.y = self.canvas2img_space(event.x, event.y)
-            _point_xy_list = [self.canvas2img_space(*pt) for pt in _point_xy_list]
-            on_drag(event, _point_xy_list)  # type: ignore
-        on_drag_img = on_drag_img0 if on_drag else None
-
-        def on_release_img0(event, _point_xy_list):
-            event.x, event.y = self.canvas2img_space(event.x, event.y)
-            _point_xy_list = [self.canvas2img_space(*pt) for pt in _point_xy_list]
-            on_release(event, _point_xy_list)  # type: ignore
-        on_release_img = on_release_img0 if on_release else None
-
-        ipolygon = interactive_overlays.Polygon(self.canvas, point_xy_list, label, on_click_img, on_drag_img, on_release_img)
-        self.interactive_overlay_instance_list.append(ipolygon)
-
+        magnets = None
         if magnet_points is not None:
-            magnets = interactive_overlays.Magnets(self.canvas, magnet_points, self.img2canvas_space)
-            for ipoint in ipolygon.ipoints:
-                magnets.magnetize_overlay(ipoint)
-            self.magnets_overlay_instance_set.add(magnets)
+            magnets = interactive_overlays.Magnets(self.canvas, magnet_points)
+
+        ipolygon = interactive_overlays.Polygon(self.canvas, point_xy_list, label,
+                                                on_click, on_drag, on_release,
+                                                magnets=magnets)
+        self.interactive_overlay_instance_list.append(ipolygon)
+        return ipolygon
 
     def createInteractiveRectangle(self, point0_xy, point1_xy, label="",
             on_click:CallbackRect=None, on_drag:CallbackRect=None, on_release:CallbackRect=None,
             magnet_points:Optional[Point2DList]=None):
-        # Callbacks are wrapped to convert coordinate from canvas to image space.
-        def on_click_img0(event, _point0_xy, _point1_xy):
-            event.x, event.y = self.canvas2img_space(event.x, event.y)
-            _point0_xy = self.canvas2img_space(*_point0_xy)
-            _point1_xy = self.canvas2img_space(*_point1_xy)
-            on_click(event, _point0_xy, _point1_xy)  # type: ignore
-        on_click_img = on_click_img0 if on_click else None
 
-        def on_drag_img0(event, _point0_xy, _point1_xy):
-            event.x, event.y = self.canvas2img_space(event.x, event.y)
-            _point0_xy = self.canvas2img_space(*_point0_xy)
-            _point1_xy = self.canvas2img_space(*_point1_xy)
-            on_drag(event, _point0_xy, _point1_xy)  # type: ignore
-        on_drag_img = on_drag_img0 if on_drag else None
+        magnets = None
+        if magnet_points is not None:
+            magnets = interactive_overlays.Magnets(self.canvas, magnet_points)
 
-        def on_release_img0(event, _point0_xy, _point1_xy):
-            event.x, event.y = self.canvas2img_space(event.x, event.y)
-            _point0_xy = self.canvas2img_space(*_point0_xy)
-            _point1_xy = self.canvas2img_space(*_point1_xy)
-            on_release(event, _point0_xy, _point1_xy)  # type: ignore
-        on_release_img = on_release_img0 if on_release else None
-
-        ipolygon = interactive_overlays.Rectangle(self.canvas, point0_xy, point1_xy, label, on_click_img, on_drag_img, on_release_img)
+        ipolygon = interactive_overlays.Rectangle(self.canvas, point0_xy, point1_xy, label,
+                                                  on_click, on_drag, on_release,
+                                                  magnets=magnets)
         self.interactive_overlay_instance_list.append(ipolygon)
 
-        if magnet_points is not None:
-            magnets = interactive_overlays.Magnets(self.canvas, magnet_points, self.img2canvas_space)
-            for ipoint in ipolygon.ipoints:
-                magnets.magnetize_overlay(ipoint)
-            self.magnets_overlay_instance_set.add(magnets)
 
     def pack(self, *args, **kwargs):
         self.canvas.pack(*args, **kwargs)
@@ -287,25 +216,27 @@ class ImageViewer:
 
         canh, canw = self.canvas_shape_hw
         imgh, imgw = mat.shape[:2]
-
-        self.zoom_factor = 1
-        if mode == "fit":
-            self.zoom_factor = min(canh / imgh, canw / imgw)
-        elif mode == "fill":
-            self.zoom_factor = max(canh / imgh, canw / imgw)
-
-        self.img_shape0_hw = mat.shape[:2]
         mat = cv2.cvtColor(mat, cv2.COLOR_BGR2RGB)
-        mat = cv2.resize(mat, None, fx=self.zoom_factor, fy=self.zoom_factor, interpolation=cv2.INTER_LINEAR)
-        self.img_shape1_hw = mat.shape[:2]
+
+        img_space_matrix: TransformMatrix
+        can_space_matrix: TransformMatrix
+        if mode == "fit":
+            img_space_matrix = tm.T((imgw/2, imgh/2)) @ tm.S((max(imgw, imgh), max(imgw, imgh)))
+            can_space_matrix = tm.T((canw/2, canh/2)) @ tm.S((max(canw, canh), max(canw, canh)))
+        elif mode == "fill":
+            img_space_matrix = tm.T((imgw / 2, imgh / 2)) @ tm.S((min(imgw, imgh), min(imgw, imgh)))
+            can_space_matrix = tm.T((canw / 2, canh / 2)) @ tm.S((min(canw, canh), min(canw, canh)))
+        else:
+            raise ValueError(f"Don't know mode: \"{mode}\"")
+
+        self.set_img2can_matrix(can_space_matrix @ np.linalg.inv(img_space_matrix))
+        mat = cv2.warpPerspective(mat, self.img2can_matrix, dsize=(canh, canw))
 
         self.imgtk = ImageTk.PhotoImage(image=Image.fromarray(mat))
         self.canvas.create_image(canw // 2, canh // 2, anchor=tk.CENTER, image=self.imgtk)
 
-        for overlay in self.magnets_overlay_instance_set:
-            overlay.update()
-
         for overlay in self.interactive_overlay_instance_list:
+            overlay.set_img2can_matrix(self.img2can_matrix)
             overlay.update()
 
 
