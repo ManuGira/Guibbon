@@ -80,8 +80,8 @@ def createButton(text='Button', command=None, winname=None):
     Tk4Cv2.get_instance(winname)._createButton(text, command)
 
 
-def createTrackbar(trackbarName, windowName=None, value=0, count=10, onChange=None):
-    Tk4Cv2.get_instance(windowName)._createTrackbar(trackbarName, value, count, onChange)
+def createTrackbar(trackbarName, winname=None, value=0, count=10, onChange=None):
+    Tk4Cv2.get_instance(winname)._createTrackbar(trackbarName, value, count, onChange)
 
 
 def setTrackbarPos(trackbarname, winname, pos):
@@ -283,9 +283,11 @@ class Tk4Cv2:
         # tk.Button(frame, text=f"{value} {count}", command=onChange).pack(padx=2, fill=tk.X, expand=1)
         trackbar = tk.Scale(frame, from_=0, to=count, orient=tk.HORIZONTAL, bg=COLORS.widget, borderwidth=0)
         trackbar.set(value)
-        trackbar["command"] = onChange
+        def callback(val):
+            return onChange(int(val))
+        trackbar["command"] = callback
         trackbar.pack(padx=2, fill=tk.X, expand=1)
-        self.trackbars_by_names[trackbarName] = {"tkObject": trackbar, "callback": onChange}
+        self.trackbars_by_names[trackbarName] = {"tkObject": trackbar, "callback": callback}
         # self.trackbars_by_names[trackbarName] = {"tkObject": trackbar}
         frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
 
