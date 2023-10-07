@@ -320,14 +320,11 @@ class Tk4Cv2:
         trackbar["command"] = callback
         trackbar.pack(padx=2, fill=tk.X, expand=1)
         self.trackbars_by_names[trackbarName] = {"tkObject": trackbar, "callback": callback}
-        # self.trackbars_by_names[trackbarName] = {"tkObject": trackbar}
         frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
 
     def _setTrackbarPos(self, trackbarname, pos):
         trackbar = self.trackbars_by_names[trackbarname]["tkObject"]
-        onChange = self.trackbars_by_names[trackbarname]["callback"]
         trackbar.set(pos)
-        onChange(pos)
 
     def _getTrackbarPos(self, trackbarname):
         return self.trackbars_by_names[trackbarname]["tkObject"].get()
