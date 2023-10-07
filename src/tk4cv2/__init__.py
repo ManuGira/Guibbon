@@ -80,6 +80,14 @@ def createButton(text='Button', command=None, winname=None):
     Tk4Cv2.get_instance(winname)._createButton(text, command)
 
 
+def createSlider(sliderName, winname, values, initial_pos, onChange=None):
+    Tk4Cv2.get_instance(winname)._createSlider(sliderName, values, initial_pos, onChange)
+
+
+def setSliderPos(sliderName, winname, pos):
+    Tk4Cv2.get_instance(winname)._setSliderPos(sliderName, pos)
+
+
 def createTrackbar(trackbarName, winname=None, value=0, count=10, onChange=None):
     Tk4Cv2.get_instance(winname)._createTrackbar(trackbarName, value, count, onChange)
 
@@ -250,6 +258,7 @@ class Tk4Cv2:
 
         self.ctrl_frame = tk.Frame(master=self.frame, width=300, bg=COLORS.ctrl_panel)
         self.trackbars_by_names = {}
+        self.sliders_by_names = {}
         self.radiobuttons_by_names = {}
 
         self.frame.pack()
@@ -277,10 +286,33 @@ class Tk4Cv2:
         tk.Button(frame, text=text, command=command).pack(side=tk.LEFT)
         frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.BOTH)
 
+    def _createSlider(self, sliderName, values, initial_pos, onChange):
+        frame = tk.Frame(self.ctrl_frame, bg=COLORS.widget)
+        tk.Label(frame, text=sliderName, bg=COLORS.widget).pack(padx=2, side=tk.LEFT)
+        value_var = tk.StringVar()
+        value_var.set(values[initial_pos])
+        tk.Label(frame, textvariable=value_var, bg=COLORS.widget).pack(padx=2, side=tk.TOP)
+        count = len(values)
+        slider = tk.Scale(frame, from_=0, to=count-1, orient=tk.HORIZONTAL, bg=COLORS.widget, borderwidth=0, showvalue=False)
+        slider.set(initial_pos)
+
+        def callback(val):
+            val = values[int(val)]
+            value_var.set(val)
+            return onChange(val)
+
+        slider["command"] = callback
+        slider.pack(padx=2, fill=tk.X, expand=1)
+        self.sliders_by_names[sliderName] = {"tkObject": slider, "callback": callback}
+        frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
+
+    def _setSliderPos(self, sliderName, pos):
+        slider = self.sliders_by_names[sliderName]["tkObject"]
+        slider.set(pos)
+
     def _createTrackbar(self, trackbarName, value, count, onChange):
         frame = tk.Frame(self.ctrl_frame, bg=COLORS.widget)
         tk.Label(frame, text=trackbarName, bg=COLORS.widget).pack(padx=2, side=tk.LEFT)
-        # tk.Button(frame, text=f"{value} {count}", command=onChange).pack(padx=2, fill=tk.X, expand=1)
         trackbar = tk.Scale(frame, from_=0, to=count, orient=tk.HORIZONTAL, bg=COLORS.widget, borderwidth=0)
         trackbar.set(value)
         def callback(val):
