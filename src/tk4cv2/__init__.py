@@ -1,5 +1,5 @@
 from typing import Dict, Any, Optional
-from .typedef import CallbackPoint, CallbackPolygon, CallbackRect, Point2DList, InteractivePolygon
+from .typedef import CallbackPoint, CallbackPolygon, CallbackRect, CallbackCircle, Point2DList, InteractivePolygon
 
 import time
 
@@ -179,6 +179,11 @@ def createInteractiveRectangle(windowName, point0_xy, point1_xy, label="",
             on_click:CallbackRect=None, on_drag:CallbackRect=None, on_release:CallbackRect=None,
             magnet_points:Optional[Point2DList]=None):
     Tk4Cv2.get_instance(windowName).image_viewer.createInteractiveRectangle(point0_xy, point1_xy, label, on_click, on_drag, on_release, magnet_points)
+
+def createInteractiveCircle(windowName, center_xy, radius, label="",
+            on_click:CallbackCircle=None, on_drag:CallbackCircle=None, on_release:CallbackCircle=None,
+            magnet_points:Optional[Point2DList]=None):
+    Tk4Cv2.get_instance(windowName).image_viewer.createInteractiveCircle(center_xy, radius, label, on_click, on_drag, on_release, magnet_points)
 
 
 class Tk4Cv2:

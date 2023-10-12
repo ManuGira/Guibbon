@@ -12,7 +12,7 @@ from PIL import Image, ImageTk
 from . import interactive_overlays
 from . import transform_matrix as tm
 from .transform_matrix import TransformMatrix
-from .typedef import CallbackPoint, CallbackPolygon, CallbackRect, Point2DList, MouseCallback
+from .typedef import CallbackPoint, CallbackPolygon, CallbackRect, CallbackCircle, Point2DList, MouseCallback
 
 
 class ImageViewer:
@@ -203,6 +203,19 @@ class ImageViewer:
                                                   on_click, on_drag, on_release,
                                                   magnets=magnets)
         self.interactive_overlay_instance_list.append(ipolygon)
+
+    def createInteractiveCircle(self, center_xy, radius, label="",
+            on_click:CallbackCircle=None, on_drag:CallbackCircle=None, on_release:CallbackCircle=None,
+            magnet_points:Optional[Point2DList]=None):
+
+        magnets = None
+        if magnet_points is not None:
+            magnets = interactive_overlays.Magnets(self.canvas, magnet_points)
+
+        icircle = interactive_overlays.Circle(self.canvas, center_xy, radius, label,
+                                                  on_click, on_drag, on_release,
+                                                  magnets=magnets)
+        self.interactive_overlay_instance_list.append(icircle)
 
 
     def pack(self, *args, **kwargs):

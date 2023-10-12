@@ -5,7 +5,7 @@ from .typedef import Point2D
 # 3x3 matrix
 TransformMatrix = npt.NDArray[np.float64]
 
-def isTransformMatrix(mat: TransformMatrix):
+def isTransformMatrix(mat: TransformMatrix) -> bool:
     return (mat.dtype == np.float64) and (mat.shape == (3, 3))
 
 def identity_matrix() -> TransformMatrix:
@@ -50,6 +50,14 @@ def rotation_matrix(theta_rad: float) -> TransformMatrix:
 def R(theta_rad: float) -> TransformMatrix:
     return rotation_matrix(theta_rad)
 
+def extract_scale(mat: TransformMatrix) -> Point2D:
+    if not isTransformMatrix(mat):
+        raise TypeError("Transform Matrix 'mat' must be a numpy array of shape=(3, 3) and dtype=float")
+
+    scale_x = np.sqrt(mat[0, 0]**2 + mat[1, 0]**2)
+    scale_y = np.sqrt(mat[0, 1]**2 + mat[1, 1]**2)
+    return scale_x, scale_y
+
 def apply(mat: TransformMatrix, point_xy: Point2D) -> Point2D:
     if not isTransformMatrix(mat):
         raise TypeError("Transform Matrix 'mat' must be a numpy array of shape=(3, 3) and dtype=float")
@@ -57,4 +65,5 @@ def apply(mat: TransformMatrix, point_xy: Point2D) -> Point2D:
     point_xyw = np.array([[point_xy[0]], [point_xy[1]], [1]], dtype=float)
     point_xyw = mat @ point_xyw
     point_xyw /= point_xyw[2]
-    return (point_xyw[0, 0], point_xyw[1, 0])
+    return point_xyw[0, 0], point_xyw[1, 0]
+

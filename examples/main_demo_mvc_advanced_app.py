@@ -31,6 +31,10 @@ class DemoMVCAdvApp:
         point1_xy  = (300, 250)
         tcv2.createInteractiveRectangle(self.winname, point0_xy, point1_xy, "rectangle", on_drag=self.on_drag_rect, magnet_points=[(100, 300), (150, 300)])
 
+        center_xy = (500, 800)
+        radius = 100
+        tcv2.createInteractiveCircle(self.winname, center_xy, radius, "circle", on_drag=self.on_drag_circle)
+
         self.model = DemoMVCAdvApp.Model()
         self.result = DemoMVCAdvApp.Result()
         self.is_update_needed: bool = True
@@ -88,6 +92,10 @@ class DemoMVCAdvApp:
             self.rect_p1_xy = point1_xy
             self.model.cross_xy = (event.x, event.y)
             self.is_update_needed = True
+
+    def on_drag_circle(self, event, center_xy, radius):
+        print(center_xy, radius)
+
 
 if __name__ == '__main__':
     mc = DemoMVCAdvApp("images/dog.jpg")
