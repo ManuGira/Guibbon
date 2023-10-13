@@ -4,6 +4,9 @@ import tkinter
 import unittest
 from tk4cv2 import interactive_overlays
 from tk4cv2 import transform_matrix as tmat
+from tk4cv2 import typedef
+from tk4cv2.typedef import Point2D, Point2DList
+
 
 eps = sys.float_info.epsilon
 
@@ -484,6 +487,192 @@ class TestRectangle(unittest.TestCase):
 
         with self.assertRaises(Exception):
             self.rect._on_drag(0, event)
+
+
+class TestCircle(unittest.TestCase):
+    def setUp(self) -> None:
+        self.event_count = 0
+        self.drag_count = 0
+        self.release_count = 0
+        self.center_xy = (100.0, 200.0)
+        self.radius = 30.0
+        self.event = None
+
+        self.canvas = tkinter.Canvas()
+
+    def tearDown(self) -> None:
+        pass
+
+    def on_event(self, event, center_xy: Point2D, radius: float):
+        print(event, center_xy, radius)
+        self.event_count += 1
+        self.assertTrue(typedef.is_point2d(center_xy))
+        self.center_xy = center_xy
+        self.radius = radius
+
+    def on_event_error(self, event, point_xy_list):
+        raise
+
+    def test_callback(self):
+        self.assertIsInstance(self.center_xy, tuple)  # make sure our values are immutable, otherwise the test will give a false positive
+        self.assertIsInstance(self.radius, float)
+
+        center_xy_bck: Point2D = self.center_xy
+        radius_bck: float = self.radius
+
+        self.icircle = interactive_overlays.Circle(
+            canvas=self.canvas,
+            center_xy=self.center_xy,
+            radius=self.radius,
+            label="ok",
+            on_click=self.on_event,
+            on_drag=self.on_event,
+            on_release=self.on_event)
+
+        self.assertIsInstance(self.icircle.ipoint, interactive_overlays.Point, "Circle must have 1 Interactive Point instance for its center")
+
+        for tag_id in [self.icircle.curve_id, self.icircle.ipoint.circle_id]:
+            binds = self.canvas.tag_bind(tag_id)
+            self.assertIn(EventName.CLICK, binds, f"{EventName.CLICK} tag not binded")
+            self.assertIn(EventName.DRAG, binds, f"{EventName.DRAG} tag not binded")
+            self.assertIn(EventName.RELEASE, binds, f"{EventName.RELEASE} tag not binded")
+            self.assertIn(EventName.ENTER, binds, f"{EventName.ENTER} tag not binded")
+            self.assertIn(EventName.LEAVE, binds, f"{EventName.LEAVE} tag not binded")
+
+        self.assertEqual(0, self.event_count)
+        self.assertEqual(center_xy_bck, self.center_xy, "center_xy should not change at Circle's creation")
+        self.assertEqual(radius_bck, self.radius, "radius should not change at Circle's creation")
+
+        center_xy_bck = self.center_xy
+        event = Event(x=10, y=11)
+        self.icircle._on_click(event)
+        self.assertEqual(1, self.event_count)
+        self.assertEqual(center_xy_bck, self.center_xy, "_on_click should not change center_xy")
+        self.assertEqual(radius_bck, self.radius, "_on_click should not change radius")
+
+        # drag center
+        radius_bck = self.radius
+        expected_center_xy = int(self.center_xy[0] + 10), int(self.center_xy[1] + 5)
+        event = Event(x=expected_center_xy[0], y=expected_center_xy[1])
+        self.icircle.ipoint._on_drag(event)
+        self.assertEqual(2, self.event_count, "Event must be triggered")
+        self.assertEqual(radius_bck, self.radius, "_on_drag of center (icircle.ipoint) should not change radius")
+        self.assertTupleEqual(expected_center_xy, self.center_xy, "_on_drag of center (icircle.ipoint) should change center_xy")
+
+        # release center
+        event = Event(x=41, y=42)
+        radius_bck = self.radius
+        center_xy_bck = self.center_xy
+        self.icircle._on_release_center(event)
+        self.assertEqual(3, self.event_count, "Event must be triggered")
+        self.assertEqual(radius_bck, self.radius, "_on_release_center should not change radius")
+        self.assertEqual(center_xy_bck, self.center_xy, "_on_release_center should not change center_xy")
+
+        # drag radius
+        expected_radius = self.radius + 10
+        center_xy_bck = self.center_xy
+        event = Event(x=int(self.center_xy[0]+expected_radius), y=int(self.center_xy[1]))
+        self.icircle._on_drag_curve(event)
+        self.assertEqual(4, self.event_count, "Event must be triggered")
+        self.assertEqual(expected_radius, self.radius, "_on_drag_curve should change radius")
+        self.assertTupleEqual(center_xy_bck, self.center_xy, "_on_drag_curve should not change center_xy")
+
+        # release radius
+        event = Event(x=41, y=42)
+        radius_bck = self.radius
+        center_xy_bck = self.center_xy
+        self.icircle._on_release_curve(event)
+        self.assertEqual(5, self.event_count, "Event must be triggered")
+        self.assertEqual(radius_bck, self.radius, "_on_release_curve should not change radius")
+        self.assertEqual(center_xy_bck, self.center_xy, "_on_release_curve should not change center_xy")
+
+
+    def test_none_callback(self):
+        self.assertIsInstance(self.center_xy, tuple)  # make sure our values are immutable, otherwise the test will give a false positive
+        self.assertIsInstance(self.radius, float)
+
+        center_xy_bck = self.center_xy
+        radius_bck = self.radius
+
+        self.icircle = interactive_overlays.Circle(canvas=self.canvas, center_xy=self.center_xy, radius=self.radius, label="ok",
+                                                    on_click=None,
+                                                    on_drag=None,
+                                                    on_release=None)
+
+        for tag_id in [self.icircle.curve_id, self.icircle.ipoint.circle_id]:
+            binds = self.canvas.tag_bind(tag_id)
+            self.assertIn(EventName.CLICK, binds, f"{EventName.CLICK} tag not binded")
+            self.assertIn(EventName.DRAG, binds, f"{EventName.DRAG} tag not binded")
+            self.assertIn(EventName.RELEASE, binds, f"{EventName.RELEASE} tag not binded")
+            self.assertIn(EventName.ENTER, binds, f"{EventName.ENTER} tag not binded")
+            self.assertIn(EventName.LEAVE, binds, f"{EventName.LEAVE} tag not binded")
+
+        self.assertEqual(0, self.event_count, "Event should not be triggered")
+        self.assertEqual(center_xy_bck, self.center_xy, "center_xy should not change at Circle creation")
+        self.assertEqual(radius_bck, self.radius, "radius should not change at Circle creation")
+
+        event = Event(123, 456)
+        self.icircle._on_click(event)
+        self.icircle._on_drag_curve(event)
+        self.icircle._on_release_curve(event)
+        self.icircle._on_drag_center(event)
+        self.icircle._on_release_center(event)
+
+        self.assertEqual(0, self.event_count, "Event should not be triggered")
+        self.assertEqual(center_xy_bck, self.center_xy, "those callbacks should not be able to change center_xy")
+        self.assertEqual(radius_bck, self.radius, "those callbacks should not be able to change the radius")
+
+
+    def test_event_sequence(self):
+        self.icircle = interactive_overlays.Circle(canvas=self.canvas, center_xy=self.center_xy, radius=self.radius, label="ok",
+                                                    on_click=None,
+                                                    on_drag=None,
+                                                    on_release=None)
+        event = Event(0, 0)
+        self.assertEqual(interactive_overlays.State.NORMAL, self.icircle.state, f"icircle must interact")
+
+        self.icircle._on_enter(event)
+        self.assertEqual(interactive_overlays.State.HOVERED, self.icircle.state, f"icircle must interact")
+
+        self.icircle._on_click(event)
+        self.assertEqual(interactive_overlays.State.DRAGGED, self.icircle.state, f"icircle must interact")
+
+        self.icircle._on_drag_center(event)
+        self.assertEqual(interactive_overlays.State.DRAGGED, self.icircle.state, f"icircle must interact")
+
+        self.icircle._on_release_center(event)
+        self.assertEqual(interactive_overlays.State.HOVERED, self.icircle.state, f"icircle must interact")
+
+        self.icircle._on_leave(event)
+        self.assertEqual(interactive_overlays.State.NORMAL, self.icircle.state, f"icircle must interact")
+
+        self.icircle._on_enter(event)
+        self.assertEqual(interactive_overlays.State.HOVERED, self.icircle.state, f"icircle must interact")
+
+        self.icircle._on_click(event)
+        self.assertEqual(interactive_overlays.State.DRAGGED, self.icircle.state, f"icircle must interact")
+
+        self.icircle._on_drag_curve(event)
+        self.assertEqual(interactive_overlays.State.DRAGGED, self.icircle.state, f"icircle must interact")
+
+        self.icircle._on_release_curve(event)
+        self.assertEqual(interactive_overlays.State.HOVERED, self.icircle.state, f"icircle must interact")
+
+        self.icircle._on_leave(event)
+        self.assertEqual(interactive_overlays.State.NORMAL, self.icircle.state, f"icircle must interact")
+
+    def test_event_raise(self):
+        self.icircle = interactive_overlays.Circle(canvas=self.canvas, center_xy=self.center_xy, radius=self.radius, label="ok",
+                                                   on_click=None,
+                                                   on_drag=self.on_event_error,
+                                                   on_release=None)
+        event = Event(0, 0)
+
+        with self.assertRaises(Exception):
+            self.icircle._on_drag_curve(event)
+
+        with self.assertRaises(Exception):
+            self.icircle._on_drag_center(event)
 
 
 if __name__ == '__main__':

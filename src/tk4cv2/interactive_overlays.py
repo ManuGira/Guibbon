@@ -197,7 +197,6 @@ class Point:
         self.update()
 
 
-
 class Circle:
     colors = {
         State.NORMAL: '#%02x%02x%02x' % (0, 0, 255),
@@ -209,7 +208,7 @@ class Circle:
     def distance(point0_xy: Point2D, point1_xy: Point2D) -> float:
         dx = point1_xy[0] - point0_xy[0]
         dy = point1_xy[1] - point0_xy[1]
-        return float(np.sqrt(dx**2 + dy**2))
+        return float(np.sqrt(dx ** 2 + dy ** 2))
 
     @staticmethod
     def convert_coords(center_xy: Point2D, radius: float) -> Tuple[int, int, int, int]:
@@ -219,12 +218,12 @@ class Circle:
         y1 = int(round(center_xy[1] + radius))
         return x0, y0, x1, y1
 
-    def __init__(self, canvas: tk.Canvas, center_xy: Point2D, radius: float, label:str="",
-                 on_click:CallbackCircle=None,
-                 on_drag:CallbackCircle=None,
-                 on_release:CallbackCircle=None,
-                 img2can_matrix:Optional[TransformMatrix]=None,
-                 magnets: Optional[Magnets]=None):
+    def __init__(self, canvas: tk.Canvas, center_xy: Point2D, radius: float, label: str = "",
+                 on_click: CallbackCircle = None,
+                 on_drag: CallbackCircle = None,
+                 on_release: CallbackCircle = None,
+                 img2can_matrix: Optional[TransformMatrix] = None,
+                 magnets: Optional[Magnets] = None):
         if img2can_matrix is None:
             img2can_matrix = tmat.identity_matrix()
         self.canvas = canvas
@@ -238,11 +237,11 @@ class Circle:
         self.on_release = on_release
 
         self.ipoint = Point(canvas, center_xy, label="",
-                           on_click=None if on_click is None else self._on_click,
-                           on_drag=self._on_drag_center,
-                           on_release=None if on_release is None else self._on_release_center,
-                           img2can_matrix=img2can_matrix,
-                           magnets=magnets)
+                            on_click=None if on_click is None else self._on_click,
+                            on_drag=self._on_drag_center,
+                            on_release=None if on_release is None else self._on_release_center,
+                            img2can_matrix=img2can_matrix,
+                            magnets=magnets)
         self.curve_id = self.canvas.create_oval(-2, -2, -1, -1, outline=Circle.colors[self.state], width=3)
 
         self.on_click = on_click
@@ -292,26 +291,28 @@ class Circle:
 
     def _on_drag_center(self, event):
         try:
+            # ipoint's callback already called. event coordinates already converted to image space
             self.state = State.DRAGGED
             self._update_curve()
             if self.on_drag is not None:
                 self.on_drag(event, self.ipoint.get_img_point_xy(), self.radius)
         except Exception as e:
-            print(f"ERROR: {self}: self._on_drag({event}) --->", e)
+            print(f"ERROR: {self}: self._on_drag_center({event}) --->", e)
             raise e
 
     def _on_drag_curve(self, event):
         try:
-            can_xy = event.x, event.y
-            img_xy = tmat.apply(self.ipoint.can2img_matrix, can_xy)
-            self.radius = Circle.distance(img_xy, self.ipoint.get_img_point_xy())
+            ev_can_xy = event.x, event.y
+            ev_img_xy = tmat.apply(self.ipoint.can2img_matrix, ev_can_xy)
+            center_img_xy = self.ipoint.get_img_point_xy()
+            self.radius = Circle.distance(ev_img_xy, center_img_xy)
             self.state = State.DRAGGED
             self.update()
             if self.on_drag is not None:
-                event.x, event.y = img_xy
-                self.on_drag(event, img_xy, self.radius)
+                event.x, event.y = ev_img_xy
+                self.on_drag(event, center_img_xy, self.radius)
         except Exception as e:
-            print(f"ERROR: {self}: self._on_drag({event}) --->", e)
+            print(f"ERROR: {self}: self._on_drag_curve({event}) --->", e)
             raise e
 
     def _on_release_center(self, event):
@@ -351,8 +352,7 @@ class Circle:
 
     def get_can_radius(self):
         scale_xy = tmat.extract_scale(self.ipoint.img2can_matrix)
-        return self.radius*scale_xy[0]
-
+        return self.radius * scale_xy[0]
 
 
 class Polygon(InteractivePolygon):
