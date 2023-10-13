@@ -33,3 +33,14 @@ class InteractivePolygon(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def set_point_xy_list(self, point_xy_list: Point2DList):
         raise NotImplementedError
+
+def is_point2d(val) -> bool:
+    out = True
+    try:
+        out &=isinstance(val, tuple)
+        out &= len(val) == 2
+        for i in range(2):
+            out &= isinstance(val[i], float) or isinstance(val[i], int)
+        return out
+    except:
+        return False
