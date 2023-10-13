@@ -94,7 +94,8 @@ class DemoMVCAdvApp:
             self.is_update_needed = True
 
     def on_drag_circle(self, event, center_xy, radius):
-        print(center_xy, radius)
+        self.model.cross_xy = center_xy
+        self.is_update_needed = True
 
 
 if __name__ == '__main__':
