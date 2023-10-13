@@ -52,6 +52,8 @@ $ tox
 
 ## TODO
 
+* **Bug**: Closing the windows doesn't kill all threads
+
 #### Image Viewer
 * **Feature**: Handle double clicks
 * **Feature**: Handle **param** field of mouse callback
@@ -62,7 +64,7 @@ $ tox
 * **Feature**: Make sure that the failing demo also fails with cv2
 
 #### Interactive Overlays
-* **Feature**: Make sure that the failing demo also fails with cv2
+* **Feature**: Labels
 
 
 ## Documentation
