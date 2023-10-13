@@ -257,6 +257,12 @@ class Circle:
         self.canvas.tag_bind(self.curve_id, "<Enter>", self._on_enter)
         self.canvas.tag_bind(self.curve_id, "<Leave>", self._on_leave)
 
+        # unbind callbacks of ipoint and rebind them for us
+        self.canvas.tag_unbind(self.ipoint.circle_id, "<Enter>")
+        self.canvas.tag_unbind(self.ipoint.circle_id, "<Leave>")
+        self.canvas.tag_bind(self.ipoint.circle_id, "<Enter>", self._on_enter)
+        self.canvas.tag_bind(self.ipoint.circle_id, "<Leave>", self._on_leave)
+
         self.update()
 
     def _update_curve(self):
