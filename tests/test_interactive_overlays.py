@@ -5,7 +5,7 @@ import unittest
 from tk4cv2 import interactive_overlays
 from tk4cv2 import transform_matrix as tmat
 from tk4cv2 import typedef
-from tk4cv2.typedef import Point2D, Point2DList
+from tk4cv2.typedef import Point2D
 
 
 eps = sys.float_info.epsilon
@@ -510,7 +510,7 @@ class TestCircle(unittest.TestCase):
         self.center_xy = center_xy
         self.radius = radius
 
-    def on_event_error(self, event, point_xy_list):
+    def on_event_error(self, event, center_xy, radius):
         raise
 
     def test_callback(self):
@@ -629,37 +629,37 @@ class TestCircle(unittest.TestCase):
                                                     on_drag=None,
                                                     on_release=None)
         event = Event(0, 0)
-        self.assertEqual(interactive_overlays.State.NORMAL, self.icircle.state, f"icircle must interact")
+        self.assertEqual(interactive_overlays.State.NORMAL, self.icircle.state, "icircle must interact")
 
         self.icircle._on_enter(event)
-        self.assertEqual(interactive_overlays.State.HOVERED, self.icircle.state, f"icircle must interact")
+        self.assertEqual(interactive_overlays.State.HOVERED, self.icircle.state, "icircle must interact")
 
         self.icircle._on_click(event)
-        self.assertEqual(interactive_overlays.State.DRAGGED, self.icircle.state, f"icircle must interact")
+        self.assertEqual(interactive_overlays.State.DRAGGED, self.icircle.state, "icircle must interact")
 
         self.icircle._on_drag_center(event)
-        self.assertEqual(interactive_overlays.State.DRAGGED, self.icircle.state, f"icircle must interact")
+        self.assertEqual(interactive_overlays.State.DRAGGED, self.icircle.state, "icircle must interact")
 
         self.icircle._on_release_center(event)
-        self.assertEqual(interactive_overlays.State.HOVERED, self.icircle.state, f"icircle must interact")
+        self.assertEqual(interactive_overlays.State.HOVERED, self.icircle.state, "icircle must interact")
 
         self.icircle._on_leave(event)
-        self.assertEqual(interactive_overlays.State.NORMAL, self.icircle.state, f"icircle must interact")
+        self.assertEqual(interactive_overlays.State.NORMAL, self.icircle.state, "icircle must interact")
 
         self.icircle._on_enter(event)
-        self.assertEqual(interactive_overlays.State.HOVERED, self.icircle.state, f"icircle must interact")
+        self.assertEqual(interactive_overlays.State.HOVERED, self.icircle.state, "icircle must interact")
 
         self.icircle._on_click(event)
-        self.assertEqual(interactive_overlays.State.DRAGGED, self.icircle.state, f"icircle must interact")
+        self.assertEqual(interactive_overlays.State.DRAGGED, self.icircle.state, "icircle must interact")
 
         self.icircle._on_drag_curve(event)
-        self.assertEqual(interactive_overlays.State.DRAGGED, self.icircle.state, f"icircle must interact")
+        self.assertEqual(interactive_overlays.State.DRAGGED, self.icircle.state, "icircle must interact")
 
         self.icircle._on_release_curve(event)
-        self.assertEqual(interactive_overlays.State.HOVERED, self.icircle.state, f"icircle must interact")
+        self.assertEqual(interactive_overlays.State.HOVERED, self.icircle.state, "icircle must interact")
 
         self.icircle._on_leave(event)
-        self.assertEqual(interactive_overlays.State.NORMAL, self.icircle.state, f"icircle must interact")
+        self.assertEqual(interactive_overlays.State.NORMAL, self.icircle.state, "icircle must interact")
 
     def test_event_raise(self):
         self.icircle = interactive_overlays.Circle(canvas=self.canvas, center_xy=self.center_xy, radius=self.radius, label="ok",

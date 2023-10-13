@@ -42,5 +42,5 @@ def is_point2d(val) -> bool:
         for i in range(2):
             out &= isinstance(val[i], float) or isinstance(val[i], int)
         return out
-    except:
+    except Exception:
         return False
