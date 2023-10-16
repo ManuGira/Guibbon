@@ -85,6 +85,16 @@ def createButton(text="Button", command=None, winname=None):
     Tk4Cv2.get_instance(winname)._createButton(text, command)
 
 
+def create_custom_widget(CustomWidgetClass, winname, name, *params):
+    widget_instance = Tk4Cv2.get_instance(winname).create_custom_widget(CustomWidgetClass, name, *params)
+    return widget_instance
+
+
+def get_custom_widget_instance(winname, name):
+    widget_instance = Tk4Cv2.get_instance(winname).get_custom_widget_instance(name)
+    return widget_instance
+
+
 def create_slider(winname, slider_name, values, initial_index, on_change=None) -> SliderWidget:
     slider_instance: SliderWidget = Tk4Cv2.get_instance(winname).create_slider(slider_name, values, initial_index, on_change)
     return slider_instance
@@ -304,8 +314,8 @@ class Tk4Cv2:
         self._imshow(img)
 
         self.ctrl_frame = tk.Frame(master=self.frame, width=300, bg=COLORS.ctrl_panel)
-        self.trackbars_by_names = {}
         self.sliders_by_names = {}
+        self.custom_widtgets_by_names = {}
         self.radiobuttons_by_names = {}
 
         self.frame.pack()
@@ -341,6 +351,16 @@ class Tk4Cv2:
 
     def get_slider_instance(self, slider_name):
         return self.sliders_by_names[slider_name]
+
+    def create_custom_widget(self, CustomWidgetClass, name, *params):
+        tk_frame = tk.Frame(self.ctrl_frame, bg=COLORS.widget)
+        widget_instance = CustomWidgetClass(tk_frame, name, *params, COLORS.widget)
+        self.custom_widtgets_by_names[name] = widget_instance
+        tk_frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
+        return widget_instance
+
+    def get_custom_widget_instance(self, name):
+        return self.custom_widtgets_by_names[name]
 
     def _createRadioButtons(self, name, options, value, onChange):
         options = options + []  # copy

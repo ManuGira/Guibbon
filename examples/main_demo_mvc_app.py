@@ -14,7 +14,8 @@ class DemoMVCApp:
         tcv2.namedWindow(self.winname)
         tcv2.createInteractivePoint(self.winname, (100, 100), "point", on_drag=self.on_drag)
 
-        slider = tcv2.create_slider(self.winname, "slider", [0, 10, 20, 30], 2, lambda index, val: print("slider", index, val))
+        # slider = tcv2.create_slider(self.winname, "slider", [0, 10, 20, 30], 2, lambda index, val: print("slider", index, val))
+        slider = tcv2.create_custom_widget(tcv2.SliderWidget, self.winname, "custom slider", [0, 10, 20, 30], 2, lambda index, val: print("custom slider", index, val))
         slider.set_index(1)
 
         tcv2.createTrackbar("trackbar", self.winname, 2, 4, lambda val: print("trackbar", val))
