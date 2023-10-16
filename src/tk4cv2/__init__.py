@@ -11,6 +11,7 @@ import cv2
 
 from .image_viewer import ImageViewer
 from .keyboard_event_handler import KeyboardEventHandler
+from .slider_widget import SliderWidget
 
 __version__ = "0.0.0"
 __version_info__ = tuple(int(i) for i in __version__.split(".") if i.isdigit())
@@ -80,13 +81,13 @@ def createButton(text='Button', command=None, winname=None):
     Tk4Cv2.get_instance(winname)._createButton(text, command)
 
 
-def create_slider(winname, slider_name, values, initial_index, on_change=None) -> "SliderWidget":
-    slider_instance: "SliderWidget" = Tk4Cv2.get_instance(winname).create_slider(slider_name, values, initial_index, on_change)
+def create_slider(winname, slider_name, values, initial_index, on_change=None) -> SliderWidget:
+    slider_instance: SliderWidget = Tk4Cv2.get_instance(winname).create_slider(slider_name, values, initial_index, on_change)
     return slider_instance
 
 
-def get_slider_instance(winname, slider_name) -> "SliderWidget":
-    slider_instance: "SliderWidget" = Tk4Cv2.get_instance(winname).get_slider_instance(slider_name)
+def get_slider_instance(winname, slider_name) -> SliderWidget:
+    slider_instance: SliderWidget = Tk4Cv2.get_instance(winname).get_slider_instance(slider_name)
     return slider_instance
 
 
@@ -178,48 +179,6 @@ def createInteractiveRectangle(windowName, point0_xy, point1_xy, label="",
             on_click:CallbackRect=None, on_drag:CallbackRect=None, on_release:CallbackRect=None,
             magnet_points:Optional[Point2DList]=None):
     Tk4Cv2.get_instance(windowName).image_viewer.createInteractiveRectangle(point0_xy, point1_xy, label, on_click, on_drag, on_release, magnet_points)
-
-
-class SliderWidget:
-    def __init__(self, tk_frame, slider_name, values, initial_index, on_change, widget_color):
-        self.name = slider_name
-        self.values = values
-        self.on_change = on_change
-        self.value_var = tk.StringVar()
-
-        tk.Label(tk_frame, text=self.name, bg=widget_color).pack(padx=2, side=tk.LEFT)
-        self.value_var.set(self.values[initial_index])
-        tk.Label(tk_frame, textvariable=self.value_var, bg=widget_color).pack(padx=2, side=tk.TOP)
-        count = len(self.values)
-        self.tk_scale = tk.Scale(tk_frame, from_=0, to=count-1, orient=tk.HORIZONTAL, bg=widget_color, borderwidth=0, showvalue=False)
-        self.tk_scale.set(initial_index)
-
-        self.tk_scale["command"] = self.callback
-        self.tk_scale.pack(padx=2, fill=tk.X, expand=1)
-
-    def callback(self, index):
-        val = self.values[int(index)]
-        self.value_var.set(val)
-        return self.on_change(index, val)
-
-    def set_index(self, index, trigger_callback=True):
-        self.tk_scale.set(index)
-        if trigger_callback:
-            self.callback(index)
-
-    def get_index(self):
-        return self.tk_scale.get()
-
-    def get_values(self):
-        return self.values
-
-    def set_values(self, values, new_index=None):
-        count = len(values)
-        self.tk_scale["to"] = count-1
-        self.values = values
-        if new_index is not None:
-            self.set_index(new_index, trigger_callback=False)
-            self.value_var.set(values[new_index])
 
 
 class Tk4Cv2:
