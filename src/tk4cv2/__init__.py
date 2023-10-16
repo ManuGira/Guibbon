@@ -11,6 +11,7 @@ import cv2
 
 from .image_viewer import ImageViewer
 from .keyboard_event_handler import KeyboardEventHandler
+from .slider_widget import SliderWidget
 
 __version__ = "0.0.0"
 __version_info__ = tuple(int(i) for i in __version__.split(".") if i.isdigit())
@@ -80,32 +81,58 @@ def createButton(text='Button', command=None, winname=None):
     Tk4Cv2.get_instance(winname)._createButton(text, command)
 
 
-def createTrackbar(trackbarName, winname=None, value=0, count=10, onChange=None):
-    Tk4Cv2.get_instance(winname)._createTrackbar(trackbarName, value, count, onChange)
+def create_slider(winname, slider_name, values, initial_index, on_change=None) -> SliderWidget:
+    slider_instance: SliderWidget = Tk4Cv2.get_instance(winname).create_slider(slider_name, values, initial_index, on_change)
+    return slider_instance
+
+
+def get_slider_instance(winname, slider_name) -> SliderWidget:
+    slider_instance: SliderWidget = Tk4Cv2.get_instance(winname).get_slider_instance(slider_name)
+    return slider_instance
+
+
+def createTrackbar(trackbarName, windowName, value, count, onChange):
+    values = list(range(count+1))
+    initial_index = value
+    def on_change(index, val):
+        return onChange(val)
+    Tk4Cv2.get_instance(windowName).create_slider(trackbarName, values, initial_index, on_change)
 
 
 def setTrackbarPos(trackbarname, winname, pos):
-    Tk4Cv2.get_instance(winname)._setTrackbarPos(trackbarname, pos)
+    trackbar_instance = get_slider_instance(winname, trackbarname)
+    trackbar_instance.set_index(pos)
 
 
 def getTrackbarPos(trackbarname, winname):
-    return Tk4Cv2.get_instance(winname)._getTrackbarPos(trackbarname)
+    trackbar_instance = get_slider_instance(winname, trackbarname)
+    return trackbar_instance.get_index()
 
 
 def setTrackbarMin(trackbarname, winname, minval):
-    Tk4Cv2.get_instance(winname)._setTrackbarMin(trackbarname, minval)
+    trackbar_instance = get_slider_instance(winname, trackbarname)
+    current_minval = trackbar_instance.get_values()[0]
+    maxval = trackbar_instance.get_values()[-1]
+    values = list(range(minval, maxval+1))
+    new_index = max(trackbar_instance.get_index() + current_minval - minval, 0)
+    trackbar_instance.set_values(values, new_index)
 
 
 def getTrackbarMin(trackbarname, winname):
-    return Tk4Cv2.get_instance(winname)._getTrackbarMin(trackbarname)
+    trackbar_instance = get_slider_instance(winname, trackbarname)
+    return trackbar_instance.get_values()[0]
 
 
 def setTrackbarMax(trackbarname, winname, maxval):
-    Tk4Cv2.get_instance(winname)._setTrackbarMax(trackbarname, maxval)
+    trackbar_instance = get_slider_instance(winname, trackbarname)
+    minval = trackbar_instance.get_values()[0]
+    values = list(range(minval, maxval+1))
+    trackbar_instance.set_values(values)
 
 
 def getTrackbarMax(trackbarname, winname):
-    return Tk4Cv2.get_instance(winname)._getTrackbarMax(trackbarname)
+    trackbar_instance = get_slider_instance(winname, trackbarname)
+    return trackbar_instance.get_values()[-1]
 
 
 def namedWindow(winname):  # TODO: add "flags" argument
@@ -250,6 +277,7 @@ class Tk4Cv2:
 
         self.ctrl_frame = tk.Frame(master=self.frame, width=300, bg=COLORS.ctrl_panel)
         self.trackbars_by_names = {}
+        self.sliders_by_names = {}
         self.radiobuttons_by_names = {}
 
         self.frame.pack()
@@ -277,40 +305,15 @@ class Tk4Cv2:
         tk.Button(frame, text=text, command=command).pack(side=tk.LEFT)
         frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.BOTH)
 
-    def _createTrackbar(self, trackbarName, value, count, onChange):
-        frame = tk.Frame(self.ctrl_frame, bg=COLORS.widget)
-        tk.Label(frame, text=trackbarName, bg=COLORS.widget).pack(padx=2, side=tk.LEFT)
-        # tk.Button(frame, text=f"{value} {count}", command=onChange).pack(padx=2, fill=tk.X, expand=1)
-        trackbar = tk.Scale(frame, from_=0, to=count, orient=tk.HORIZONTAL, bg=COLORS.widget, borderwidth=0)
-        trackbar.set(value)
-        def callback(val):
-            return onChange(int(val))
-        trackbar["command"] = callback
-        trackbar.pack(padx=2, fill=tk.X, expand=1)
-        self.trackbars_by_names[trackbarName] = {"tkObject": trackbar, "callback": callback}
-        # self.trackbars_by_names[trackbarName] = {"tkObject": trackbar}
-        frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
+    def create_slider(self, slider_name, values, initial_index, onChange):
+        tk_frame = tk.Frame(self.ctrl_frame, bg=COLORS.widget)
+        slider = SliderWidget(tk_frame, slider_name, values, initial_index, onChange, COLORS.widget)
+        self.sliders_by_names[slider_name] = slider
+        tk_frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
+        return slider
 
-    def _setTrackbarPos(self, trackbarname, pos):
-        trackbar = self.trackbars_by_names[trackbarname]["tkObject"]
-        onChange = self.trackbars_by_names[trackbarname]["callback"]
-        trackbar.set(pos)
-        onChange(pos)
-
-    def _getTrackbarPos(self, trackbarname):
-        return self.trackbars_by_names[trackbarname]["tkObject"].get()
-
-    def _setTrackbarMin(self, trackbarname, minval):
-        self.trackbars_by_names[trackbarname]["tkObject"]["from"] = minval
-
-    def _getTrackbarMin(self, trackbarname):
-        return self.trackbars_by_names[trackbarname]["tkObject"]["from"]
-
-    def _setTrackbarMax(self, trackbarname, maxval):
-        self.trackbars_by_names[trackbarname]["tkObject"]["to"] = maxval
-
-    def _getTrackbarMax(self, trackbarname):
-        return self.trackbars_by_names[trackbarname]["tkObject"]["to"]
+    def get_slider_instance(self, slider_name):
+        return self.sliders_by_names[slider_name]
 
     def _createRadioButtons(self, name, options, value, onChange):
         options = options + []  # copy

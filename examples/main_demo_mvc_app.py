@@ -13,6 +13,15 @@ class DemoMVCApp:
         tcv2.namedWindow(self.winname)
         tcv2.createInteractivePoint(self.winname, (100, 100), "point", on_drag=self.on_drag)
 
+        slider = tcv2.create_slider(self.winname, "slider", [0, 10, 20, 30], 2, lambda index, val: print("slider", index, val))
+        slider.set_index(1)
+
+        tcv2.createTrackbar("trackbar", self.winname, 2, 4, lambda val: print("trackbar", val))
+        tcv2.setTrackbarPos("trackbar", self.winname, 1)
+        tcv2.setTrackbarPos("trackbar", self.winname, 2)
+
+        tcv2.createButton("+2", self.add2, self.winname)
+
         self.x = 0
         self.y = 0
 
@@ -48,6 +57,11 @@ class DemoMVCApp:
         self.y = event.y
         self.is_update_needed = True
 
+    def add2(self):
+        slider = tcv2.get_slider_instance(self.winname, "slider")
+        slider.set_values(slider.get_values() + [100])
+
+        tcv2.setTrackbarMin("trackbar", self.winname, 2)
 
 if __name__ == '__main__':
     mc = DemoMVCApp("images/dog.jpg")
