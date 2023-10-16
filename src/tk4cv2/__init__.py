@@ -80,40 +80,58 @@ def createButton(text='Button', command=None, winname=None):
     Tk4Cv2.get_instance(winname)._createButton(text, command)
 
 
-def createSlider(sliderName, winname, values, initial_pos, onChange=None):
-    Tk4Cv2.get_instance(winname)._createSlider(sliderName, values, initial_pos, onChange)
+def create_slider(winname, slider_name, values, initial_index, on_change=None) -> "SliderWidget":
+    slider_instance: "SliderWidget" = Tk4Cv2.get_instance(winname).create_slider(slider_name, values, initial_index, on_change)
+    return slider_instance
 
 
-def setSliderPos(sliderName, winname, pos):
-    Tk4Cv2.get_instance(winname)._setSliderPos(sliderName, pos)
+def get_slider_instance(winname, slider_name) -> "SliderWidget":
+    slider_instance: "SliderWidget" = Tk4Cv2.get_instance(winname).get_slider_instance(slider_name)
+    return slider_instance
 
 
-def createTrackbar(trackbarName, winname=None, value=0, count=10, onChange=None):
-    Tk4Cv2.get_instance(winname)._createTrackbar(trackbarName, value, count, onChange)
+def createTrackbar(trackbarName, windowName, value, count, onChange):
+    values = list(range(count+1))
+    initial_index = value
+    def on_change(index, val):
+        return onChange(val)
+    Tk4Cv2.get_instance(windowName).create_slider(trackbarName, values, initial_index, on_change)
 
 
 def setTrackbarPos(trackbarname, winname, pos):
-    Tk4Cv2.get_instance(winname)._setTrackbarPos(trackbarname, pos)
+    trackbar_instance = get_slider_instance(winname, trackbarname)
+    trackbar_instance.set_index(pos)
 
 
 def getTrackbarPos(trackbarname, winname):
-    return Tk4Cv2.get_instance(winname)._getTrackbarPos(trackbarname)
+    trackbar_instance = get_slider_instance(winname, trackbarname)
+    return trackbar_instance.get_index()
 
 
 def setTrackbarMin(trackbarname, winname, minval):
-    Tk4Cv2.get_instance(winname)._setTrackbarMin(trackbarname, minval)
+    trackbar_instance = get_slider_instance(winname, trackbarname)
+    current_minval = trackbar_instance.get_values()[0]
+    maxval = trackbar_instance.get_values()[-1]
+    values = list(range(minval, maxval+1))
+    new_index = max(trackbar_instance.get_index() + current_minval - minval, 0)
+    trackbar_instance.set_values(values, new_index)
 
 
 def getTrackbarMin(trackbarname, winname):
-    return Tk4Cv2.get_instance(winname)._getTrackbarMin(trackbarname)
+    trackbar_instance = get_slider_instance(winname, trackbarname)
+    return trackbar_instance.get_values()[0]
 
 
 def setTrackbarMax(trackbarname, winname, maxval):
-    Tk4Cv2.get_instance(winname)._setTrackbarMax(trackbarname, maxval)
+    trackbar_instance = get_slider_instance(winname, trackbarname)
+    minval = trackbar_instance.get_values()[0]
+    values = list(range(minval, maxval+1))
+    trackbar_instance.set_values(values)
 
 
 def getTrackbarMax(trackbarname, winname):
-    return Tk4Cv2.get_instance(winname)._getTrackbarMax(trackbarname)
+    trackbar_instance = get_slider_instance(winname, trackbarname)
+    return trackbar_instance.get_values()[-1]
 
 
 def namedWindow(winname):  # TODO: add "flags" argument
@@ -160,6 +178,48 @@ def createInteractiveRectangle(windowName, point0_xy, point1_xy, label="",
             on_click:CallbackRect=None, on_drag:CallbackRect=None, on_release:CallbackRect=None,
             magnet_points:Optional[Point2DList]=None):
     Tk4Cv2.get_instance(windowName).image_viewer.createInteractiveRectangle(point0_xy, point1_xy, label, on_click, on_drag, on_release, magnet_points)
+
+
+class SliderWidget:
+    def __init__(self, tk_frame, slider_name, values, initial_index, on_change, widget_color):
+        self.name = slider_name
+        self.values = values
+        self.on_change = on_change
+        self.value_var = tk.StringVar()
+
+        tk.Label(tk_frame, text=self.name, bg=widget_color).pack(padx=2, side=tk.LEFT)
+        self.value_var.set(self.values[initial_index])
+        tk.Label(tk_frame, textvariable=self.value_var, bg=widget_color).pack(padx=2, side=tk.TOP)
+        count = len(self.values)
+        self.tk_scale = tk.Scale(tk_frame, from_=0, to=count-1, orient=tk.HORIZONTAL, bg=widget_color, borderwidth=0, showvalue=False)
+        self.tk_scale.set(initial_index)
+
+        self.tk_scale["command"] = self.callback
+        self.tk_scale.pack(padx=2, fill=tk.X, expand=1)
+
+    def callback(self, index):
+        val = self.values[int(index)]
+        self.value_var.set(val)
+        return self.on_change(index, val)
+
+    def set_index(self, index, trigger_callback=True):
+        self.tk_scale.set(index)
+        if trigger_callback:
+            self.callback(index)
+
+    def get_index(self):
+        return self.tk_scale.get()
+
+    def get_values(self):
+        return self.values
+
+    def set_values(self, values, new_index=None):
+        count = len(values)
+        self.tk_scale["to"] = count-1
+        self.values = values
+        if new_index is not None:
+            self.set_index(new_index, trigger_callback=False)
+            self.value_var.set(values[new_index])
 
 
 class Tk4Cv2:
@@ -286,60 +346,15 @@ class Tk4Cv2:
         tk.Button(frame, text=text, command=command).pack(side=tk.LEFT)
         frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.BOTH)
 
-    def _createSlider(self, sliderName, values, initial_pos, onChange):
-        frame = tk.Frame(self.ctrl_frame, bg=COLORS.widget)
-        tk.Label(frame, text=sliderName, bg=COLORS.widget).pack(padx=2, side=tk.LEFT)
-        value_var = tk.StringVar()
-        value_var.set(values[initial_pos])
-        tk.Label(frame, textvariable=value_var, bg=COLORS.widget).pack(padx=2, side=tk.TOP)
-        count = len(values)
-        slider = tk.Scale(frame, from_=0, to=count-1, orient=tk.HORIZONTAL, bg=COLORS.widget, borderwidth=0, showvalue=False)
-        slider.set(initial_pos)
+    def create_slider(self, slider_name, values, initial_index, onChange):
+        tk_frame = tk.Frame(self.ctrl_frame, bg=COLORS.widget)
+        slider = SliderWidget(tk_frame, slider_name, values, initial_index, onChange, COLORS.widget)
+        self.sliders_by_names[slider_name] = slider
+        tk_frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
+        return slider
 
-        def callback(val):
-            val = values[int(val)]
-            value_var.set(val)
-            return onChange(val)
-
-        slider["command"] = callback
-        slider.pack(padx=2, fill=tk.X, expand=1)
-        self.sliders_by_names[sliderName] = {"tkObject": slider, "callback": callback}
-        frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
-
-    def _setSliderPos(self, sliderName, pos):
-        slider = self.sliders_by_names[sliderName]["tkObject"]
-        slider.set(pos)
-
-    def _createTrackbar(self, trackbarName, value, count, onChange):
-        frame = tk.Frame(self.ctrl_frame, bg=COLORS.widget)
-        tk.Label(frame, text=trackbarName, bg=COLORS.widget).pack(padx=2, side=tk.LEFT)
-        trackbar = tk.Scale(frame, from_=0, to=count, orient=tk.HORIZONTAL, bg=COLORS.widget, borderwidth=0)
-        trackbar.set(value)
-        def callback(val):
-            return onChange(int(val))
-        trackbar["command"] = callback
-        trackbar.pack(padx=2, fill=tk.X, expand=1)
-        self.trackbars_by_names[trackbarName] = {"tkObject": trackbar, "callback": callback}
-        frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
-
-    def _setTrackbarPos(self, trackbarname, pos):
-        trackbar = self.trackbars_by_names[trackbarname]["tkObject"]
-        trackbar.set(pos)
-
-    def _getTrackbarPos(self, trackbarname):
-        return self.trackbars_by_names[trackbarname]["tkObject"].get()
-
-    def _setTrackbarMin(self, trackbarname, minval):
-        self.trackbars_by_names[trackbarname]["tkObject"]["from"] = minval
-
-    def _getTrackbarMin(self, trackbarname):
-        return self.trackbars_by_names[trackbarname]["tkObject"]["from"]
-
-    def _setTrackbarMax(self, trackbarname, maxval):
-        self.trackbars_by_names[trackbarname]["tkObject"]["to"] = maxval
-
-    def _getTrackbarMax(self, trackbarname):
-        return self.trackbars_by_names[trackbarname]["tkObject"]["to"]
+    def get_slider_instance(self, slider_name):
+        return self.sliders_by_names[slider_name]
 
     def _createRadioButtons(self, name, options, value, onChange):
         options = options + []  # copy

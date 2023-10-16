@@ -170,7 +170,7 @@ class TestTk4Cv2_TrackBar(unittest.TestCase):
          - setTrackBarPos
         """
         name = "TrackBar"
-        res = tcv2.createTrackbar(trackbarName=name, winname=self.winname, value=1, count=10, onChange=self.callback)
+        res = tcv2.createTrackbar(trackbarName=name, windowName=self.winname, value=1, count=10, onChange=self.callback)
         self.assertIsNone(res, msg="function tcv2.createTrackBar must return None")
 
         value = tcv2.getTrackbarPos(name, self.winname)
@@ -191,7 +191,7 @@ class TestTk4Cv2_TrackBar(unittest.TestCase):
          - getTrackbarMin
         """
         name = "TrackBar"
-        tcv2.createTrackbar(trackbarName=name, winname=self.winname, value=1, count=10, onChange=self.callback)
+        tcv2.createTrackbar(trackbarName=name, windowName=self.winname, value=1, count=10, onChange=self.callback)
         initial_min = tcv2.getTrackbarMin(trackbarname=name, winname=self.winname)
         initial_max = tcv2.getTrackbarMax(trackbarname=name, winname=self.winname)
 
