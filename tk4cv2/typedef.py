@@ -30,3 +30,7 @@ class InteractivePolygon(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def set_point_xy_list(self, point_xy_list: Point2DList):
         raise NotImplementedError
+
+    @abc.abstractmethod
+    def set_visible(self, value: bool):
+        raise NotImplementedError
