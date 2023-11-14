@@ -4,6 +4,8 @@ import tkinter
 import unittest
 from tk4cv2 import interactive_overlays
 from tk4cv2 import transform_matrix as tmat
+from tk4cv2.typedef import InteractivePoint, InteractivePolygon, CallbackPoint
+from types import FunctionType
 
 eps = sys.float_info.epsilon
 
@@ -95,6 +97,10 @@ class TestPoint(unittest.TestCase):
 
     def on_event_error(self, event):
         raise
+
+    def test_interface(self):
+        self.pt = interactive_overlays.Point(canvas=self.canvas, point_xy=self.point_xy)
+        self.assertIsInstance(self.pt, InteractivePoint)
 
     def test_callback(self):
         self.pt = interactive_overlays.Point(
@@ -219,6 +225,12 @@ class TestPolygon(unittest.TestCase):
 
     def on_event_error(self, event, point_xy_list):
         raise
+
+    def test_interface(self):
+        self.plg = interactive_overlays.Polygon(
+            canvas=self.canvas,
+            point_xy_list=self.point_xy_list)
+        self.assertIsInstance(self.plg, InteractivePolygon)
 
     def test_callback(self):
         point_xy_list_bck = self.point_xy_list + []
@@ -357,6 +369,13 @@ class TestRectangle(unittest.TestCase):
 
     def on_event_error(self, event, point0_xy, point1_xy):
         raise
+
+    def test_interface(self):
+        self.rect = interactive_overlays.Rectangle(
+            canvas=self.canvas,
+            point0_xy=self.point0_xy,
+            point1_xy=self.point1_xy)
+        self.assertIsInstance(self.rect, InteractivePolygon)
 
     def test_callback(self):
         point0_xy_bck = self.point0_xy
