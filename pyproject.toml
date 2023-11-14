@@ -1,30 +1,14 @@
+[tool.poetry]
+name = "tk4cv2"
+version = "0.1.0"
+description = ""
+authors = ["Emmanuel Girardin <emmanuel.girardin@outlook.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+
 [build-system]
-requires = ["setuptools>=42.0", "wheel"]
-build-backend = "setuptools.build_meta"
-
-[tool.pytest.ini_options]
-addopts = "--cov-report=term --cov-report=html:build/.pytest_coverage_html --cov=tk4cv2"
-testpaths = [
-    "tests",
-]
-cache_dir = "build/.pytest_cache"
-
-
-[tool.mypy]
-check_untyped_defs = true
-disallow_any_generics = true
-ignore_missing_imports = true
-no_implicit_optional = true
-show_error_codes = true
-strict_equality = true
-warn_redundant_casts = true
-warn_return_any = true
-warn_unreachable = true
-warn_unused_configs = true
-implicit_reexport = true
-pretty = true
-cache_dir = "build/.mypy_cache"
-
-[tool.ruff]
-line-length = 160
-cache-dir = "build/.ruff_cache"
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
