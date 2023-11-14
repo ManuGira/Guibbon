@@ -6,7 +6,9 @@ authors = ["Emmanuel Girardin <emmanuel.girardin@outlook.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.7"
+opencv-python = "^4.5.4.60"
+Pillow = "^9.1.0"
 
 
 [build-system]
