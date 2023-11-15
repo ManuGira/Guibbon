@@ -5,6 +5,10 @@ description = ""
 authors = ["Emmanuel Girardin <emmanuel.girardin@outlook.com>"]
 readme = "README.md"
 
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
 [tool.poetry.dependencies]
 python = "^3.7"
 opencv-python = "^4.5.4.60"
@@ -14,10 +18,7 @@ Pillow = "^9.1.0"
 pytest = "^7.2.2"
 pytest-cov = "^4.0.0"
 ruff = "^0.1.5"
-
-[build-system]
-requires = ["poetry-core", "setuptools"]
-build-backend = "poetry.core.masonry.api"
+mypy = "^1.4.1"
 
 [tool.pytest.ini_options]
 addopts = "--cov-report=term --cov-report=html:build/pytest_coverage_html --cov=tk4cv2"
@@ -30,3 +31,18 @@ data_file="build/.coverage"
 [tool.ruff]
 line-length = 160
 cache-dir = "build/.ruff_cache"
+
+[tool.mypy]
+check_untyped_defs = true
+disallow_any_generics = true
+ignore_missing_imports = true
+no_implicit_optional = true
+show_error_codes = true
+strict_equality = true
+warn_redundant_casts = true
+warn_return_any = true
+warn_unreachable = true
+warn_unused_configs = true
+implicit_reexport = true
+pretty = true
+cache_dir = "build/.mypy_cache"
