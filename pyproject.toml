@@ -6,25 +6,22 @@ authors = ["Emmanuel Girardin <emmanuel.girardin@outlook.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.7"
 opencv-python = "^4.5.4.60"
 Pillow = "^9.1.0"
+ruff = "^0.1.5"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.2.2"
 pytest-cov = "^4.0.0"
-poetry-plugin-export = "^1.6.0"
-setuptools = "^68.2.2"
 
 [build-system]
-requires = ["poetry-core"]
+requires = ["poetry-core", "setuptools"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.pytest.ini_options]
 addopts = "--cov-report=term --cov-report=html:build/pytest_coverage_html --cov=tk4cv2"
-testpaths = [
-    "tests",
-]
+testpaths = ["tests"]
 cache_dir = "build/.pytest_cache"
 
 [tool.coverage.run]
