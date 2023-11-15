@@ -10,10 +10,11 @@ then
 fi
 
 rm -rf ./.venv
-rm poetry.lock
+rm -f poetry.lock
+poetry.exe install
 
-poetry.exe install --sync --no-cache
-poetry.exe run pip freeze | grep -v "-e git+" > requirements_ci.txt
-
+rm -f requirements_ci.txt
+poetry export --with dev --without-hashes -f requirements.txt --output requirements_ci.txt
 cat requirements_ci.txt
+
 popd

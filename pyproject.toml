@@ -9,11 +9,11 @@ readme = "README.md"
 python = "^3.7"
 opencv-python = "^4.5.4.60"
 Pillow = "^9.1.0"
-ruff = "^0.1.5"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.2.2"
 pytest-cov = "^4.0.0"
+ruff = "^0.1.5"
 
 [build-system]
 requires = ["poetry-core", "setuptools"]
