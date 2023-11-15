@@ -26,3 +26,6 @@ testpaths = [
     "tests",
 ]
 cache_dir = "build/.pytest_cache"
+
+[tool.coverage.run]
+data_file="build/.coverage"
