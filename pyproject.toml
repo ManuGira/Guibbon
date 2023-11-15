@@ -26,3 +26,7 @@ cache_dir = "build/.pytest_cache"
 
 [tool.coverage.run]
 data_file="build/.coverage"
+
+[tool.ruff]
+line-length = 160
+cache-dir = "build/.ruff_cache"
