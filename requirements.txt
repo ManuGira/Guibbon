@@ -1,2 +1,5 @@
-opencv-python==4.5.4.60
-Pillow==9.1.0
+numpy==1.21.6 ; python_version >= "3.7" and python_version < "3.8"
+numpy==1.24.4 ; python_version >= "3.8" and python_version < "3.9"
+numpy==1.26.2 ; python_version >= "3.9" and python_version < "4.0"
+opencv-python==4.8.1.78 ; python_version >= "3.7" and python_version < "4.0"
+pillow==9.5.0 ; python_version >= "3.7" and python_version < "4.0"

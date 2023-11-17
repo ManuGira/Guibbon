@@ -1,14 +1,38 @@
+[tool.poetry]
+name = "tk4cv2"
+version = "0.1.0"
+description = ""
+authors = ["Emmanuel Girardin <emmanuel.girardin@outlook.com>"]
+readme = "README.md"
+
 [build-system]
-requires = ["setuptools>=42.0", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.dependencies]
+python = "^3.7"
+opencv-python = "^4.5.4.60"
+Pillow = "^9.1.0"
+
+[tool.poetry.group.test.dependencies]
+pytest = "^7.2.2"
+pytest-cov = "^4.0.0"
+
+[tool.poetry.group.check.dependencies]
+ruff = "^0.1.5"
+mypy = "^1.4.1"
 
 [tool.pytest.ini_options]
-addopts = "--cov-report=term --cov-report=html:build/.pytest_coverage_html --cov=tk4cv2"
-testpaths = [
-    "tests",
-]
+addopts = "--cov-report=term --cov-report=html:build/pytest_coverage_html --cov=tk4cv2"
+testpaths = ["tests"]
 cache_dir = "build/.pytest_cache"
 
+[tool.coverage.run]
+data_file="build/.coverage"
+
+[tool.ruff]
+line-length = 160
+cache-dir = "build/.ruff_cache"
 
 [tool.mypy]
 check_untyped_defs = true
@@ -24,7 +48,3 @@ warn_unused_configs = true
 implicit_reexport = true
 pretty = true
 cache_dir = "build/.mypy_cache"
-
-[tool.ruff]
-line-length = 160
-cache-dir = "build/.ruff_cache"

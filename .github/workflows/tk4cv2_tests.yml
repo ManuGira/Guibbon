@@ -1,0 +1,71 @@
+name: Tk4Cv2 Continuous Integration
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: 'ubuntu-latest'
+    name: Linter and type checker
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements_ci_check.txt
+          python -m pip install -e .
+
+      - name: Type check with mypy
+        run: |
+          python -m mypy .
+
+      - name: Lint check with ruff
+        run: |
+          python -m ruff check .
+
+  tests:
+    defaults:
+      run:
+        shell: bash
+
+    strategy:
+      matrix:
+        os: ['windows-latest', 'ubuntu-latest']
+        python-version: ['3.10', '3.7']
+    runs-on: ${{ matrix.os }}
+
+    name: "Tests: ${{ matrix.os }}, py ${{ matrix.python-version }}"
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements_ci_test.txt
+          python -m pip install -e .
+
+      - name: Tests with pytest
+        run: |
+          if ${{ matrix.os == 'ubuntu-latest' }}
+          then
+            echo "Create virtual display to avoid tk/tcl errors on ubuntu"
+            export DISPLAY=:99 
+            Xvfb :99 &  
+          fi
+          python -m pytest

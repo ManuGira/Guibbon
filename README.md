@@ -8,33 +8,38 @@ This package is not hosted on PyPl, but you can still install this repo as a pac
 ```
 pip install git+https://github.com/ManuGira/Tk4Cv2.git@master
 ```
-## Development
-If you forked this repo, the following commands will be your new friends.  
+## Development 
+
+The project is configureed in `pyproject.toml`. It contains dependecies, and configs for continuous integration.
 
 ### Dev Installation
-Install development requirements:
+Install development requirements with poetry:
+```
+$ poetry install
+```
+This will create a new venv for this project and install dependencies according to poetry.lock. If you prefer to manage your venv yourself, you can install with pip:
 ```
 $ pip install -r requirements_dev.txt
+$ pip install -e .  # Install this package in editable mode
+``` 
+All requirements files and poetry.lock have been generated with the `prepare_python.sh` script.
 ```
-Install this package in editable mode:
+./prepare_python.sh
 ```
-$ pip install -e .
-```
+
 ### Continuous Integration
-#### Testing with pytest
-Configured in `pyproject.toml`  
+This repo
+#### Testing with pytest 
 Run tests and generate coverage report:
 ```
 $ pytest 
 ```
 #### Type checking with mypy
-Configured in `pyproject.toml`  
 Run it with:
 ```
 $ mypy .
 ```
 #### Lintering with ruff
-Configured in `pyproject.toml`  
 Linter check:
 ```
 $ ruff check .
@@ -42,12 +47,6 @@ $ ruff check .
 Linter fix:
 ```
 $ ruff check --fix .
-```
-#### CI Launched with tox
-Configured in `tox.ini`
-All of the above (except Linter fix):
-```
-$ tox
 ```
 
 ## TODO
