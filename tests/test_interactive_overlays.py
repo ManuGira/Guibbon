@@ -4,8 +4,7 @@ import tkinter
 import unittest
 from tk4cv2 import interactive_overlays
 from tk4cv2 import transform_matrix as tmat
-from tk4cv2.typedef import InteractivePoint, InteractivePolygon, CallbackPoint
-from types import FunctionType
+from tk4cv2.typedef import InteractivePoint, InteractivePolygon
 
 eps = sys.float_info.epsilon
 

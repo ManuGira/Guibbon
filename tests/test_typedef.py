@@ -1,6 +1,5 @@
 import unittest
 from tk4cv2.typedef import InteractivePoint, InteractivePolygon
-from tk4cv2.interactive_overlays import Point
 from types import FunctionType
 
 class TestPoint(unittest.TestCase):
