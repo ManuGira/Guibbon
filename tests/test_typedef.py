@@ -7,10 +7,10 @@ class TestPoint(unittest.TestCase):
     def test_interface_pattern(self):
         for interface in [InteractivePoint, InteractivePolygon]:
             with self.assertRaises(AttributeError, msg="Calling non existing functions must raise an AttributeError"):
-                _ = interface.this_does_not_exist_and_should_raise
+                _ = interface.this_does_not_exist_and_should_raise  # type: ignore
 
-            # makes sure the interface is correctly prevent bad implementation
-            class BadClass(interface):
+            # makes sure the interface correctly prevent bad implementation
+            class BadClass(interface):  # type: ignore
                 pass
 
             with self.assertRaises(TypeError, msg="BadClass doesn't properly implement the interface. Its instanciation must raise a TypeError"):
