@@ -14,9 +14,11 @@ python = "^3.7"
 opencv-python = "^4.5.4.60"
 Pillow = "^9.1.0"
 
-[tool.poetry.group.dev.dependencies]
+[tool.poetry.group.test.dependencies]
 pytest = "^7.2.2"
 pytest-cov = "^4.0.0"
+
+[tool.poetry.group.check.dependencies]
 ruff = "^0.1.5"
 mypy = "^1.4.1"
 
