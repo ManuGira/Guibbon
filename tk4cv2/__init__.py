@@ -1,3 +1,4 @@
+import enum
 from typing import Dict, Any, Optional
 from .typedef import CallbackPoint, CallbackPolygon, CallbackRect, Point2DList, InteractivePolygon
 
@@ -211,8 +212,13 @@ def createInteractiveRectangle(
 
 
 class Tk4Cv2:
+    class STATUS(enum.Enum):
+        NONE = 0
+        ALIVE = 1
+        DESTROYED = 2
+
     root: tk.Tk
-    is_alive: bool = False
+    status: STATUS = STATUS.NONE
     instances: Dict[str, Any] = {}
     active_instance_name: Optional[str]
     is_timeout: bool
@@ -221,7 +227,7 @@ class Tk4Cv2:
     @staticmethod
     def init():
         Tk4Cv2.root = tk.Tk()
-        Tk4Cv2.is_alive = True
+        Tk4Cv2.status = Tk4Cv2.STATUS.ALIVE
         Tk4Cv2.keyboard = KeyboardEventHandler()
         Tk4Cv2.root.withdraw()
         Tk4Cv2.reset()
@@ -263,7 +269,7 @@ class Tk4Cv2:
             Tk4Cv2.root.update_idletasks()
             Tk4Cv2.root.update()  # root can be destroyed at this line
 
-            if not Tk4Cv2.is_alive:
+            if not Tk4Cv2.status == Tk4Cv2.STATUS.ALIVE:
                 return -1
 
             if track_keypress and Tk4Cv2.keyboard.is_keypress_updated:
@@ -281,7 +287,10 @@ class Tk4Cv2:
             tic = time.time()
 
     def __init__(self, winname):
-        if not Tk4Cv2.is_alive:
+        if Tk4Cv2.status == Tk4Cv2.STATUS.DESTROYED:
+            return
+
+        if Tk4Cv2.status == Tk4Cv2.STATUS.NONE:
             Tk4Cv2.init()
 
         # Make master root windows invisible
@@ -321,7 +330,7 @@ class Tk4Cv2:
         if len(Tk4Cv2.instances) == 0:
             print("destroy root master")
             Tk4Cv2.root.destroy()
-            Tk4Cv2.is_alive = False
+            Tk4Cv2.status = Tk4Cv2.STATUS.DESTROYED
         elif Tk4Cv2.active_instance_name == self.winname:
             Tk4Cv2.active_instance_name = list(Tk4Cv2.instances.keys())[-1]
 
