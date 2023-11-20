@@ -199,11 +199,11 @@ class ImageViewer:
         if magnet_points is not None:
             magnets = interactive_overlays.Magnets(self.canvas, magnet_points)
 
-        ipolygon = interactive_overlays.Rectangle(self.canvas, point0_xy, point1_xy, label,
+        irectangle = interactive_overlays.Rectangle(self.canvas, point0_xy, point1_xy, label,
                                                   on_click, on_drag, on_release,
                                                   magnets=magnets)
-        self.interactive_overlay_instance_list.append(ipolygon)
-
+        self.interactive_overlay_instance_list.append(irectangle)
+        return irectangle
 
     def pack(self, *args, **kwargs):
         self.canvas.pack(*args, **kwargs)
