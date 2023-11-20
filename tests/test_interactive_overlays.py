@@ -342,7 +342,8 @@ class TestPolygon(unittest.TestCase):
 
         self.plg.update()
         self.assertTrue(self.plg.visible, msg="Polygon must be visible by default")
-        [self.assertTrue(ipoint.visible, msg="Polygon's points must be visible by default") for ipoint in self.plg.ipoints]
+        for ipoint in self.plg.ipoints:
+            self.assertTrue(ipoint.visible, msg="Polygon's points must be visible by default")
 
         for _, _, line_id in self.plg.lines:
             state = self.canvas.itemcget(line_id, "state")
@@ -352,7 +353,10 @@ class TestPolygon(unittest.TestCase):
             self.plg.set_visible(val)
             self.plg.update()
             self.assertEqual(self.plg.visible, val, msg="set_visible function must work properly")
-            [self.assertEqual(ipoint.visible, val, msg="Polygon's points must be visible by default") for ipoint in self.plg.ipoints]
+
+            for ipoint in self.plg.ipoints:
+                self.assertEqual(ipoint.visible, val, msg="Polygon's points must be visible by default")
+
             for _, _, line_id in self.plg.lines:
                 state = self.canvas.itemcget(line_id, "state")
                 self.assertEqual(state, expected_state[val], msg="set_visible function must work properly")
