@@ -1,5 +1,6 @@
 import tkinter as tk
 
+
 class SliderWidget:
     def __init__(self, tk_frame, slider_name, values, initial_index, on_change, widget_color):
         self.name = slider_name
@@ -11,7 +12,7 @@ class SliderWidget:
         self.value_var.set(self.values[initial_index])
         tk.Label(tk_frame, textvariable=self.value_var, bg=widget_color).pack(padx=2, side=tk.TOP)
         count = len(self.values)
-        self.tk_scale = tk.Scale(tk_frame, from_=0, to=count-1, orient=tk.HORIZONTAL, bg=widget_color, borderwidth=0, showvalue=False)
+        self.tk_scale = tk.Scale(tk_frame, from_=0, to=count - 1, orient=tk.HORIZONTAL, bg=widget_color, borderwidth=0, showvalue=False)
         self.tk_scale.set(initial_index)
 
         self.tk_scale["command"] = self.callback
@@ -35,7 +36,7 @@ class SliderWidget:
 
     def set_values(self, values, new_index=None):
         count = len(values)
-        self.tk_scale["to"] = count-1
+        self.tk_scale["to"] = count - 1
         self.values = values
         if new_index is not None:
             self.set_index(new_index, trigger_callback=False)

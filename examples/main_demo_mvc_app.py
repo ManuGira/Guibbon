@@ -6,6 +6,7 @@ import tk4cv2 as tcv2
 
 Image_t = Optional[npt.NDArray[np.uint8]]
 
+
 class DemoMVCApp:
     def __init__(self, filename):
         self.img = cv2.imread(filename)
@@ -37,9 +38,9 @@ class DemoMVCApp:
 
         res = self.img.copy()
         res = res.astype(np.uint16)
-        res[:, :, 0:1] = res[:, :, 0:1]*gain_b
-        res[:, :, 2:3] = res[:, :, 2:3]*gain_r
-        res[res>255] = 255
+        res[:, :, 0:1] = res[:, :, 0:1] * gain_b
+        res[:, :, 2:3] = res[:, :, 2:3] * gain_r
+        res[res > 255] = 255
         res = res.astype(np.uint8)
         self.res = res
         self.is_update_needed = False
@@ -63,6 +64,7 @@ class DemoMVCApp:
 
         tcv2.setTrackbarMin("trackbar", self.winname, 2)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     mc = DemoMVCApp("images/dog.jpg")
     mc.show()

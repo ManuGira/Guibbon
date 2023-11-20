@@ -1,10 +1,10 @@
-
 import dataclasses
 import numpy as np
 import cv2
 import tk4cv2 as tcv2
 from tk4cv2.typedef import Image_t
 import threading
+
 
 class DemoMVCAdvApp:
     @dataclasses.dataclass
@@ -27,8 +27,8 @@ class DemoMVCAdvApp:
         point_xy_list = [(300, 300), (300, 500), (500, 400), (400, 300)]
         tcv2.createInteractivePolygon(self.winname, point_xy_list, "polygon", on_drag=self.on_drag_poly, magnet_points=[(100, 300), (170, 300)])
 
-        point0_xy  = (200, 200)
-        point1_xy  = (300, 250)
+        point0_xy = (200, 200)
+        point1_xy = (300, 250)
         tcv2.createInteractiveRectangle(self.winname, point0_xy, point1_xy, "rectangle", on_drag=self.on_drag_rect, magnet_points=[(100, 300), (150, 300)])
 
         self.model = DemoMVCAdvApp.Model()
@@ -38,18 +38,18 @@ class DemoMVCAdvApp:
     def update(self):
         h, w = self.img.shape[:2]
         with self.lock:
-            x = self.model.x/w
-            y = self.model.y/h
+            x = self.model.x / w
+            y = self.model.y / h
             cross_x, cross_y = self.model.cross_xy
 
-        gain_b = max(0.5, min(2.0, 1.5*x + 0.5))
-        gain_r = max(0.5, min(2.0, 1.5*y + 0.5))
+        gain_b = max(0.5, min(2.0, 1.5 * x + 0.5))
+        gain_r = max(0.5, min(2.0, 1.5 * y + 0.5))
 
         res = self.img.copy()
         res = res.astype(np.uint16)
-        res[:, :, 0:1] = res[:, :, 0:1]*gain_b
-        res[:, :, 2:3] = res[:, :, 2:3]*gain_r
-        res[res>255] = 255
+        res[:, :, 0:1] = res[:, :, 0:1] * gain_b
+        res[:, :, 2:3] = res[:, :, 2:3] * gain_r
+        res[res > 255] = 255
 
         res[int(round(cross_y)), :, 2] = 255
         res[:, int(round(cross_x)), 2] = 255
@@ -89,6 +89,7 @@ class DemoMVCAdvApp:
             self.model.cross_xy = (event.x, event.y)
             self.is_update_needed = True
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     mc = DemoMVCAdvApp("images/dog.jpg")
     mc.show()

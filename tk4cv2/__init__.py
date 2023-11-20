@@ -16,6 +16,7 @@ from .slider_widget import SliderWidget
 __version__ = "0.0.0"
 __version_info__ = tuple(int(i) for i in __version__.split(".") if i.isdigit())
 
+
 class COLORS:
     background = "gray80"
     ctrl_panel = "gray80"
@@ -52,6 +53,7 @@ def inject(cv2_package):
 def not_implemented_error():
     raise NotImplementedError("Function not implemented in current version of Tk4Cv2")
 
+
 def imshow(winname, mat, mode=None):
     Tk4Cv2.get_instance(winname)._imshow(mat, mode)
 
@@ -64,8 +66,10 @@ def getWindowProperty(winname: str, prop_id: int):
 
 def waitKey(delay, track_keypress=True, track_keyrelease=False, SilentWarning=False):
     if not SilentWarning:
-        print("WARNING: waitKey function not implemented in Tk4Cv2. The current version is similar to waitKeyEx function. (To suppress this warning, use "
-              "SilentWarning=True)")
+        print(
+            "WARNING: waitKey function not implemented in Tk4Cv2. The current version is similar to waitKeyEx function. (To suppress this warning, use "
+            "SilentWarning=True)"
+        )
     return waitKeyEx(delay, track_keypress, track_keyrelease)
 
 
@@ -77,7 +81,7 @@ def setMouseCallback(winname, onMouse, param=None):
     return Tk4Cv2.get_instance(winname)._setMouseCallback(onMouse, param=param)
 
 
-def createButton(text='Button', command=None, winname=None):
+def createButton(text="Button", command=None, winname=None):
     Tk4Cv2.get_instance(winname)._createButton(text, command)
 
 
@@ -92,10 +96,12 @@ def get_slider_instance(winname, slider_name) -> SliderWidget:
 
 
 def createTrackbar(trackbarName, windowName, value, count, onChange):
-    values = list(range(count+1))
+    values = list(range(count + 1))
     initial_index = value
+
     def on_change(index, val):
         return onChange(val)
+
     Tk4Cv2.get_instance(windowName).create_slider(trackbarName, values, initial_index, on_change)
 
 
@@ -113,7 +119,7 @@ def setTrackbarMin(trackbarname, winname, minval):
     trackbar_instance = get_slider_instance(winname, trackbarname)
     current_minval = trackbar_instance.get_values()[0]
     maxval = trackbar_instance.get_values()[-1]
-    values = list(range(minval, maxval+1))
+    values = list(range(minval, maxval + 1))
     new_index = max(trackbar_instance.get_index() + current_minval - minval, 0)
     trackbar_instance.set_values(values, new_index)
 
@@ -126,7 +132,7 @@ def getTrackbarMin(trackbarname, winname):
 def setTrackbarMax(trackbarname, winname, maxval):
     trackbar_instance = get_slider_instance(winname, trackbarname)
     minval = trackbar_instance.get_values()[0]
-    values = list(range(minval, maxval+1))
+    values = list(range(minval, maxval + 1))
     trackbar_instance.set_values(values)
 
 
@@ -163,21 +169,42 @@ def createColorPicker(name, windowName, values, onChange):
     Tk4Cv2.get_instance(windowName)._createColorPicker(name, values, onChange)
 
 
-def createInteractivePoint(windowName, point_xy, label="",
-            on_click:CallbackPoint=None, on_drag:CallbackPoint=None, on_release:CallbackPoint=None,
-            magnet_points:Optional[Point2DList]=None):
+def createInteractivePoint(
+    windowName,
+    point_xy,
+    label="",
+    on_click: CallbackPoint = None,
+    on_drag: CallbackPoint = None,
+    on_release: CallbackPoint = None,
+    magnet_points: Optional[Point2DList] = None,
+):
     Tk4Cv2.get_instance(windowName).image_viewer.createInteractivePoint(point_xy, label, on_click, on_drag, on_release, magnet_points)
 
-def createInteractivePolygon(windowName, point_xy_list, label="",
-            on_click:CallbackPolygon=None, on_drag:CallbackPolygon=None, on_release:CallbackPolygon=None,
-            magnet_points:Optional[Point2DList]=None) -> InteractivePolygon:
+
+def createInteractivePolygon(
+    windowName,
+    point_xy_list,
+    label="",
+    on_click: CallbackPolygon = None,
+    on_drag: CallbackPolygon = None,
+    on_release: CallbackPolygon = None,
+    magnet_points: Optional[Point2DList] = None,
+) -> InteractivePolygon:
     ipolygon: InteractivePolygon
     ipolygon = Tk4Cv2.get_instance(windowName).image_viewer.createInteractivePolygon(point_xy_list, label, on_click, on_drag, on_release, magnet_points)
     return ipolygon
 
-def createInteractiveRectangle(windowName, point0_xy, point1_xy, label="",
-            on_click:CallbackRect=None, on_drag:CallbackRect=None, on_release:CallbackRect=None,
-            magnet_points:Optional[Point2DList]=None) -> InteractivePolygon:
+
+def createInteractiveRectangle(
+    windowName,
+    point0_xy,
+    point1_xy,
+    label="",
+    on_click: CallbackRect = None,
+    on_drag: CallbackRect = None,
+    on_release: CallbackRect = None,
+    magnet_points: Optional[Point2DList] = None,
+) -> InteractivePolygon:
     irect: InteractivePolygon
     irect = Tk4Cv2.get_instance(windowName).image_viewer.createInteractiveRectangle(point0_xy, point1_xy, label, on_click, on_drag, on_release, magnet_points)
     return irect
@@ -209,12 +236,12 @@ class Tk4Cv2:
 
     @staticmethod
     def is_instance(winname: str):
-        assert (isinstance(winname, str))
+        assert isinstance(winname, str)
         return winname in Tk4Cv2.instances.keys()
 
     @staticmethod
     def get_instance(winname):
-        assert(isinstance(winname, str))
+        assert isinstance(winname, str)
         if winname not in Tk4Cv2.instances.keys():
             Tk4Cv2.instances[winname] = Tk4Cv2(winname)
         Tk4Cv2.active_instance_name = winname
@@ -248,11 +275,10 @@ class Tk4Cv2:
             if Tk4Cv2.is_timeout:
                 return -1
 
-            dt = (time.time()-tic)
-            sleep_time = max(0.0, 1/20 - dt)
+            dt = time.time() - tic
+            sleep_time = max(0.0, 1 / 20 - dt)
             time.sleep(sleep_time)
             tic = time.time()
-
 
     def __init__(self, winname):
         if not Tk4Cv2.is_alive:
@@ -287,7 +313,6 @@ class Tk4Cv2:
         # self.ctrl_frame.pack_propagate(False)
         self.ctrl_frame.pack()
 
-
     def on_closing(self):
         print("Destroy Root", self.winname)
         Tk4Cv2.instances.pop(self.winname)
@@ -300,7 +325,7 @@ class Tk4Cv2:
         elif Tk4Cv2.active_instance_name == self.winname:
             Tk4Cv2.active_instance_name = list(Tk4Cv2.instances.keys())[-1]
 
-    def _createButton(self, text='Button', command=None):
+    def _createButton(self, text="Button", command=None):
         frame = tk.Frame(self.ctrl_frame, bg=COLORS.ctrl_panel)
         frame.pack_propagate(True)
 
@@ -356,7 +381,6 @@ class Tk4Cv2:
         opt = radio_options[i]
         return i, opt
 
-
     def _createCheckbutton(self, name, value, onChange):
         frame = tk.Frame(self.ctrl_frame)
         tk.Label(frame, text=name).pack(padx=2, side=tk.LEFT, anchor=tk.W)
@@ -365,8 +389,7 @@ class Tk4Cv2:
             onChange(var.get())
 
         var = tk.BooleanVar()
-        cb = tk.Checkbutton(frame, text="", variable=var, onvalue=True, offvalue=False,
-                            command=callback)
+        cb = tk.Checkbutton(frame, text="", variable=var, onvalue=True, offvalue=False, command=callback)
         if value:
             cb.select()
         cb.pack(side=tk.TOP, anchor=tk.W)
@@ -423,7 +446,6 @@ class Tk4Cv2:
     #     self.is_keypressed = True
     #     self.keypressed = event.keycode  # TODO: make threadsafe
 
-
     def _getWindowProperty(self, prop_id: int):
         """
         TODO: not all flags ar handled
@@ -438,9 +460,10 @@ class Tk4Cv2:
         if prop_id == cv2.WND_PROP_VISIBLE:
             return 1.0 if self.window.state() == "normal" else 0.0
         else:
-            raise NotImplementedError(f"Function getWindowProperty is not fully implemented in current version of Tk4Cv2 and does not support the provided "
-                                      f"flag: prop_id={prop_id}")
-
+            raise NotImplementedError(
+                f"Function getWindowProperty is not fully implemented in current version of Tk4Cv2 and does not support the provided "
+                f"flag: prop_id={prop_id}"
+            )
 
     def _setMouseCallback(self, onMouse, param=None):
         self.image_viewer.setMouseCallback(onMouse, param)

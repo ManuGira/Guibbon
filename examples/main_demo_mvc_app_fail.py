@@ -6,12 +6,14 @@ import tk4cv2 as tcv2
 
 Image_t = Optional[npt.NDArray[np.uint8]]
 
+
 class DemoMVCAppFail:
     """
     This demonstrate a BAD architecture. This is just an example for you to see the difference compared to a correct architecture
     The difference here is that the on_drag callback is calling update() and show()
     TODO: try it with a full cv2 widget (mouse event, or trackbar). And make sure the bug also appear. Otherwise a fix must be done
     """
+
     def __init__(self, filename):
         self.img = cv2.imread(filename)
         self.winname = "demo app"
@@ -33,9 +35,9 @@ class DemoMVCAppFail:
 
         res = self.img.copy()
         res = res.astype(np.uint16)
-        res[:, :, 0:1] = res[:, :, 0:1]*gain_b
-        res[:, :, 2:3] = res[:, :, 2:3]*gain_r
-        res[res>255] = 255
+        res[:, :, 0:1] = res[:, :, 0:1] * gain_b
+        res[:, :, 2:3] = res[:, :, 2:3] * gain_r
+        res[res > 255] = 255
         res = res.astype(np.uint8)
         self.res = res
 
@@ -50,6 +52,6 @@ class DemoMVCAppFail:
         self.show()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     mc = DemoMVCAppFail("images/dog.jpg")
     mc.show()

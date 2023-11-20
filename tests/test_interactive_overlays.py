@@ -8,17 +8,20 @@ from tk4cv2.typedef import InteractivePoint, InteractivePolygon
 
 eps = sys.float_info.epsilon
 
+
 @dataclasses.dataclass
 class Event:
     x: int = 0
     y: int = 0
 
+
 class EventName:
-    CLICK = '<Button-1>'
-    DRAG = '<B1-Motion>'
-    RELEASE = '<ButtonRelease-1>'
-    ENTER = '<Enter>'
-    LEAVE = '<Leave>'
+    CLICK = "<Button-1>"
+    DRAG = "<B1-Motion>"
+    RELEASE = "<ButtonRelease-1>"
+    ENTER = "<Enter>"
+    LEAVE = "<Leave>"
+
 
 class TestMagnets(unittest.TestCase):
     def foo(self, x_img, y_img):
@@ -27,7 +30,7 @@ class TestMagnets(unittest.TestCase):
     def setUp(self) -> None:
         self.canvas = tkinter.Canvas()
         self.val = 0
-        self.points_img = [(10.1*k, 10.1*k) for k in range(4)]
+        self.points_img = [(10.1 * k, 10.1 * k) for k in range(4)]
         self.img2can_matrix = tmat.T((123, 456)) @ tmat.S((100, 200))
 
     def test_magnets_creation(self):
@@ -43,7 +46,6 @@ class TestMagnets(unittest.TestCase):
         # default threshold is bigger than 0
         self.assertTrue(magnets.dist_threshold > 0)
 
-
     def test_snap_to_nearest_magnet(self):
         empty_magnet = interactive_overlays.Magnets(self.canvas, [])
         for point_xy in [(0, 0), (10, 20), (300, 400), (-10.2, -12.2)]:
@@ -54,8 +56,8 @@ class TestMagnets(unittest.TestCase):
         for thresh in [10, 50]:
             magnets.dist_threshold = thresh
             self.assertTupleEqual((x, y), magnets.snap_to_nearest_magnet((x, y)))
-            self.assertTupleEqual((x, y), magnets.snap_to_nearest_magnet((x+thresh-1, y)))
-            self.assertTupleEqual((x+thresh+1, y), magnets.snap_to_nearest_magnet((x+thresh+1, y)))
+            self.assertTupleEqual((x, y), magnets.snap_to_nearest_magnet((x + thresh - 1, y)))
+            self.assertTupleEqual((x + thresh + 1, y), magnets.snap_to_nearest_magnet((x + thresh + 1, y)))
 
         magnets.dist_threshold = 50
         self.assertTupleEqual((10.1, 10.1), magnets.snap_to_nearest_magnet((14, 14)))
@@ -71,10 +73,10 @@ class TestMagnets(unittest.TestCase):
         for point_img_xy, circle_id in zip(self.points_img, magnets.circle_id_list):
             x_can_expected, y_can_expected = tmat.apply(self.img2can_matrix, point_img_xy)
             x1, y1, x2, y2 = self.canvas.coords(circle_id)
-            x = round((x1 + x2)/2)
-            y = round((y1 + y2)/2)
-            self.assertLess(abs(x-x_can_expected), 0.1, "Coordinates of magnet points must be accurately placed on the canvas")
-            self.assertLess(abs(y-y_can_expected), 0.1, "Coordinates of magnet points must be accurately placed on the canvas")
+            x = round((x1 + x2) / 2)
+            y = round((y1 + y2) / 2)
+            self.assertLess(abs(x - x_can_expected), 0.1, "Coordinates of magnet points must be accurately placed on the canvas")
+            self.assertLess(abs(y - y_can_expected), 0.1, "Coordinates of magnet points must be accurately placed on the canvas")
 
 
 class TestPoint(unittest.TestCase):
@@ -103,12 +105,8 @@ class TestPoint(unittest.TestCase):
 
     def test_callback(self):
         self.pt = interactive_overlays.Point(
-            canvas=self.canvas,
-            point_xy=self.point_xy,
-            label="ok",
-            on_click=self.on_event,
-            on_drag=self.on_event,
-            on_release=self.on_event)
+            canvas=self.canvas, point_xy=self.point_xy, label="ok", on_click=self.on_event, on_drag=self.on_event, on_release=self.on_event
+        )
 
         binds = self.canvas.tag_bind(self.pt.circle_id)
         self.assertIn(EventName.CLICK, binds, f"{EventName.CLICK} tag not binded")
@@ -140,12 +138,8 @@ class TestPoint(unittest.TestCase):
         self.assertEqual((31, 32), self.point_xy, "Event coordinate must be passed to callback")
         self.assertEqual(pt_point_bck, self.pt.point_xy, "point._on_release() must correctly set point_xy coordinates")
 
-
     def test_none_callback(self):
-        self.pt = interactive_overlays.Point(canvas=self.canvas, point_xy=self.point_xy, label="ok",
-                on_click=None,
-                on_drag=None,
-                on_release=None)
+        self.pt = interactive_overlays.Point(canvas=self.canvas, point_xy=self.point_xy, label="ok", on_click=None, on_drag=None, on_release=None)
 
         binds = self.canvas.tag_bind(self.pt.circle_id)
         self.assertIn(EventName.CLICK, binds, f"{EventName.CLICK} tag not binded")
@@ -167,10 +161,7 @@ class TestPoint(unittest.TestCase):
         self.assertEqual((123, 456), self.pt.point_xy, "point.point_xy must change even if no user callback is set")
 
     def test_event_sequence(self):
-        self.pt = interactive_overlays.Point(canvas=self.canvas, point_xy=self.point_xy, label="ok",
-            on_click=None,
-            on_drag=None,
-            on_release=None)
+        self.pt = interactive_overlays.Point(canvas=self.canvas, point_xy=self.point_xy, label="ok", on_click=None, on_drag=None, on_release=None)
         event = Event(0, 0)
 
         self.assertEqual(self.pt.state, interactive_overlays.State.NORMAL)
@@ -191,10 +182,9 @@ class TestPoint(unittest.TestCase):
         self.assertEqual(self.pt.state, interactive_overlays.State.NORMAL)
 
     def test_event_raise(self):
-        self.pt = interactive_overlays.Point(canvas=self.canvas, point_xy=self.point_xy, label="ok",
-            on_click=None,
-            on_drag=self.on_event_error,
-            on_release=None)
+        self.pt = interactive_overlays.Point(
+            canvas=self.canvas, point_xy=self.point_xy, label="ok", on_click=None, on_drag=self.on_event_error, on_release=None
+        )
         event = Event(0, 0)
 
         with self.assertRaises(Exception):
@@ -206,14 +196,14 @@ class TestPoint(unittest.TestCase):
 
         self.pt.update()
         self.assertTrue(self.pt.visible, msg="Point must be visible by default")
-        state = self.canvas.itemcget(self.pt.circle_id,'state')
+        state = self.canvas.itemcget(self.pt.circle_id, "state")
         self.assertEqual(state, "normal", msg="Point must be visible by default")
 
         for val in [False, False, True, True]:
             self.pt.set_visible(val)
             self.pt.update()
             self.assertEqual(self.pt.visible, val, msg="set_visible function must work properly")
-            state = self.canvas.itemcget(self.pt.circle_id, 'state')
+            state = self.canvas.itemcget(self.pt.circle_id, "state")
             self.assertEqual(state, expected_state[val], msg="set_visible function must work properly")
 
             self.assertEqual(self.pt.visible, val)
@@ -244,21 +234,15 @@ class TestPolygon(unittest.TestCase):
         raise
 
     def test_interface(self):
-        self.plg = interactive_overlays.Polygon(
-            canvas=self.canvas,
-            point_xy_list=self.point_xy_list)
+        self.plg = interactive_overlays.Polygon(canvas=self.canvas, point_xy_list=self.point_xy_list)
         self.assertIsInstance(self.plg, InteractivePolygon)
 
     def test_callback(self):
         point_xy_list_bck = self.point_xy_list + []
 
         self.plg = interactive_overlays.Polygon(
-            canvas=self.canvas,
-            point_xy_list=self.point_xy_list,
-            label="ok",
-            on_click=self.on_event,
-            on_drag=self.on_event,
-            on_release=self.on_event)
+            canvas=self.canvas, point_xy_list=self.point_xy_list, label="ok", on_click=self.on_event, on_drag=self.on_event, on_release=self.on_event
+        )
 
         self.assertEqual(len(self.plg.ipoints), len(self.point_xy_list), "Polygon must have 1 Interactive Point instance for each point in point_xy_list")
 
@@ -271,8 +255,7 @@ class TestPolygon(unittest.TestCase):
             self.assertIn(EventName.LEAVE, binds, f"{EventName.LEAVE} tag not binded")
 
         self.assertEqual(0, self.event_count)
-        self.assertEqual(point_xy_list_bck, self.point_xy_list,
-                         "point_xy_list should not change at Polygon creation")
+        self.assertEqual(point_xy_list_bck, self.point_xy_list, "point_xy_list should not change at Polygon creation")
 
         point_xy_list_bck = self.point_xy_list + []
         event = Event(x=11, y=12)
@@ -298,14 +281,10 @@ class TestPolygon(unittest.TestCase):
         self.assertEqual(4, self.event_count, "Event must not be triggered")
         self.assertEqual(point_xy_list_bck, self.point_xy_list, "_on_release should not change point_xy_list")
 
-
     def test_none_callback(self):
         point_xy_list_bck = self.point_xy_list + []
 
-        self.plg = interactive_overlays.Polygon(canvas=self.canvas, point_xy_list=self.point_xy_list, label="ok",
-                on_click=None,
-                on_drag=None,
-                on_release=None)
+        self.plg = interactive_overlays.Polygon(canvas=self.canvas, point_xy_list=self.point_xy_list, label="ok", on_click=None, on_drag=None, on_release=None)
 
         for k in range(len(self.plg.ipoints)):
             binds = self.canvas.tag_bind(self.plg.ipoints[k].circle_id)
@@ -316,8 +295,7 @@ class TestPolygon(unittest.TestCase):
             self.assertIn(EventName.LEAVE, binds, f"{EventName.LEAVE} tag not binded")
 
         self.assertEqual(0, self.event_count, "Event should not be triggered")
-        self.assertEqual(point_xy_list_bck,self.point_xy_list,
-                         "point_xy_list should not change at Polygon creation")
+        self.assertEqual(point_xy_list_bck, self.point_xy_list, "point_xy_list should not change at Polygon creation")
 
         event = Event(123, 456)
         self.plg._on_click(event)
@@ -328,10 +306,7 @@ class TestPolygon(unittest.TestCase):
         self.assertEqual(point_xy_list_bck, self.point_xy_list, "those callbacks should not be able to change self.point_xy_list")
 
     def test_event_sequence(self):
-        self.plg = interactive_overlays.Polygon(canvas=self.canvas, point_xy_list=self.point_xy_list, label="ok",
-            on_click=None,
-            on_drag=None,
-            on_release=None)
+        self.plg = interactive_overlays.Polygon(canvas=self.canvas, point_xy_list=self.point_xy_list, label="ok", on_click=None, on_drag=None, on_release=None)
         event = Event(0, 0)
 
         for k, pt in enumerate(self.plg.ipoints):
@@ -353,10 +328,9 @@ class TestPolygon(unittest.TestCase):
             self.assertEqual(interactive_overlays.State.NORMAL, pt.state, f"polygon.ipoints[{k}] must interact")
 
     def test_event_raise(self):
-        self.plg = interactive_overlays.Polygon(canvas=self.canvas, point_xy_list=self.point_xy_list, label="ok",
-            on_click=None,
-            on_drag=self.on_event_error,
-            on_release=None)
+        self.plg = interactive_overlays.Polygon(
+            canvas=self.canvas, point_xy_list=self.point_xy_list, label="ok", on_click=None, on_drag=self.on_event_error, on_release=None
+        )
         event = Event(0, 0)
 
         with self.assertRaises(Exception):
@@ -371,7 +345,7 @@ class TestPolygon(unittest.TestCase):
         [self.assertTrue(ipoint.visible, msg="Polygon's points must be visible by default") for ipoint in self.plg.ipoints]
 
         for _, _, line_id in self.plg.lines:
-            state = self.canvas.itemcget(line_id, 'state')
+            state = self.canvas.itemcget(line_id, "state")
             self.assertEqual(expected_state[True], state, msg="Polygon's lines must be visible by default")
 
         for val in [False, False, True, True]:
@@ -380,11 +354,11 @@ class TestPolygon(unittest.TestCase):
             self.assertEqual(self.plg.visible, val, msg="set_visible function must work properly")
             [self.assertEqual(ipoint.visible, val, msg="Polygon's points must be visible by default") for ipoint in self.plg.ipoints]
             for _, _, line_id in self.plg.lines:
-                state = self.canvas.itemcget(line_id, 'state')
+                state = self.canvas.itemcget(line_id, "state")
                 self.assertEqual(state, expected_state[val], msg="set_visible function must work properly")
 
-
             self.assertEqual(self.plg.visible, val)
+
 
 class TestRectangle(unittest.TestCase):
     def setUp(self) -> None:
@@ -411,10 +385,7 @@ class TestRectangle(unittest.TestCase):
         raise
 
     def test_interface(self):
-        self.rect = interactive_overlays.Rectangle(
-            canvas=self.canvas,
-            point0_xy=self.point0_xy,
-            point1_xy=self.point1_xy)
+        self.rect = interactive_overlays.Rectangle(canvas=self.canvas, point0_xy=self.point0_xy, point1_xy=self.point1_xy)
         self.assertIsInstance(self.rect, InteractivePolygon)
 
     def test_callback(self):
@@ -428,7 +399,8 @@ class TestRectangle(unittest.TestCase):
             label="ok",
             on_click=self.on_event,
             on_drag=self.on_event,
-            on_release=self.on_event)
+            on_release=self.on_event,
+        )
 
         self.assertEqual(2, len(self.rect.ipoints), "Rectangle must have 2 Interactive Point instances")
 
@@ -474,19 +446,13 @@ class TestRectangle(unittest.TestCase):
         self.assertEqual(point0_xy_bck, self.point0_xy, "_on_release should not change point0_xy")
         self.assertEqual(point1_xy_bck, self.point1_xy, "_on_release should not change point1_xy")
 
-
     def test_none_callback(self):
         point0_xy_bck = self.point0_xy
         point1_xy_bck = self.point1_xy
 
         self.rect = interactive_overlays.Rectangle(
-                canvas=self.canvas,
-                point0_xy=self.point0_xy,
-                point1_xy=self.point1_xy,
-                label="ok",
-                on_click=None,
-                on_drag=None,
-                on_release=None)
+            canvas=self.canvas, point0_xy=self.point0_xy, point1_xy=self.point1_xy, label="ok", on_click=None, on_drag=None, on_release=None
+        )
 
         for k in range(2):
             binds = self.canvas.tag_bind(self.rect.ipoints[k].circle_id)
@@ -510,10 +476,9 @@ class TestRectangle(unittest.TestCase):
         self.assertEqual(point1_xy_bck, self.point1_xy, "those callbacks should not be able to change self.point0_xy_bck")
 
     def test_event_sequence(self):
-        self.rect = interactive_overlays.Rectangle(canvas=self.canvas, point0_xy=self.point0_xy, point1_xy=self.point1_xy, label="ok",
-                on_click=None,
-                on_drag=None,
-                on_release=None)
+        self.rect = interactive_overlays.Rectangle(
+            canvas=self.canvas, point0_xy=self.point0_xy, point1_xy=self.point1_xy, label="ok", on_click=None, on_drag=None, on_release=None
+        )
         event = Event(0, 0)
 
         for k, pt in enumerate(self.rect.ipoints):
@@ -535,15 +500,14 @@ class TestRectangle(unittest.TestCase):
             self.assertEqual(interactive_overlays.State.NORMAL, pt.state, f"rectangle.ipoints[{k}] must interact")
 
     def test_event_raise(self):
-        self.rect = interactive_overlays.Rectangle(canvas=self.canvas, point0_xy=self.point0_xy, point1_xy=self.point1_xy, label="ok",
-                on_click=None,
-                on_drag=self.on_event_error,
-                on_release=None)
+        self.rect = interactive_overlays.Rectangle(
+            canvas=self.canvas, point0_xy=self.point0_xy, point1_xy=self.point1_xy, label="ok", on_click=None, on_drag=self.on_event_error, on_release=None
+        )
         event = Event(0, 0)
 
         with self.assertRaises(Exception):
             self.rect._on_drag(0, event)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

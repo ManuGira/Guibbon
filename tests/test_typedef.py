@@ -2,6 +2,7 @@ import unittest
 from tk4cv2.typedef import InteractivePoint, InteractivePolygon
 from types import FunctionType
 
+
 class TestPoint(unittest.TestCase):
     def test_interface_pattern(self):
         for interface in [InteractivePoint, InteractivePolygon]:
@@ -34,5 +35,5 @@ class TestPoint(unittest.TestCase):
             self.assertIsInstance(func, FunctionType, msg=f"Attribute {func} is supposed to be a function")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

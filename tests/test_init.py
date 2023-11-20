@@ -6,8 +6,8 @@ import numpy as np
 
 eps = sys.float_info.epsilon
 
-class TestTk4Cv2(unittest.TestCase):
 
+class TestTk4Cv2(unittest.TestCase):
     def tearDown(self) -> None:
         tcv2.Tk4Cv2.instances = {}
         tcv2.Tk4Cv2.active_instance_name = None
@@ -41,7 +41,7 @@ class TestTk4Cv2(unittest.TestCase):
         winname = "win0"
         self.assertEqual(len(tcv2.Tk4Cv2.instances), 0, msg="At initialisation, number of instances must be 0.")
         res = tcv2.getWindowProperty(winname, cv2.WND_PROP_VISIBLE)
-        self.assertTrue(abs(res-0.0) <= eps, msg="Non existant windows must have property WND_PROP_VISIBLE set to 0.0")
+        self.assertTrue(abs(res - 0.0) <= eps, msg="Non existant windows must have property WND_PROP_VISIBLE set to 0.0")
         self.assertFalse(tcv2.Tk4Cv2.is_instance(winname), msg="tcv2.Tk4Cv2.is_instance must return false for non-existant windows")
         self.assertEqual(len(tcv2.Tk4Cv2.instances), 0, msg="getWindowProperty should not be able to create new window")
 
@@ -51,11 +51,10 @@ class TestTk4Cv2(unittest.TestCase):
         self.assertIsNone(res, msg="tcv2.imshow must return None")
 
         res = tcv2.getWindowProperty(winname, cv2.WND_PROP_VISIBLE)
-        self.assertTrue(abs(res-1.0) <= eps, msg="Existant and visible windows must have property WND_PROP_VISIBLE set to 1.0")
+        self.assertTrue(abs(res - 1.0) <= eps, msg="Existant and visible windows must have property WND_PROP_VISIBLE set to 1.0")
         tcv2.Tk4Cv2.instances = {}  # TODO: use
         res = tcv2.getWindowProperty(winname, cv2.WND_PROP_VISIBLE)
-        self.assertTrue(abs(res-0.0) <= eps, msg="Deleting instance of a windows must destroy it. getWindowProperty must return 0")
-
+        self.assertTrue(abs(res - 0.0) <= eps, msg="Deleting instance of a windows must destroy it. getWindowProperty must return 0")
 
 
 def find_widget_by_name(tk4cv2_instance, widgetname):
@@ -82,7 +81,7 @@ class TestTk4Cv2_button(unittest.TestCase):
         self.triggered = True
 
     def test_createButton(self):
-        res = tcv2.createButton(text='Button', command=self.callback, winname=self.winname)
+        res = tcv2.createButton(text="Button", command=self.callback, winname=self.winname)
         self.assertIsNone(res, msg="function tcv2.createButton must return None")
 
         widget = find_widget_by_name(self.tk4cv2_instance, "button")
@@ -135,12 +134,11 @@ class TestTk4Cv2_RadioButtons(unittest.TestCase):
          - setRadioButtons
         """
         name = "RadioButtons"
-        res = tcv2.createRadioButtons(
-            name=name, options=["A", "B", "C"], winname=self.winname, value=1, onChange=self.callback)
+        res = tcv2.createRadioButtons(name=name, options=["A", "B", "C"], winname=self.winname, value=1, onChange=self.callback)
         self.assertIsNone(res, msg="function tcv2.createRadioButtons must return None")
 
         i, opt = tcv2.getRadioButtons(name, self.winname)
-        self.assertEqual(i , 1, msg="function tcv2.getRadioButtons must return correct index")
+        self.assertEqual(i, 1, msg="function tcv2.getRadioButtons must return correct index")
         self.assertEqual(opt, "B", msg="function tcv2.getRadioButtons must return correct option")
 
         self.triggered = False
@@ -149,6 +147,7 @@ class TestTk4Cv2_RadioButtons(unittest.TestCase):
         i, opt = tcv2.getRadioButtons(name, self.winname)
         self.assertEqual(i, 2, msg="function tcv2.getRadioButtons must return correct index")
         self.assertEqual(opt, "C", msg="function tcv2.getRadioButtons must return correct option")
+
 
 class TestTk4Cv2_Slider(unittest.TestCase):
     def setUp(self):
@@ -170,14 +169,14 @@ class TestTk4Cv2_Slider(unittest.TestCase):
         """
         values = [10, 13, 100]
         name = "Slider"
-        slider = tcv2.create_slider(winname=self.winname, slider_name=name, values=values+[], initial_index=2, on_change=self.callback)
+        slider = tcv2.create_slider(winname=self.winname, slider_name=name, values=values + [], initial_index=2, on_change=self.callback)
         self.assertIsInstance(slider, tcv2.SliderWidget, msg="function tcv2.create_slider must return an instance of a SliderWidget")
 
         slider = tcv2.get_slider_instance(self.winname, name)
         self.assertIsInstance(slider, tcv2.SliderWidget, msg="function tcv2.get_slider_instance must return an instance of a SliderWidget")
 
         index = slider.get_index()
-        self.assertEqual(index , 2, msg="function get_values of SliderWidget instance must return correct value")
+        self.assertEqual(index, 2, msg="function get_values of SliderWidget instance must return correct value")
 
         self.triggered = False
         slider.set_index(0)
@@ -191,7 +190,7 @@ class TestTk4Cv2_Slider(unittest.TestCase):
             self.assertEqual(expected, actual, msg="function get_values of SliderWidget instance must return correct values")
 
         values = [100, 200, 300, 400]
-        slider.set_values(values+[])
+        slider.set_values(values + [])
 
         values_res = slider.get_values()
         for expected, actual in zip(values, values_res):
@@ -221,7 +220,7 @@ class TestTk4Cv2_TrackBar(unittest.TestCase):
         self.assertIsNone(res, msg="function tcv2.createTrackBar must return None")
 
         value = tcv2.getTrackbarPos(name, self.winname)
-        self.assertEqual(value , 1, msg="function tcv2.getTrackbarPos must return correct value")
+        self.assertEqual(value, 1, msg="function tcv2.getTrackbarPos must return correct value")
 
         self.triggered = False
         tcv2.setTrackbarPos(name, self.winname, 8)
@@ -261,5 +260,5 @@ class TestTk4Cv2_other(unittest.TestCase):
             tcv2.not_implemented_error()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

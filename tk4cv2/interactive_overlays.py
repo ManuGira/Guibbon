@@ -9,6 +9,7 @@ import tkinter as tk
 from . import transform_matrix as tmat
 from .transform_matrix import TransformMatrix
 
+
 class State(enum.IntEnum):
     NORMAL = 0
     HOVERED = 1
@@ -17,10 +18,9 @@ class State(enum.IntEnum):
 
 class Magnets:
     DISTANCE_THERSHOLD = 20  # distance on img space
-    COLOR = '#%02x%02x%02x' % (255, 0, 255)
+    COLOR = "#%02x%02x%02x" % (255, 0, 255)
 
-    def __init__(self, canvas: tk.Canvas, point_xy_list: Point2DList,
-                 dist_threshold=DISTANCE_THERSHOLD):
+    def __init__(self, canvas: tk.Canvas, point_xy_list: Point2DList, dist_threshold=DISTANCE_THERSHOLD):
         self.canvas = canvas
         self.point_xy_list = point_xy_list
 
@@ -30,10 +30,9 @@ class Magnets:
 
         self.img2can_matrix: TransformMatrix = tmat.identity_matrix()
 
-
     def update(self):
-        radius = Point.radius[State.NORMAL]//2
-        item_state = 'normal' if self.visible else 'hidden'
+        radius = Point.radius[State.NORMAL] // 2
+        item_state = "normal" if self.visible else "hidden"
         for circle_id, point_xy in zip(self.circle_id_list, self.point_xy_list):
             point_xy = tmat.apply(self.img2can_matrix, point_xy)
             point_xy = (int(round(point_xy[0])), int(round(point_xy[1])))
@@ -50,7 +49,7 @@ class Magnets:
             return point_xy_img
 
         dists2 = np.array(point_xy_img) - np.array(self.point_xy_list)
-        dists2 = np.sum(dists2 ** 2, axis=1)
+        dists2 = np.sum(dists2**2, axis=1)
         ind = np.argmin(dists2)
         if dists2[ind] < self.dist_threshold**2:
             return self.point_xy_list[ind]
@@ -60,11 +59,12 @@ class Magnets:
     def set_img2can_matrix(self, img2can_matrix: TransformMatrix):
         self.img2can_matrix = img2can_matrix.copy()
 
+
 class Point(InteractivePoint):
     colors = {
-        State.NORMAL: '#%02x%02x%02x' % (0, 0, 255),
-        State.HOVERED: '#%02x%02x%02x' % (0, 255, 255),
-        State.DRAGGED: '#%02x%02x%02x' % (255, 255, 0),
+        State.NORMAL: "#%02x%02x%02x" % (0, 0, 255),
+        State.HOVERED: "#%02x%02x%02x" % (0, 255, 255),
+        State.DRAGGED: "#%02x%02x%02x" % (255, 255, 0),
     }
 
     radius = {
@@ -73,12 +73,17 @@ class Point(InteractivePoint):
         State.DRAGGED: 7,
     }
 
-    def __init__(self, canvas: tk.Canvas, point_xy: Point2D, label:str="",
-                 on_click:CallbackPoint=None,
-                 on_drag:CallbackPoint=None,
-                 on_release:CallbackPoint=None,
-                 img2can_matrix:Optional[TransformMatrix]=None,
-                 magnets: Optional[Magnets]=None):
+    def __init__(
+        self,
+        canvas: tk.Canvas,
+        point_xy: Point2D,
+        label: str = "",
+        on_click: CallbackPoint = None,
+        on_drag: CallbackPoint = None,
+        on_release: CallbackPoint = None,
+        img2can_matrix: Optional[TransformMatrix] = None,
+        magnets: Optional[Magnets] = None,
+    ):
         if img2can_matrix is None:
             img2can_matrix = tmat.identity_matrix()
 
@@ -107,7 +112,6 @@ class Point(InteractivePoint):
         self.canvas.tag_bind(self.circle_id, "<Enter>", self._on_enter)
         self.canvas.tag_bind(self.circle_id, "<Leave>", self._on_leave)
 
-
     def update(self):
         self.update_magnets()
         radius = Point.radius[self.state]
@@ -117,7 +121,7 @@ class Point(InteractivePoint):
         x2 = can_x + radius
         y2 = can_y + radius
         self.canvas.coords(self.circle_id, x1, y1, x2, y2)
-        item_state = 'normal' if self.visible else 'hidden'
+        item_state = "normal" if self.visible else "hidden"
         self.canvas.itemconfig(self.circle_id, fill=Point.colors[self.state], state=item_state)
         self.canvas.tag_raise(self.circle_id)
 
@@ -200,17 +204,22 @@ class Point(InteractivePoint):
 
 class Polygon(InteractivePolygon):
     colors = {
-        State.NORMAL: '#%02x%02x%02x' % (0, 255, 0),
-        State.HOVERED: '#%02x%02x%02x' % (127, 255, 127),
-        State.DRAGGED: '#%02x%02x%02x' % (255, 255, 0),
+        State.NORMAL: "#%02x%02x%02x" % (0, 255, 0),
+        State.HOVERED: "#%02x%02x%02x" % (127, 255, 127),
+        State.DRAGGED: "#%02x%02x%02x" % (255, 255, 0),
     }
 
-    def __init__(self, canvas: tk.Canvas, point_xy_list: Point2DList, label:str="",
-                 on_click:CallbackPolygon=None,
-                 on_drag:CallbackPolygon=None,
-                 on_release:CallbackPolygon=None,
-                 img2can_matrix:Optional[TransformMatrix]=None,
-                 magnets: Optional[Magnets]=None):
+    def __init__(
+        self,
+        canvas: tk.Canvas,
+        point_xy_list: Point2DList,
+        label: str = "",
+        on_click: CallbackPolygon = None,
+        on_drag: CallbackPolygon = None,
+        on_release: CallbackPolygon = None,
+        img2can_matrix: Optional[TransformMatrix] = None,
+        magnets: Optional[Magnets] = None,
+    ):
         self.canvas = canvas
         self.label = label
         self.visible: bool = True
@@ -229,12 +238,16 @@ class Polygon(InteractivePolygon):
             # subscribe to on_click only if needed.
             # subscribe to on_drag in any cases (to update points coordinates). Use lambda to pass point index.
             # subscribe to on_release only if needed.
-            ipoint = Point(canvas, point_xy, label="",
-                           on_click=None if on_click is None else self._on_click,
-                           on_drag=on_drag_lambdas[k],
-                           on_release=None if on_release is None else self._on_release,
-                           img2can_matrix=img2can_matrix,
-                           magnets=magnets)
+            ipoint = Point(
+                canvas,
+                point_xy,
+                label="",
+                on_click=None if on_click is None else self._on_click,
+                on_drag=on_drag_lambdas[k],
+                on_release=None if on_release is None else self._on_release,
+                img2can_matrix=img2can_matrix,
+                magnets=magnets,
+            )
             self.ipoints.append(ipoint)
 
         self.lines = self._create_lines()
@@ -252,7 +265,7 @@ class Polygon(InteractivePolygon):
 
     def _update_lines(self):
         # draw lines
-        item_state = 'normal' if self.visible else 'hidden'
+        item_state = "normal" if self.visible else "hidden"
         point_xy_list = [ipoint.get_can_point_xy() for ipoint in self.ipoints]
         point_xy_list = [(int(round(x)), int(round(y))) for x, y in point_xy_list]
         for i1, i2, line_id in self.lines:
@@ -307,19 +320,25 @@ class Polygon(InteractivePolygon):
         for ipoint in self.ipoints:
             ipoint.set_visible(value)
 
-class Rectangle(Polygon):
-    def __init__(self, canvas: tk.Canvas, point0_xy: Point2D, point1_xy: Point2D, label:str="",
-                 on_click:CallbackRect=None,
-                 on_drag:CallbackRect=None,
-                 on_release:CallbackRect=None,
-                 img2can_matrix:Optional[TransformMatrix]=None,
-                 magnets: Optional[Magnets]=None):
 
+class Rectangle(Polygon):
+    def __init__(
+        self,
+        canvas: tk.Canvas,
+        point0_xy: Point2D,
+        point1_xy: Point2D,
+        label: str = "",
+        on_click: CallbackRect = None,
+        on_drag: CallbackRect = None,
+        on_release: CallbackRect = None,
+        img2can_matrix: Optional[TransformMatrix] = None,
+        magnets: Optional[Magnets] = None,
+    ):
         # wrap user callback to convert signature from CallbackRect to CallbackPolygon
         lambda0 = None if on_click is None else lambda event, point_list_xy: on_click(event, point_list_xy[0], point_list_xy[1])
         on_click_rect: CallbackPolygon = lambda0
 
-        lambda1 = None if on_drag is None else lambda event, point_list_xy:  on_drag(event, point_list_xy[0], point_list_xy[1])
+        lambda1 = None if on_drag is None else lambda event, point_list_xy: on_drag(event, point_list_xy[0], point_list_xy[1])
         on_drag_rect: CallbackPolygon = lambda1
 
         lambda2 = None if on_release is None else lambda event, point_list_xy: on_release(event, point_list_xy[0], point_list_xy[1])
@@ -329,18 +348,22 @@ class Rectangle(Polygon):
         point_list_xy = [point0_xy, point1_xy]
 
         # create an instance of Polygon using wrapped callbacks
-        super().__init__(canvas, point_list_xy, label,
-                on_click=None if on_click is None else on_click_rect,
-                on_drag=None if on_drag is None else on_drag_rect,
-                on_release=None if on_release is None else on_release_rect,
-                img2can_matrix=img2can_matrix,
-                magnets=magnets)
+        super().__init__(
+            canvas,
+            point_list_xy,
+            label,
+            on_click=None if on_click is None else on_click_rect,
+            on_drag=None if on_drag is None else on_drag_rect,
+            on_release=None if on_release is None else on_release_rect,
+            img2can_matrix=img2can_matrix,
+            magnets=magnets,
+        )
 
     def _create_lines(self):
         return [(-1, -1, self.canvas.create_line(-1, -1, -1, -1, fill=Polygon.colors[self.state], width=5)) for i in range(4)]
 
     def _update_lines(self):
-        item_state = 'normal' if self.visible else 'hidden'
+        item_state = "normal" if self.visible else "hidden"
 
         point_xy_list = [ipoint.get_can_point_xy() for ipoint in self.ipoints]
         point_xy_list = [(int(round(x)), int(round(y))) for x, y in point_xy_list]
