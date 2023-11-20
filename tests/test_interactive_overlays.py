@@ -4,6 +4,7 @@ import tkinter
 import unittest
 from tk4cv2 import interactive_overlays
 from tk4cv2 import transform_matrix as tmat
+from tk4cv2.typedef import InteractivePoint, InteractivePolygon
 
 eps = sys.float_info.epsilon
 
@@ -95,6 +96,10 @@ class TestPoint(unittest.TestCase):
 
     def on_event_error(self, event):
         raise
+
+    def test_interface(self):
+        self.pt = interactive_overlays.Point(canvas=self.canvas, point_xy=self.point_xy)
+        self.assertIsInstance(self.pt, InteractivePoint)
 
     def test_callback(self):
         self.pt = interactive_overlays.Point(
@@ -195,6 +200,24 @@ class TestPoint(unittest.TestCase):
         with self.assertRaises(Exception):
             self.pt._on_drag(event)
 
+    def test_visible(self):
+        expected_state = {True: "normal", False: "hidden"}
+        self.pt = interactive_overlays.Point(canvas=self.canvas, point_xy=self.point_xy, label="ok")
+
+        self.pt.update()
+        self.assertTrue(self.pt.visible, msg="Point must be visible by default")
+        state = self.canvas.itemcget(self.pt.circle_id,'state')
+        self.assertEqual(state, "normal", msg="Point must be visible by default")
+
+        for val in [False, False, True, True]:
+            self.pt.set_visible(val)
+            self.pt.update()
+            self.assertEqual(self.pt.visible, val, msg="set_visible function must work properly")
+            state = self.canvas.itemcget(self.pt.circle_id, 'state')
+            self.assertEqual(state, expected_state[val], msg="set_visible function must work properly")
+
+            self.assertEqual(self.pt.visible, val)
+
 
 class TestPolygon(unittest.TestCase):
     def setUp(self) -> None:
@@ -219,6 +242,12 @@ class TestPolygon(unittest.TestCase):
 
     def on_event_error(self, event, point_xy_list):
         raise
+
+    def test_interface(self):
+        self.plg = interactive_overlays.Polygon(
+            canvas=self.canvas,
+            point_xy_list=self.point_xy_list)
+        self.assertIsInstance(self.plg, InteractivePolygon)
 
     def test_callback(self):
         point_xy_list_bck = self.point_xy_list + []
@@ -333,6 +362,29 @@ class TestPolygon(unittest.TestCase):
         with self.assertRaises(Exception):
             self.plg._on_drag(0, event)
 
+    def test_visible(self):
+        expected_state = {True: "normal", False: "hidden"}
+        self.plg = interactive_overlays.Polygon(canvas=self.canvas, point_xy_list=self.point_xy_list, label="ok")
+
+        self.plg.update()
+        self.assertTrue(self.plg.visible, msg="Polygon must be visible by default")
+        [self.assertTrue(ipoint.visible, msg="Polygon's points must be visible by default") for ipoint in self.plg.ipoints]
+
+        for _, _, line_id in self.plg.lines:
+            state = self.canvas.itemcget(line_id, 'state')
+            self.assertEqual(expected_state[True], state, msg="Polygon's lines must be visible by default")
+
+        for val in [False, False, True, True]:
+            self.plg.set_visible(val)
+            self.plg.update()
+            self.assertEqual(self.plg.visible, val, msg="set_visible function must work properly")
+            [self.assertEqual(ipoint.visible, val, msg="Polygon's points must be visible by default") for ipoint in self.plg.ipoints]
+            for _, _, line_id in self.plg.lines:
+                state = self.canvas.itemcget(line_id, 'state')
+                self.assertEqual(state, expected_state[val], msg="set_visible function must work properly")
+
+
+            self.assertEqual(self.plg.visible, val)
 
 class TestRectangle(unittest.TestCase):
     def setUp(self) -> None:
@@ -357,6 +409,13 @@ class TestRectangle(unittest.TestCase):
 
     def on_event_error(self, event, point0_xy, point1_xy):
         raise
+
+    def test_interface(self):
+        self.rect = interactive_overlays.Rectangle(
+            canvas=self.canvas,
+            point0_xy=self.point0_xy,
+            point1_xy=self.point1_xy)
+        self.assertIsInstance(self.rect, InteractivePolygon)
 
     def test_callback(self):
         point0_xy_bck = self.point0_xy

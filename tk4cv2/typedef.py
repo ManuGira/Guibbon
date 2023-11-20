@@ -22,11 +22,29 @@ CallbackRect = Optional[Callable[[tk.Event, Point2D, Point2D], NoReturn]]
 # foo(cvevent, x, y, flag, param) -> None
 MouseCallback = Optional[Callable[[int, int, int, int, None], NoReturn]]
 
+class InteractivePoint(metaclass=abc.ABCMeta):
+    @abc.abstractmethod
+    def update(self):
+        pass
+
+    @abc.abstractmethod
+    def set_img_point_xy(self, img_point_xy: Point2D):
+        pass
+
+    @abc.abstractmethod
+    def set_visible(self, value: bool):
+        pass
+
 class InteractivePolygon(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def update(self):
-        raise NotImplementedError
+        pass
 
     @abc.abstractmethod
     def set_point_xy_list(self, point_xy_list: Point2DList):
-        raise NotImplementedError
+        pass
+
+    @abc.abstractmethod
+    def set_visible(self, value: bool):
+        pass
+

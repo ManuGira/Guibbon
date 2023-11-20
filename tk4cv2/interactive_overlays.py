@@ -2,7 +2,7 @@ from typing import Sequence, Optional
 
 import numpy as np
 
-from .typedef import Point2D, Point2DList, CallbackPoint, CallbackPolygon, CallbackRect, InteractivePolygon
+from .typedef import Point2D, Point2DList, CallbackPoint, CallbackPolygon, CallbackRect, InteractivePolygon, InteractivePoint
 
 import enum
 import tkinter as tk
@@ -60,7 +60,7 @@ class Magnets:
     def set_img2can_matrix(self, img2can_matrix: TransformMatrix):
         self.img2can_matrix = img2can_matrix.copy()
 
-class Point:
+class Point(InteractivePoint):
     colors = {
         State.NORMAL: '#%02x%02x%02x' % (0, 0, 255),
         State.HOVERED: '#%02x%02x%02x' % (0, 255, 255),
@@ -192,6 +192,11 @@ class Point:
             self.state = State.NORMAL
         self.update()
 
+    def set_visible(self, value: bool):
+        if value == self.visible:
+            return
+        self.visible = value
+
 
 class Polygon(InteractivePolygon):
     colors = {
@@ -294,6 +299,13 @@ class Polygon(InteractivePolygon):
         for ipoint, point_xy in zip(self.ipoints, point_xy_list):
             ipoint.set_img_point_xy(point_xy)
             self.update()
+
+    def set_visible(self, value: bool):
+        if value == self.visible:
+            return
+        self.visible = value
+        for ipoint in self.ipoints:
+            ipoint.set_visible(value)
 
 class Rectangle(Polygon):
     def __init__(self, canvas: tk.Canvas, point0_xy: Point2D, point1_xy: Point2D, label:str="",
