@@ -12,6 +12,7 @@ import cv2
 from .image_viewer import ImageViewer
 from .keyboard_event_handler import KeyboardEventHandler
 from .widgets.slider_widget import SliderWidget
+from .widgets.widget import WidgetInterface  # noqa: F401
 
 __version__ = "0.0.0"
 __version_info__ = tuple(int(i) for i in __version__.split(".") if i.isdigit())
@@ -85,8 +86,8 @@ def createButton(text="Button", command=None, winname=None):
     Tk4Cv2.get_instance(winname)._createButton(text, command)
 
 
-def create_custom_widget(CustomWidgetClass, winname, name, *params):
-    widget_instance = Tk4Cv2.get_instance(winname).create_custom_widget(CustomWidgetClass, name, *params)
+def create_custom_widget(winname, CustomWidgetClass, *params):
+    widget_instance = Tk4Cv2.get_instance(winname).create_custom_widget(CustomWidgetClass, *params)
     return widget_instance
 
 
@@ -352,15 +353,11 @@ class Tk4Cv2:
     def get_slider_instance(self, slider_name):
         return self.sliders_by_names[slider_name]
 
-    def create_custom_widget(self, CustomWidgetClass, name, *params):
+    def create_custom_widget(self, CustomWidgetClass, *params):
         tk_frame = tk.Frame(self.ctrl_frame, bg=COLORS.widget)
-        widget_instance = CustomWidgetClass(tk_frame, name, *params, COLORS.widget)
-        self.custom_widtgets_by_names[name] = widget_instance
+        widget_instance = CustomWidgetClass(tk_frame, *params)
         tk_frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
         return widget_instance
-
-    def get_custom_widget_instance(self, name):
-        return self.custom_widtgets_by_names[name]
 
     def _createRadioButtons(self, name, options, value, onChange):
         options = options + []  # copy
