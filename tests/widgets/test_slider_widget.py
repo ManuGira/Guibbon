@@ -1,6 +1,6 @@
 import tk4cv2 as tcv2
-from tk4cv2.widgets.slider_widget import SliderWidget
 import unittest
+
 
 class Test_SliderWidget(unittest.TestCase):
     def setUp(self):
