@@ -11,7 +11,7 @@ import cv2
 
 from .image_viewer import ImageViewer
 from .keyboard_event_handler import KeyboardEventHandler
-from .slider_widget import SliderWidget
+from .widgets.slider_widget import SliderWidget
 
 __version__ = "0.0.0"
 __version_info__ = tuple(int(i) for i in __version__.split(".") if i.isdigit())
