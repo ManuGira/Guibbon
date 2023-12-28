@@ -10,6 +10,8 @@ Point2D = Tuple[float, float]
 
 Point2DList = List[Point2D]
 
+CallbackRadioButtons = Optional[Callable[[int, str], NoReturn]]
+
 # foo(event) -> None
 CallbackPoint = Optional[Callable[[tk.Event], NoReturn]]
 

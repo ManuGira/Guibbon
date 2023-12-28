@@ -1,4 +1,4 @@
-from typing import Dict, Any, Optional, Type
+from typing import Dict, Optional, Type
 from .typedef import CallbackPoint, CallbackPolygon, CallbackRect, Point2DList, InteractivePolygon
 
 import time
@@ -81,15 +81,9 @@ def createButton(text="Button", command=None, winname=None):
     Tk4Cv2.get_instance(winname)._createButton(text, command)
 
 
-def create_custom_widget(winname, CustomWidgetClass: Type[WidgetInterface], *params):
+def create_custom_widget(winname, CustomWidgetClass: Type[WidgetInterface], *params) -> WidgetInterface:
     widget_instance = Tk4Cv2.get_instance(winname).create_custom_widget(CustomWidgetClass, *params)
     return widget_instance
-
-
-def get_custom_widget_instance(winname, name):
-    widget_instance = Tk4Cv2.get_instance(winname).get_custom_widget_instance(name)
-    return widget_instance
-
 
 def create_slider(winname, slider_name, values, initial_index, on_change=None) -> SliderWidget:
     slider_instance: SliderWidget = Tk4Cv2.get_instance(winname).create_slider(slider_name, values, initial_index, on_change)
@@ -155,7 +149,7 @@ def createRadioButtons(name, options, winname, value, onChange):
     Tk4Cv2.get_instance(winname)._createRadioButtons(name, options, value, onChange)
 
 
-def create_radio_buttons(winname, name, options, on_change):
+def create_radio_buttons(winname, name, options, on_change) -> RadioButtonWidget:
     return Tk4Cv2.get_instance(winname).create_radio_buttons(name, options, on_change)
 
 
@@ -223,7 +217,7 @@ def createInteractiveRectangle(
 class Tk4Cv2:
     root: tk.Tk
     is_alive: bool = False
-    instances: Dict[str, Any] = {}
+    instances: Dict[str, "Tk4Cv2"] = {}
     active_instance_name: Optional[str]
     is_timeout: bool
     keyboard: KeyboardEventHandler
@@ -245,12 +239,12 @@ class Tk4Cv2:
         Tk4Cv2.is_timeout = True
 
     @staticmethod
-    def is_instance(winname: str):
+    def is_instance(winname: str) -> bool:
         assert isinstance(winname, str)
         return winname in Tk4Cv2.instances.keys()
 
     @staticmethod
-    def get_instance(winname):
+    def get_instance(winname) -> "Tk4Cv2":
         assert isinstance(winname, str)
         if winname not in Tk4Cv2.instances.keys():
             Tk4Cv2.instances[winname] = Tk4Cv2(winname)
@@ -258,7 +252,7 @@ class Tk4Cv2:
         return Tk4Cv2.instances[winname]
 
     @staticmethod
-    def get_active_instance():
+    def get_active_instance() -> "Tk4Cv2":
         return Tk4Cv2.get_instance(Tk4Cv2.active_instance_name)
 
     @staticmethod
@@ -355,13 +349,13 @@ class Tk4Cv2:
     def get_slider_instance(self, slider_name):
         return self.sliders_by_names[slider_name]
 
-    def create_custom_widget(self, CustomWidgetClass: Type[WidgetInterface], *params):
+    def create_custom_widget(self, CustomWidgetClass: Type[WidgetInterface], *params) -> WidgetInterface:
         tk_frame = tk.Frame(self.ctrl_frame, bg=COLORS.widget)
         widget_instance = CustomWidgetClass(tk_frame, *params)
         tk_frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
         return widget_instance
 
-    def create_radio_buttons(self, name, options, on_change):
+    def create_radio_buttons(self, name, options, on_change) -> RadioButtonWidget:
         tk_frame = tk.Frame(self.ctrl_frame, bg=COLORS.widget)
         radio_button = RadioButtonWidget(tk_frame, name, options, on_change)
         self.radio_buttons_by_names[name] = radio_button

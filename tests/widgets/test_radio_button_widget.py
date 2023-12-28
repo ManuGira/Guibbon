@@ -1,6 +1,4 @@
-import sys
 import unittest
-
 import tk4cv2 as tcv2
 
 
@@ -16,12 +14,6 @@ class TestTk4Cv2_RadioButtons(unittest.TestCase):
         self.triggered = True
 
     def test_RadioButtons(self):
-        """
-        testing 3 functions:
-         - createRadioButtons
-         - getRadioButtons
-         - setRadioButtons
-        """
         name = "RadioButtons"
         rb_abc = tcv2.create_radio_buttons(winname=self.winname, name=name, options=["A", "B", "C"], on_change=self.callback)
         self.assertIsNotNone(rb_abc, msg="function tcv2.create_radio_buttons() must return None")
@@ -43,3 +35,20 @@ class TestTk4Cv2_RadioButtons(unittest.TestCase):
         i, opt = rb_abc.get_current_selection()
         self.assertEqual(i, 2, msg="function get_current_selection() must return correct index")
         self.assertEqual(opt, "C", msg="function get_current_selection() must return correct option")
+
+    def test_RadioButtons_option_getter_setter(self):
+        name = "RadioButtons"
+        expected = ["A", "B", "C"]
+        rbs = tcv2.create_radio_buttons(winname=self.winname, name=name, options=expected + [], on_change=self.callback)
+        result = rbs.get_options_list()
+        self.assertListEqual(expected, result, "function get_options_list() must return correct result")
+
+        expected = ["D", "E", "F"]
+        rbs.set_options_list(expected + [])
+        result = rbs.get_options_list()
+        self.assertListEqual(expected, result, "function get_options_list() must return correct result")
+
+        expected = ["D", "E", "F", "G"]
+        rbs.set_options_list(expected + [])
+        result = rbs.get_options_list()
+        self.assertListEqual(expected, result, "function get_options_list() must return correct result")

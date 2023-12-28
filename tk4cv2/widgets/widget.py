@@ -1,4 +1,3 @@
-from typing import Any, Tuple
 import tkinter as tk
 import abc
 
