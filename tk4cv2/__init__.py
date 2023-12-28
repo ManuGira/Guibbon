@@ -1,4 +1,4 @@
-from typing import Dict, Any, Optional
+from typing import Dict, Optional, Type
 from .typedef import CallbackPoint, CallbackPolygon, CallbackRect, Point2DList, InteractivePolygon
 
 import time
@@ -11,17 +11,13 @@ import cv2
 
 from .image_viewer import ImageViewer
 from .keyboard_event_handler import KeyboardEventHandler
-from .slider_widget import SliderWidget
+from .widgets.slider_widget import SliderWidget
+from .widgets.radio_button_widget import RadioButtonWidget
+from .widgets.widget import WidgetInterface
+from .colors import COLORS
 
 __version__ = "0.0.0"
 __version_info__ = tuple(int(i) for i in __version__.split(".") if i.isdigit())
-
-
-class COLORS:
-    background = "gray80"
-    ctrl_panel = "gray80"
-    widget = "gray90"
-    border = "gray70"
 
 
 def inject(cv2_package):
@@ -84,6 +80,10 @@ def setMouseCallback(winname, onMouse, param=None):
 def createButton(text="Button", command=None, winname=None):
     Tk4Cv2.get_instance(winname)._createButton(text, command)
 
+
+def create_custom_widget(winname, CustomWidgetClass: Type[WidgetInterface], *params) -> WidgetInterface:
+    widget_instance = Tk4Cv2.get_instance(winname).create_custom_widget(CustomWidgetClass, *params)
+    return widget_instance
 
 def create_slider(winname, slider_name, values, initial_index, on_change=None) -> SliderWidget:
     slider_instance: SliderWidget = Tk4Cv2.get_instance(winname).create_slider(slider_name, values, initial_index, on_change)
@@ -149,6 +149,10 @@ def createRadioButtons(name, options, winname, value, onChange):
     Tk4Cv2.get_instance(winname)._createRadioButtons(name, options, value, onChange)
 
 
+def create_radio_buttons(winname, name, options, on_change) -> RadioButtonWidget:
+    return Tk4Cv2.get_instance(winname).create_radio_buttons(name, options, on_change)
+
+
 def setRadioButtons(name, winname, ind):
     Tk4Cv2.get_instance(winname)._setRadioButtons(name, ind)
 
@@ -170,25 +174,25 @@ def createColorPicker(name, windowName, values, onChange):
 
 
 def createInteractivePoint(
-    windowName,
-    point_xy,
-    label="",
-    on_click: CallbackPoint = None,
-    on_drag: CallbackPoint = None,
-    on_release: CallbackPoint = None,
-    magnet_points: Optional[Point2DList] = None,
+        windowName,
+        point_xy,
+        label="",
+        on_click: CallbackPoint = None,
+        on_drag: CallbackPoint = None,
+        on_release: CallbackPoint = None,
+        magnet_points: Optional[Point2DList] = None,
 ):
     Tk4Cv2.get_instance(windowName).image_viewer.createInteractivePoint(point_xy, label, on_click, on_drag, on_release, magnet_points)
 
 
 def createInteractivePolygon(
-    windowName,
-    point_xy_list,
-    label="",
-    on_click: CallbackPolygon = None,
-    on_drag: CallbackPolygon = None,
-    on_release: CallbackPolygon = None,
-    magnet_points: Optional[Point2DList] = None,
+        windowName,
+        point_xy_list,
+        label="",
+        on_click: CallbackPolygon = None,
+        on_drag: CallbackPolygon = None,
+        on_release: CallbackPolygon = None,
+        magnet_points: Optional[Point2DList] = None,
 ) -> InteractivePolygon:
     ipolygon: InteractivePolygon
     ipolygon = Tk4Cv2.get_instance(windowName).image_viewer.createInteractivePolygon(point_xy_list, label, on_click, on_drag, on_release, magnet_points)
@@ -196,14 +200,14 @@ def createInteractivePolygon(
 
 
 def createInteractiveRectangle(
-    windowName,
-    point0_xy,
-    point1_xy,
-    label="",
-    on_click: CallbackRect = None,
-    on_drag: CallbackRect = None,
-    on_release: CallbackRect = None,
-    magnet_points: Optional[Point2DList] = None,
+        windowName,
+        point0_xy,
+        point1_xy,
+        label="",
+        on_click: CallbackRect = None,
+        on_drag: CallbackRect = None,
+        on_release: CallbackRect = None,
+        magnet_points: Optional[Point2DList] = None,
 ) -> InteractivePolygon:
     irect: InteractivePolygon
     irect = Tk4Cv2.get_instance(windowName).image_viewer.createInteractiveRectangle(point0_xy, point1_xy, label, on_click, on_drag, on_release, magnet_points)
@@ -213,7 +217,7 @@ def createInteractiveRectangle(
 class Tk4Cv2:
     root: tk.Tk
     is_alive: bool = False
-    instances: Dict[str, Any] = {}
+    instances: Dict[str, "Tk4Cv2"] = {}
     active_instance_name: Optional[str]
     is_timeout: bool
     keyboard: KeyboardEventHandler
@@ -235,12 +239,12 @@ class Tk4Cv2:
         Tk4Cv2.is_timeout = True
 
     @staticmethod
-    def is_instance(winname: str):
+    def is_instance(winname: str) -> bool:
         assert isinstance(winname, str)
         return winname in Tk4Cv2.instances.keys()
 
     @staticmethod
-    def get_instance(winname):
+    def get_instance(winname) -> "Tk4Cv2":
         assert isinstance(winname, str)
         if winname not in Tk4Cv2.instances.keys():
             Tk4Cv2.instances[winname] = Tk4Cv2(winname)
@@ -248,7 +252,7 @@ class Tk4Cv2:
         return Tk4Cv2.instances[winname]
 
     @staticmethod
-    def get_active_instance():
+    def get_active_instance() -> "Tk4Cv2":
         return Tk4Cv2.get_instance(Tk4Cv2.active_instance_name)
 
     @staticmethod
@@ -303,15 +307,18 @@ class Tk4Cv2:
         img = np.zeros(shape=(100, 100, 3), dtype=np.uint8)
         self._imshow(img)
 
-        self.ctrl_frame = tk.Frame(master=self.frame, width=300, bg=COLORS.ctrl_panel)
-        self.trackbars_by_names = {}
+        self.ctrl_frame = tk.Frame(master=self.frame, bg=COLORS.ctrl_panel)
+        dummy_canvas = tk.Canvas(master=self.ctrl_frame, height=0, width=300)
+        dummy_canvas.pack()
+
         self.sliders_by_names = {}
-        self.radiobuttons_by_names = {}
+        self.custom_widtgets_by_names = {}
+        self.radio_buttons_by_names = {}
 
         self.frame.pack()
         self.image_viewer.pack(side=tk.LEFT)
         # self.ctrl_frame.pack_propagate(False)
-        self.ctrl_frame.pack()
+        self.ctrl_frame.pack(fill=tk.X)
 
     def on_closing(self):
         print("Destroy Root", self.winname)
@@ -342,6 +349,19 @@ class Tk4Cv2:
     def get_slider_instance(self, slider_name):
         return self.sliders_by_names[slider_name]
 
+    def create_custom_widget(self, CustomWidgetClass: Type[WidgetInterface], *params) -> WidgetInterface:
+        tk_frame = tk.Frame(self.ctrl_frame, bg=COLORS.widget)
+        widget_instance = CustomWidgetClass(tk_frame, *params)
+        tk_frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
+        return widget_instance
+
+    def create_radio_buttons(self, name, options, on_change) -> RadioButtonWidget:
+        tk_frame = tk.Frame(self.ctrl_frame, bg=COLORS.widget)
+        radio_button = RadioButtonWidget(tk_frame, name, options, on_change)
+        self.radio_buttons_by_names[name] = radio_button
+        tk_frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
+        return radio_button
+
     def _createRadioButtons(self, name, options, value, onChange):
         options = options + []  # copy
         frame = tk.Frame(self.ctrl_frame)
@@ -364,19 +384,19 @@ class Tk4Cv2:
                 onChange(i, opt)
             rb.pack(side=tk.TOP, anchor=tk.W)
             buttons_list.append(rb)
-        self.radiobuttons_by_names[name] = {"var": var, "buttons_list": buttons_list, "options_list": options}
+        self.radio_buttons_by_names[name] = {"var": var, "buttons_list": buttons_list, "options_list": options}
 
         radioframe.pack(padx=borderwidth, pady=borderwidth, side=tk.TOP, fill=tk.X)
         radioframeborder.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X)
         frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
 
     def _setRadioButtons(self, name, ind):
-        radiolist = self.radiobuttons_by_names[name]["buttons_list"]
+        radiolist = self.radio_buttons_by_names[name]["buttons_list"]
         radiolist[ind].invoke()
 
     def _getRadioButtons(self, name):
-        radio_var = self.radiobuttons_by_names[name]["var"]
-        radio_options = self.radiobuttons_by_names[name]["options_list"]
+        radio_var = self.radio_buttons_by_names[name]["var"]
+        radio_options = self.radio_buttons_by_names[name]["options_list"]
         i = radio_var.get()
         opt = radio_options[i]
         return i, opt

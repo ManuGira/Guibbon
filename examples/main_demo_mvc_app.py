@@ -3,8 +3,19 @@ import numpy as np
 import numpy.typing as npt
 import cv2
 import tk4cv2 as tcv2
+import tkinter as tk
 
 Image_t = Optional[npt.NDArray[np.uint8]]
+
+
+class MyCustomWidget(tcv2.WidgetInterface):
+    def __init__(self, master: tk.Frame, text: str, on_click_no, on_clik_yes):
+        tk.Label(master, text=text).pack(padx=2, side=tk.TOP)
+
+        frame = tk.Frame(master)
+        tk.Button(frame, text="No", command=on_click_no).pack(side=tk.LEFT)
+        tk.Button(frame, text="Yes", command=on_clik_yes).pack(side=tk.LEFT)
+        frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.BOTH)
 
 
 class DemoMVCApp:
@@ -15,6 +26,8 @@ class DemoMVCApp:
         tcv2.createInteractivePoint(self.winname, (100, 100), "point", on_drag=self.on_drag)
 
         slider = tcv2.create_slider(self.winname, "slider", [0, 10, 20, 30], 2, lambda index, val: print("slider", index, val))
+        my_widget = tcv2.create_custom_widget(self.winname, MyCustomWidget, "Are you all right?", lambda: print("no"), lambda:print("yes"))
+        print(my_widget)
         slider.set_index(1)
 
         tcv2.createTrackbar("trackbar", self.winname, 2, 4, lambda val: print("trackbar", val))
