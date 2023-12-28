@@ -12,17 +12,12 @@ import cv2
 from .image_viewer import ImageViewer
 from .keyboard_event_handler import KeyboardEventHandler
 from .widgets.slider_widget import SliderWidget
+from .widgets.radio_button_widget import RadioButtonWidget
 from .widgets.widget import WidgetInterface
+from .colors import COLORS
 
 __version__ = "0.0.0"
 __version_info__ = tuple(int(i) for i in __version__.split(".") if i.isdigit())
-
-
-class COLORS:
-    background = "gray80"
-    ctrl_panel = "gray80"
-    widget = "gray90"
-    border = "gray70"
 
 
 def inject(cv2_package):
@@ -158,6 +153,10 @@ def namedWindow(winname):  # TODO: add "flags" argument
 
 def createRadioButtons(name, options, winname, value, onChange):
     Tk4Cv2.get_instance(winname)._createRadioButtons(name, options, value, onChange)
+
+
+def create_radio_buttons(winname, name, options, on_change):
+    return Tk4Cv2.get_instance(winname).create_radio_buttons(name, options, on_change)
 
 
 def setRadioButtons(name, winname, ind):
@@ -317,7 +316,7 @@ class Tk4Cv2:
         self.ctrl_frame = tk.Frame(master=self.frame, width=300, bg=COLORS.ctrl_panel)
         self.sliders_by_names = {}
         self.custom_widtgets_by_names = {}
-        self.radiobuttons_by_names = {}
+        self.radio_buttons_by_names = {}
 
         self.frame.pack()
         self.image_viewer.pack(side=tk.LEFT)
@@ -359,6 +358,13 @@ class Tk4Cv2:
         tk_frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
         return widget_instance
 
+    def create_radio_buttons(self, name, options, on_change):
+        tk_frame = tk.Frame(self.ctrl_frame, bg=COLORS.widget)
+        radio_button = RadioButtonWidget(tk_frame, name, options, on_change)
+        self.radio_buttons_by_names[name] = radio_button
+        tk_frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
+        return radio_button
+
     def _createRadioButtons(self, name, options, value, onChange):
         options = options + []  # copy
         frame = tk.Frame(self.ctrl_frame)
@@ -381,19 +387,19 @@ class Tk4Cv2:
                 onChange(i, opt)
             rb.pack(side=tk.TOP, anchor=tk.W)
             buttons_list.append(rb)
-        self.radiobuttons_by_names[name] = {"var": var, "buttons_list": buttons_list, "options_list": options}
+        self.radio_buttons_by_names[name] = {"var": var, "buttons_list": buttons_list, "options_list": options}
 
         radioframe.pack(padx=borderwidth, pady=borderwidth, side=tk.TOP, fill=tk.X)
         radioframeborder.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X)
         frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
 
     def _setRadioButtons(self, name, ind):
-        radiolist = self.radiobuttons_by_names[name]["buttons_list"]
+        radiolist = self.radio_buttons_by_names[name]["buttons_list"]
         radiolist[ind].invoke()
 
     def _getRadioButtons(self, name):
-        radio_var = self.radiobuttons_by_names[name]["var"]
-        radio_options = self.radiobuttons_by_names[name]["options_list"]
+        radio_var = self.radio_buttons_by_names[name]["var"]
+        radio_options = self.radio_buttons_by_names[name]["options_list"]
         i = radio_var.get()
         opt = radio_options[i]
         return i, opt

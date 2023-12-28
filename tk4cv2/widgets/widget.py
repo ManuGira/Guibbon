@@ -5,5 +5,5 @@ import abc
 
 class WidgetInterface(metaclass=abc.ABCMeta):
     @abc.abstractmethod
-    def __init__(self, master: tk.Frame, name: str, *params: Tuple[Any]):
+    def __init__(self, parent_frame: tk.Frame, *params):
         pass

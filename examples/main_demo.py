@@ -65,6 +65,7 @@ def demo_cv():
         # type: ignore
         tcv2.createButton("the button", on_button_click, winname)
         tcv2.createRadioButtons("radio", ["pomme", "poire"], winname, 1, on_radio_button)
+        radio_buttons = tcv2.create_radio_buttons(winname, "radio2", ["peche", "prune"], on_radio_button)
         tcv2.createCheckbuttons("check multi", ["roue", "volant"], winname, [False, True], on_check_buttons)
         tcv2.createCheckbutton("check single", winname, False, on_check_button)
         tcv2.createColorPicker("Color picker", winname, "yellow", on_color_pick)
