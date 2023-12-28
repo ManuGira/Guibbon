@@ -313,7 +313,10 @@ class Tk4Cv2:
         img = np.zeros(shape=(100, 100, 3), dtype=np.uint8)
         self._imshow(img)
 
-        self.ctrl_frame = tk.Frame(master=self.frame, width=300, bg=COLORS.ctrl_panel)
+        self.ctrl_frame = tk.Frame(master=self.frame, bg=COLORS.ctrl_panel)
+        dummy_canvas = tk.Canvas(master=self.ctrl_frame, height=0, width=300)
+        dummy_canvas.pack()
+
         self.sliders_by_names = {}
         self.custom_widtgets_by_names = {}
         self.radio_buttons_by_names = {}
@@ -321,7 +324,7 @@ class Tk4Cv2:
         self.frame.pack()
         self.image_viewer.pack(side=tk.LEFT)
         # self.ctrl_frame.pack_propagate(False)
-        self.ctrl_frame.pack()
+        self.ctrl_frame.pack(fill=tk.X)
 
     def on_closing(self):
         print("Destroy Root", self.winname)
