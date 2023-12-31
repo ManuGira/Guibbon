@@ -13,6 +13,7 @@ from .image_viewer import ImageViewer
 from .keyboard_event_handler import KeyboardEventHandler
 from .widgets.slider_widget import SliderWidget
 from .widgets.radio_button_widget import RadioButtonWidget
+from .widgets.button_widget import ButtonWidget
 from .widgets.widget import WidgetInterface
 from .colors import COLORS
 
@@ -77,13 +78,18 @@ def setMouseCallback(winname, onMouse, param=None):
     return Tk4Cv2.get_instance(winname)._setMouseCallback(onMouse, param=param)
 
 
-def createButton(text="Button", command=None, winname=None):
-    Tk4Cv2.get_instance(winname)._createButton(text, command)
+def create_button(winname, text="Button", command=None):
+    return Tk4Cv2.get_instance(winname).create_button(text, command)
+
+
+def get_button_instance(winname, text):
+    return Tk4Cv2.get_instance(winname).get_button_instance(text)
 
 
 def create_custom_widget(winname, CustomWidgetClass: Type[WidgetInterface], *params) -> WidgetInterface:
     widget_instance = Tk4Cv2.get_instance(winname).create_custom_widget(CustomWidgetClass, *params)
     return widget_instance
+
 
 def create_slider(winname, slider_name, values, initial_index, on_change=None) -> SliderWidget:
     slider_instance: SliderWidget = Tk4Cv2.get_instance(winname).create_slider(slider_name, values, initial_index, on_change)
@@ -145,20 +151,12 @@ def namedWindow(winname):  # TODO: add "flags" argument
     Tk4Cv2.get_instance(winname)
 
 
-def createRadioButtons(name, options, winname, value, onChange):
-    Tk4Cv2.get_instance(winname)._createRadioButtons(name, options, value, onChange)
-
-
 def create_radio_buttons(winname, name, options, on_change) -> RadioButtonWidget:
     return Tk4Cv2.get_instance(winname).create_radio_buttons(name, options, on_change)
 
 
-def setRadioButtons(name, winname, ind):
-    Tk4Cv2.get_instance(winname)._setRadioButtons(name, ind)
-
-
-def getRadioButtons(name, winname):
-    return Tk4Cv2.get_instance(winname)._getRadioButtons(name)
+def get_radio_buttons(winname, name):
+    return Tk4Cv2.get_instance(winname)._get_radio_buttons_instance(name)
 
 
 def createCheckbutton(name, windowName=None, value=False, onChange=None):
@@ -314,6 +312,7 @@ class Tk4Cv2:
         self.sliders_by_names = {}
         self.custom_widtgets_by_names = {}
         self.radio_buttons_by_names = {}
+        self.buttons_by_names = {}
 
         self.frame.pack()
         self.image_viewer.pack(side=tk.LEFT)
@@ -332,12 +331,16 @@ class Tk4Cv2:
         elif Tk4Cv2.active_instance_name == self.winname:
             Tk4Cv2.active_instance_name = list(Tk4Cv2.instances.keys())[-1]
 
-    def _createButton(self, text="Button", command=None):
-        frame = tk.Frame(self.ctrl_frame, bg=COLORS.ctrl_panel)
-        frame.pack_propagate(True)
+    def create_button(self, text="Button", command=None):
+        tk_frame = tk.Frame(self.ctrl_frame, bg=COLORS.ctrl_panel)
+        tk_frame.pack_propagate(True)
+        button = ButtonWidget(tk_frame, text, command)
+        self.buttons_by_names[text] = button
+        tk_frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.BOTH)
+        return button
 
-        tk.Button(frame, text=text, command=command).pack(side=tk.LEFT)
-        frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.BOTH)
+    def get_button_instance(self, text):
+        return self.buttons_by_names[text]
 
     def create_slider(self, slider_name, values, initial_index, onChange):
         tk_frame = tk.Frame(self.ctrl_frame, bg=COLORS.widget)
@@ -357,49 +360,13 @@ class Tk4Cv2:
 
     def create_radio_buttons(self, name, options, on_change) -> RadioButtonWidget:
         tk_frame = tk.Frame(self.ctrl_frame, bg=COLORS.widget)
-        radio_button = RadioButtonWidget(tk_frame, name, options, on_change)
-        self.radio_buttons_by_names[name] = radio_button
+        radio_buttons = RadioButtonWidget(tk_frame, name, options, on_change)
+        self.radio_buttons_by_names[name] = radio_buttons
         tk_frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
-        return radio_button
+        return radio_buttons
 
-    def _createRadioButtons(self, name, options, value, onChange):
-        options = options + []  # copy
-        frame = tk.Frame(self.ctrl_frame)
-        tk.Label(frame, text=name).pack(padx=2, side=tk.TOP, anchor=tk.W)
-        radioframeborder = tk.Frame(frame, bg=COLORS.border)
-        borderwidth = 1
-        radioframe = tk.Frame(radioframeborder)
-
-        def callback():
-            i = var.get()
-            opt = options[i]
-            onChange(i, opt)
-
-        var = tk.IntVar()
-        buttons_list = []
-        for i, opt in enumerate(options):
-            rb = tk.Radiobutton(radioframe, text=str(opt), variable=var, value=i, command=callback)
-            if i == value:
-                rb.select()
-                onChange(i, opt)
-            rb.pack(side=tk.TOP, anchor=tk.W)
-            buttons_list.append(rb)
-        self.radio_buttons_by_names[name] = {"var": var, "buttons_list": buttons_list, "options_list": options}
-
-        radioframe.pack(padx=borderwidth, pady=borderwidth, side=tk.TOP, fill=tk.X)
-        radioframeborder.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X)
-        frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
-
-    def _setRadioButtons(self, name, ind):
-        radiolist = self.radio_buttons_by_names[name]["buttons_list"]
-        radiolist[ind].invoke()
-
-    def _getRadioButtons(self, name):
-        radio_var = self.radio_buttons_by_names[name]["var"]
-        radio_options = self.radio_buttons_by_names[name]["options_list"]
-        i = radio_var.get()
-        opt = radio_options[i]
-        return i, opt
+    def _get_radio_buttons_instance(self, name):
+        return self.radio_buttons_by_names[name]
 
     def _createCheckbutton(self, name, value, onChange):
         frame = tk.Frame(self.ctrl_frame)
