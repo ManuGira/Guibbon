@@ -151,20 +151,12 @@ def namedWindow(winname):  # TODO: add "flags" argument
     Tk4Cv2.get_instance(winname)
 
 
-def createRadioButtons(name, options, winname, value, onChange):
-    Tk4Cv2.get_instance(winname)._createRadioButtons(name, options, value, onChange)
-
-
 def create_radio_buttons(winname, name, options, on_change) -> RadioButtonWidget:
     return Tk4Cv2.get_instance(winname).create_radio_buttons(name, options, on_change)
 
 
-def setRadioButtons(name, winname, ind):
-    Tk4Cv2.get_instance(winname)._setRadioButtons(name, ind)
-
-
-def getRadioButtons(name, winname):
-    return Tk4Cv2.get_instance(winname)._getRadioButtons(name)
+def get_radio_buttons(winname, name):
+    return Tk4Cv2.get_instance(winname)._get_radio_buttons_instance(name)
 
 
 def createCheckbutton(name, windowName=None, value=False, onChange=None):
