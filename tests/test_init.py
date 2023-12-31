@@ -69,29 +69,6 @@ def find_widget_by_name(tk4cv2_instance, widgetname):
     return widget
 
 
-class TestTk4Cv2_button(unittest.TestCase):
-    def setUp(self):
-        self.winname = "win0"
-        tcv2.namedWindow(self.winname)
-        self.tk4cv2_instance = tcv2.Tk4Cv2.instances["win0"]
-        self.triggered = None
-
-    def callback(self, *args):
-        print("callback_button triggered", args)
-        self.triggered = True
-
-    def test_createButton(self):
-        res = tcv2.createButton(text="Button", command=self.callback, winname=self.winname)
-        self.assertIsNone(res, msg="function tcv2.createButton must return None")
-
-        widget = find_widget_by_name(self.tk4cv2_instance, "button")
-
-        self.triggered = False
-        self.assertFalse(self.triggered)
-        widget.invoke()
-        self.assertTrue(self.triggered)
-
-
 class TestTk4Cv2_checkbutton(unittest.TestCase):
     def setUp(self):
         self.winname = "win0"

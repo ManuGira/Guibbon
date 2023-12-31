@@ -63,10 +63,11 @@ def demo_cv():
 
     if "tk4cv2" in sys.modules:
         # type: ignore
-        tcv2.createButton("the button", on_button_click, winname)
-        tcv2.createRadioButtons("radio", ["pomme", "poire"], winname, 1, on_radio_button)
         radio_buttons = tcv2.create_radio_buttons(winname, "radio2", ["peche", "prune"], on_radio_button)
-        tcv2.createButton("more fruit", lambda : radio_buttons.set_options_list(["oups", "ok", "voilà"]), winname)
+        # tcv2.createButton("more fruit", lambda : radio_buttons.set_options_list(["oups", "ok", "voilà"]), winname)
+        button = tcv2.create_button(winname, "more fruit", lambda : radio_buttons.set_options_list(["oups", "ok", "voilà"]))
+        tcv2.create_button(winname, "hide", lambda : button.set_visible(False))
+        tcv2.create_button(winname, "show", lambda : tcv2.get_button_instance(winname, "more fruit").set_visible(True))
 
         tcv2.createCheckbuttons("check multi", ["roue", "volant"], winname, [False, True], on_check_buttons)
         tcv2.createCheckbutton("check single", winname, False, on_check_button)
@@ -75,7 +76,7 @@ def demo_cv():
 
     cv2.namedWindow("ok")
 
-    while True:  # cv2.getWindowProperty(title, cv2.WND_PROP_VISIBLE) > 0.5:
+    while tcv2.Tk4Cv2.is_instance(winname):  # cv2.getWindowProperty(title, cv2.WND_PROP_VISIBLE) > 0.5:
         k += 1
         cv2.imshow(winname, img * np.uint8(k))
         # tcv2.imshow("ok", img * np.uint8(k))
