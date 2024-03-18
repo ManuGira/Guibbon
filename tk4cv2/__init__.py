@@ -1,4 +1,4 @@
-from typing import Dict, Optional, Type
+from typing import Dict, Optional, Type, List
 from .typedef import CallbackPoint, CallbackPolygon, CallbackRect, Point2DList, InteractivePolygon
 
 import time
@@ -12,7 +12,7 @@ import cv2
 from .image_viewer import ImageViewer
 from .keyboard_event_handler import KeyboardEventHandler
 from .widgets.slider_widget import SliderWidget
-from .widgets.radio_button_widget import RadioButtonWidget
+from .widgets.radio_button_widget import RadioButtonWidget, CallbackRadioButton
 from .widgets.button_widget import ButtonWidget
 from .widgets.widget import WidgetInterface
 from .colors import COLORS
@@ -151,7 +151,7 @@ def namedWindow(winname):  # TODO: add "flags" argument
     Tk4Cv2.get_instance(winname)
 
 
-def create_radio_buttons(winname, name, options, on_change) -> RadioButtonWidget:
+def create_radio_buttons(winname: str, name: str, options: List[str], on_change: CallbackRadioButton) -> RadioButtonWidget:
     return Tk4Cv2.get_instance(winname).create_radio_buttons(name, options, on_change)
 
 

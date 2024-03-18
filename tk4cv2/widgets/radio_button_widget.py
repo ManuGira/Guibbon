@@ -3,13 +3,14 @@ from typing import Callable, NoReturn, List, Tuple
 
 from tk4cv2.colors import COLORS
 
+CallbackRadioButton = Callable[[int, str], None]
 
 class RadioButtonWidget:
 
-    def __init__(self, tk_frame, name, options, on_change):
+    def __init__(self, tk_frame, name, options, on_change: CallbackRadioButton):
         self.name = name
         self.options = options + []  # copy
-        self.on_change = on_change
+        self.on_change: CallbackRadioButton = on_change
         self.frame = tk.Frame(tk_frame)
         tk.Label(self.frame, text=self.name).pack(padx=2, side=tk.TOP, anchor=tk.W)
 
