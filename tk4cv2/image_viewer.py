@@ -219,7 +219,7 @@ class ImageViewer:
     def bind(self, *args, **kwargs):
         self.canvas.bind(*args, **kwargs)
 
-    def imshow(self, mat, mode=None):
+    def imshow(self, mat, mode=None, cv2_interpolation=cv2.INTER_LINEAR):
         mode = "fit" if mode is None else mode
 
         canh, canw = self.canvas_shape_hw
@@ -238,7 +238,7 @@ class ImageViewer:
             raise ValueError(f'Don\'t know mode: "{mode}"')
 
         self.set_img2can_matrix(can_space_matrix @ np.linalg.inv(img_space_matrix))
-        mat = cv2.warpPerspective(mat, self.img2can_matrix, dsize=(canh, canw))
+        mat = cv2.warpPerspective(mat, self.img2can_matrix, dsize=(canh, canw), flags=cv2_interpolation)
 
         self.imgtk = ImageTk.PhotoImage(image=Image.fromarray(mat))
         self.canvas.create_image(canw // 2, canh // 2, anchor=tk.CENTER, image=self.imgtk)
