@@ -4,7 +4,7 @@ import numpy.typing as npt
 import tkinter as tk
 import abc
 
-Image_t = Optional[npt.NDArray[np.uint8]]
+Image_t = npt.NDArray[np.uint8]
 
 Point2D = Tuple[float, float]
 
@@ -22,7 +22,7 @@ CallbackPolygon = Optional[Callable[[tk.Event, Point2DList], NoReturn]]
 CallbackRect = Optional[Callable[[tk.Event, Point2D, Point2D], NoReturn]]
 
 # foo(cvevent, x, y, flag, param) -> None
-MouseCallback = Optional[Callable[[int, int, int, int, None], NoReturn]]
+CallbackMouse = Optional[Callable[[int, int, int, int, None], NoReturn]]
 
 
 class InteractivePoint(metaclass=abc.ABCMeta):

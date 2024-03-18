@@ -15,7 +15,7 @@ class DemoMVCAdvApp:
 
     @dataclasses.dataclass
     class Result:
-        img: Image_t = None
+        img: Image_t = np.array([])
 
     def __init__(self, filename):
         self.img = cv2.imread(filename)

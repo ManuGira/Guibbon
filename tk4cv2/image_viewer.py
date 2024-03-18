@@ -12,7 +12,7 @@ from PIL import Image, ImageTk
 from . import interactive_overlays
 from . import transform_matrix as tm
 from .transform_matrix import TransformMatrix
-from .typedef import CallbackPoint, CallbackPolygon, CallbackRect, Point2DList, MouseCallback
+from .typedef import Image_t, CallbackPoint, CallbackPolygon, CallbackRect, Point2DList, CallbackMouse
 
 
 class ImageViewer:
@@ -49,18 +49,18 @@ class ImageViewer:
         self.canvas_shape_hw = (height, width)
 
         self.imgtk = None
-        self.onMouse: MouseCallback = None
+        self.onMouse: CallbackMouse = None
         self.modifier = ImageViewer.Modifier()
         self.interactive_overlay_instance_list: List[Any] = []
         self.img2can_matrix: TransformMatrix
         self.can2img_matrix: TransformMatrix
         self.set_img2can_matrix(tm.identity_matrix())
 
-    def setMouseCallback(self, onMouse, param=None):
+    def setMouseCallback(self, onMouse, userdata=None):
         if not isinstance(onMouse, types.FunctionType) and not isinstance(onMouse, types.MethodType):
             raise TypeError(f"onMouse must be a function, got {type(onMouse)} instead")
-        if param is not None:
-            raise NotImplementedError("param argument of function setMouseCallback is not handled in current version of tk4cv2")
+        if userdata is not None:
+            raise NotImplementedError("userdata argument of function setMouseCallback is not handled in current version of tk4cv2")
 
         if self.onMouse is None:
             # <MODIFIER-MODIFIER-TYPE-DETAIL>
@@ -163,13 +163,13 @@ class ImageViewer:
         self.can2img_matrix = np.linalg.inv(self.img2can_matrix)
 
     def createInteractivePoint(
-        self,
-        point_xy,
-        label="",
-        on_click: CallbackPoint = None,
-        on_drag: CallbackPoint = None,
-        on_release: CallbackPoint = None,
-        magnet_points: Optional[Point2DList] = None,
+            self,
+            point_xy,
+            label="",
+            on_click: CallbackPoint = None,
+            on_drag: CallbackPoint = None,
+            on_release: CallbackPoint = None,
+            magnet_points: Optional[Point2DList] = None,
     ):
         magnets = None
         if magnet_points is not None:
@@ -179,13 +179,13 @@ class ImageViewer:
         self.interactive_overlay_instance_list.append(ipoint)
 
     def createInteractivePolygon(
-        self,
-        point_xy_list,
-        label="",
-        on_click: CallbackPolygon = None,
-        on_drag: CallbackPolygon = None,
-        on_release: CallbackPolygon = None,
-        magnet_points: Optional[Point2DList] = None,
+            self,
+            point_xy_list,
+            label="",
+            on_click: CallbackPolygon = None,
+            on_drag: CallbackPolygon = None,
+            on_release: CallbackPolygon = None,
+            magnet_points: Optional[Point2DList] = None,
     ) -> interactive_overlays.Polygon:
         magnets = None
         if magnet_points is not None:
@@ -196,14 +196,14 @@ class ImageViewer:
         return ipolygon
 
     def createInteractiveRectangle(
-        self,
-        point0_xy,
-        point1_xy,
-        label="",
-        on_click: CallbackRect = None,
-        on_drag: CallbackRect = None,
-        on_release: CallbackRect = None,
-        magnet_points: Optional[Point2DList] = None,
+            self,
+            point0_xy,
+            point1_xy,
+            label="",
+            on_click: CallbackRect = None,
+            on_drag: CallbackRect = None,
+            on_release: CallbackRect = None,
+            magnet_points: Optional[Point2DList] = None,
     ):
         magnets = None
         if magnet_points is not None:
@@ -219,8 +219,9 @@ class ImageViewer:
     def bind(self, *args, **kwargs):
         self.canvas.bind(*args, **kwargs)
 
-    def imshow(self, mat, mode=None, cv2_interpolation=cv2.INTER_LINEAR):
+    def imshow(self, mat: Image_t, mode: Optional[str] = None, cv2_interpolation: Optional[int] = None):
         mode = "fit" if mode is None else mode
+        cv2_interpolation = cv2.INTER_LINEAR if cv2_interpolation is None else cv2_interpolation
 
         canh, canw = self.canvas_shape_hw
         imgh, imgw = mat.shape[:2]

@@ -1,11 +1,10 @@
-from typing import Optional
 import numpy as np
 import numpy.typing as npt
 import cv2
 import tk4cv2 as tcv2
 import tkinter as tk
 
-Image_t = Optional[npt.NDArray[np.uint8]]
+Image_t = npt.NDArray[np.uint8]
 
 
 class MyCustomWidget(tcv2.WidgetInterface):
@@ -39,7 +38,7 @@ class DemoMVCApp:
         self.x = 0
         self.y = 0
 
-        self.res: Image_t = None
+        self.res: Image_t
         self.is_update_needed: bool = True
 
     def update(self):
