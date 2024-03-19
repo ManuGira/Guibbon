@@ -3,6 +3,7 @@ import unittest
 import cv2
 import tk4cv2 as tcv2
 import numpy as np
+from typing import Tuple
 
 eps = sys.float_info.epsilon
 
@@ -75,21 +76,27 @@ class TestTk4Cv2_checkbutton(unittest.TestCase):
         tcv2.namedWindow(self.winname)
         self.tk4cv2_instance = tcv2.Tk4Cv2.instances["win0"]
         self.triggered = None
+        self.args: Tuple[bool, ...]
 
-    def callback(self, *args):
+    def callback(self, *args: bool):
         print("callback checkbutton triggered", args)
         self.triggered = True
+        self.args = args
 
-    def test_createCheckButton(self):
-        res = tcv2.createCheckbutton(name="CheckButton", windowName=self.winname, value=False, onChange=self.callback)
-        self.assertIsNone(res, msg="function tcv2.createCheckbutton must return None")
+    def test_create_check_button(self):
+        widget = tcv2.create_check_button(winname=self.winname, name="CheckButton", value=False, on_change=self.callback)
+        self.assertIsNotNone(widget, msg="function tcv2.create_check_button must not return None")
+        self.assertIsInstance(widget, tcv2.CheckButtonWidget, msg="function tcv2.create_check_button must return instance of CheckButtonWidget")
 
-        widget = find_widget_by_name(self.tk4cv2_instance, "checkbutton")
+        self.assertIsNone(self.triggered)
 
-        self.triggered = False
-        self.assertFalse(self.triggered)
-        widget.invoke()
+        widget.on_change(True)
         self.assertTrue(self.triggered)
+        self.assertTupleEqual(self.args, (True,))
+
+        widget.on_change(False)
+        self.assertTrue(self.triggered)
+        self.assertTupleEqual(self.args, (False,))
 
 
 class TestTk4Cv2_TrackBar(unittest.TestCase):

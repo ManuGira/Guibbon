@@ -12,6 +12,7 @@ from .keyboard_event_handler import KeyboardEventHandler
 from .typedef import Image_t, CallbackPoint, CallbackPolygon, CallbackRect, Point2DList, InteractivePolygon, CallbackMouse
 from .widgets.button_widget import ButtonWidget, CallbackButton
 from .widgets.radio_button_widget import RadioButtonWidget, CallbackRadioButton
+from .widgets.check_button_widget import CheckButtonWidget, CallbackCheckButton
 from .widgets.slider_widget import SliderWidget, CallbackSlider
 from .widgets.widget import WidgetInterface
 
@@ -164,8 +165,8 @@ def get_radio_buttons(winname: str, name: str) -> RadioButtonWidget:
     return Tk4Cv2.get_instance(winname)._get_radio_buttons_instance(name)
 
 
-def createCheckbutton(name, windowName=None, value=False, onChange=None):
-    Tk4Cv2.get_instance(windowName)._createCheckbutton(name, value, onChange)
+def create_check_button(winname: str, name: str, value: bool, on_change: CallbackCheckButton) -> CheckButtonWidget:
+    return Tk4Cv2.get_instance(winname).create_check_button(name, value, on_change)
 
 
 def createCheckbuttons(name, options, windowName, values, onChange):
@@ -373,19 +374,11 @@ class Tk4Cv2:
     def _get_radio_buttons_instance(self, name: str) -> RadioButtonWidget:
         return self.radio_buttons_by_names[name]
 
-    def _createCheckbutton(self, name, value, onChange):
-        frame = tk.Frame(self.ctrl_frame)
-        tk.Label(frame, text=name).pack(padx=2, side=tk.LEFT, anchor=tk.W)
-
-        def callback():
-            onChange(var.get())
-
-        var = tk.BooleanVar()
-        cb = tk.Checkbutton(frame, text="", variable=var, onvalue=True, offvalue=False, command=callback)
-        if value:
-            cb.select()
-        cb.pack(side=tk.TOP, anchor=tk.W)
-        frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
+    def create_check_button(self, name, value, on_change) -> CheckButtonWidget:
+        tk_frame = tk.Frame(self.ctrl_frame, bg=COLORS.widget)
+        cb = CheckButtonWidget(tk_frame, name, value, on_change)
+        tk_frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
+        return cb
 
     def _createCheckbuttons(self, name, options, values, onChange):
         frame = tk.Frame(self.ctrl_frame)
