@@ -1,5 +1,5 @@
 import tkinter as tk
-from typing import Callable, List, Tuple, Optional
+from typing import Callable, List, Optional
 
 CallbackCheckButtonList = Callable[[List[bool]], None]
 

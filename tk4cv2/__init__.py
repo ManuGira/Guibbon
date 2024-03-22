@@ -1,7 +1,6 @@
 import time
 import tkinter as tk
-from tkinter.colorchooser import askcolor
-from typing import Dict, Optional, Type, List, Sequence, Any
+from typing import Dict, Optional, Type, List, Sequence, Any, Tuple
 
 import cv2
 import numpy as np
@@ -13,6 +12,7 @@ from .typedef import Image_t, CallbackPoint, CallbackPolygon, CallbackRect, Poin
 from .widgets.button_widget import ButtonWidget, CallbackButton
 from .widgets.check_button_list_widget import CheckButtonListWidget, CallbackCheckButtonList
 from .widgets.check_button_widget import CheckButtonWidget, CallbackCheckButton
+from .widgets.color_picker_widget import ColorPickerWidget, CallbackColorPicker
 from .widgets.radio_buttons_widget import RadioButtonsWidget, CallbackRadioButtons
 from .widgets.slider_widget import SliderWidget, CallbackSlider
 from .widgets.widget import WidgetInterface
@@ -174,8 +174,8 @@ def create_check_button_list(winname: str, name: str, options: List[str], on_cha
     return Tk4Cv2.get_instance(winname).create_check_button_list(name, options, on_change, initial_values)
 
 
-def create_color_picker(winname: str, name: str, on_change, initial_color_rgb: Optional[List[int]] = None):
-    Tk4Cv2.get_instance(winname).create_color_picker(name, on_change, initial_color_rgb)
+def create_color_picker(winname: str, name: str, on_change: CallbackColorPicker, initial_color_rgb: Optional[Tuple[int, int, int]] = None) -> ColorPickerWidget:
+    return Tk4Cv2.get_instance(winname).create_color_picker(name, on_change, initial_color_rgb)
 
 
 def createInteractivePoint(
@@ -387,21 +387,11 @@ class Tk4Cv2:
         tk_frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
         return cb
 
-    def create_color_picker(self, name: str, on_change, initial_color_rgb: Optional[List[int]] = None):
-        frame = tk.Frame(self.ctrl_frame)
-        label = tk.Label(frame, text=name)
-        label.pack(padx=2, side=tk.LEFT, anchor=tk.W)
-
-        def callback_canvas_click(event):
-            colors = askcolor(title="Tkinter Color Chooser")
-            canvas["bg"] = colors[1]
-            on_change(colors)
-
-        canvas = tk.Canvas(frame, bg=COLORS.widget, bd=2, height=10)
-        canvas.bind("<Button-1>", callback_canvas_click)
-
-        canvas.pack(side=tk.LEFT, anchor=tk.W)
-        frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
+    def create_color_picker(self, name: str, on_change: CallbackColorPicker, initial_color_rgb: Optional[Tuple[int, int, int]] = None) -> ColorPickerWidget:
+        tk_frame = tk.Frame(self.ctrl_frame)
+        cpw = ColorPickerWidget(tk_frame, name, on_change, initial_color_rgb)
+        tk_frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
+        return cpw
 
     def imshow(self, mat: Image_t, mode: Optional[str] = None, cv2_interpolation: Optional[int] = None):
         self.image_viewer.imshow(mat, mode, cv2_interpolation)
