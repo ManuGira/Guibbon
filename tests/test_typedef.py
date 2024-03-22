@@ -1,5 +1,5 @@
 import unittest
-from tk4cv2.typedef import InteractivePoint, InteractivePolygon
+from guibbon.typedef import InteractivePoint, InteractivePolygon
 from types import FunctionType
 
 

@@ -1,4 +1,4 @@
-import tk4cv2 as tcv2
+import guibbon as tcv2
 import unittest
 
 
@@ -6,7 +6,7 @@ class Test_SliderWidget(unittest.TestCase):
     def setUp(self):
         self.winname = "win0"
         tcv2.namedWindow(self.winname)
-        self.tk4cv2_instance = tcv2.Tk4Cv2.instances["win0"]
+        self.guibbon_instance = tcv2.Guibbon.instances["win0"]
         self.triggered = None
 
     def callback(self, *args):

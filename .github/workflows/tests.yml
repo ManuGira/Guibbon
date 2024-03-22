@@ -1,4 +1,4 @@
-name: Tk4Cv2 Continuous Integration
+name: Guibbon Continuous Integration
 
 on:
   push:

@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "tk4cv2"
+name = "guibbon"
 version = "0.1.0"
 description = ""
 authors = ["Emmanuel Girardin <emmanuel.girardin@outlook.com>"]
@@ -23,7 +23,7 @@ ruff = "^0.1.5"
 mypy = "^1.4.1"
 
 [tool.pytest.ini_options]
-addopts = "--cov-report=term --cov-report=html:build/pytest_coverage_html --cov=tk4cv2"
+addopts = "--cov-report=term --cov-report=html:build/pytest_coverage_html --cov=guibbon"
 testpaths = ["tests"]
 cache_dir = "build/.pytest_cache"
 

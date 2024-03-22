@@ -2,7 +2,7 @@ import unittest
 
 import numpy as np
 
-from tk4cv2 import transform_matrix as tmat
+from guibbon import transform_matrix as tmat
 
 
 def maxdiff(arr1, arr2):

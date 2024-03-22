@@ -5,11 +5,11 @@ import unittest
 
 import numpy as np
 
-from tk4cv2.image_viewer import ImageViewer
+from guibbon.image_viewer import ImageViewer
 
-from tk4cv2.typedef import Point2DList
+from guibbon.typedef import Point2DList
 
-from tk4cv2 import transform_matrix as tmat
+from guibbon import transform_matrix as tmat
 
 eps = sys.float_info.epsilon
 

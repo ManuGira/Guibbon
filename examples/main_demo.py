@@ -3,9 +3,9 @@
 import sys
 import numpy as np
 import cv2
-import tk4cv2 as tcv2
+import guibbon as tcv2
 
-if "tk4cv2" in sys.modules:
+if "guibbon" in sys.modules:
     tcv2.inject(cv2)
 
 
@@ -53,7 +53,7 @@ def demo_cv():
     img = cv2.imread("images/dog.jpg")
 
     k = 0
-    winname = "Demo Tk4Cv2"
+    winname = "Demo Guibbon"
     cv2.namedWindow(winname)
     cv2.createTrackbar("trackbar_name", winname, 0, 10, on_trackbar)
     cv2.setTrackbarMin("trackbar_name", winname, 2)
@@ -61,7 +61,7 @@ def demo_cv():
     cv2.setTrackbarPos("trackbar_name", winname, 6)
     cv2.setMouseCallback(winname, on_mouse_event)
 
-    if "tk4cv2" in sys.modules:
+    if "guibbon" in sys.modules:
         # type: ignore
         radio_buttons = tcv2.create_radio_buttons(winname, "radio2", ["peche", "prune"], on_radio_button)
         # tcv2.createButton("more fruit", lambda : radio_buttons.set_options_list(["oups", "ok", "voilà"]), winname)
@@ -76,7 +76,7 @@ def demo_cv():
 
     cv2.namedWindow("ok")
 
-    while tcv2.Tk4Cv2.is_instance(winname):  # cv2.getWindowProperty(title, cv2.WND_PROP_VISIBLE) > 0.5:
+    while tcv2.Guibbon.is_instance(winname):  # cv2.getWindowProperty(title, cv2.WND_PROP_VISIBLE) > 0.5:
         k += 1
         cv2.imshow(winname, img * np.uint8(k))
         # tcv2.imshow("ok", img * np.uint8(k))

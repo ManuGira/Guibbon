@@ -48,56 +48,56 @@ def inject(cv2_package):
 
 
 def not_implemented_error():
-    raise NotImplementedError("Function not implemented in current version of Tk4Cv2")
+    raise NotImplementedError("Function not implemented in current version of Guibbon")
 
 
 def imshow(winname: str, mat: Image_t, mode: Optional[str] = None, cv2_interpolation: Optional[int] = None):
-    Tk4Cv2.get_instance(winname).imshow(mat, mode, cv2_interpolation)
+    Guibbon.get_instance(winname).imshow(mat, mode, cv2_interpolation)
 
 
 def getWindowProperty(winname: str, prop_id: int) -> float:
-    if not Tk4Cv2.is_instance(winname):
+    if not Guibbon.is_instance(winname):
         return 0.0
-    return Tk4Cv2.get_instance(winname).getWindowProperty(prop_id)
+    return Guibbon.get_instance(winname).getWindowProperty(prop_id)
 
 
 def waitKey(delay: int, track_keypress=True, track_keyrelease=False, SilentWarning=False) -> int:
     if not SilentWarning:
         print(
-            "WARNING: waitKey function not implemented in Tk4Cv2. The current version is similar to waitKeyEx function. (To suppress this warning, use "
+            "WARNING: waitKey function not implemented in Guibbon. The current version is similar to waitKeyEx function. (To suppress this warning, use "
             "SilentWarning=True)"
         )
     return waitKeyEx(delay, track_keypress, track_keyrelease)
 
 
 def waitKeyEx(delay: int, track_keypress=True, track_keyrelease=False) -> int:
-    return Tk4Cv2.waitKeyEx(delay, track_keypress, track_keyrelease)
+    return Guibbon.waitKeyEx(delay, track_keypress, track_keyrelease)
 
 
 def setMouseCallback(winname: str, onMouse: CallbackMouse, userdata=None):
-    Tk4Cv2.get_instance(winname).setMouseCallback(onMouse, userdata=userdata)
+    Guibbon.get_instance(winname).setMouseCallback(onMouse, userdata=userdata)
 
 
 def create_button(winname, text: str, on_click: CallbackButton) -> ButtonWidget:
-    return Tk4Cv2.get_instance(winname).create_button(text, on_click)
+    return Guibbon.get_instance(winname).create_button(text, on_click)
 
 
 def get_button_instance(winname: str, text: str) -> ButtonWidget:
-    return Tk4Cv2.get_instance(winname).get_button_instance(text)
+    return Guibbon.get_instance(winname).get_button_instance(text)
 
 
 def create_custom_widget(winname, CustomWidgetClass: Type[WidgetInterface], *params) -> WidgetInterface:
-    widget_instance = Tk4Cv2.get_instance(winname).create_custom_widget(CustomWidgetClass, *params)
+    widget_instance = Guibbon.get_instance(winname).create_custom_widget(CustomWidgetClass, *params)
     return widget_instance
 
 
 def create_slider(winname: str, slider_name: str, values: Sequence[Any], on_change: CallbackSlider, initial_index: int = 0) -> SliderWidget:
-    slider_instance: SliderWidget = Tk4Cv2.get_instance(winname).create_slider(slider_name, values, on_change, initial_index)
+    slider_instance: SliderWidget = Guibbon.get_instance(winname).create_slider(slider_name, values, on_change, initial_index)
     return slider_instance
 
 
 def get_slider_instance(winname: str, slider_name: str) -> SliderWidget:
-    slider_instance: SliderWidget = Tk4Cv2.get_instance(winname).get_slider_instance(slider_name)
+    slider_instance: SliderWidget = Guibbon.get_instance(winname).get_slider_instance(slider_name)
     return slider_instance
 
 
@@ -111,7 +111,7 @@ def createTrackbar(trackbarName, windowName, value, count, onChange):
     def on_change(index, val):
         return onChange(val)
 
-    Tk4Cv2.get_instance(windowName).create_slider(trackbarName, values, on_change, initial_index)
+    Guibbon.get_instance(windowName).create_slider(trackbarName, values, on_change, initial_index)
 
 
 def setTrackbarPos(trackbarname, winname, pos):
@@ -151,31 +151,31 @@ def getTrackbarMax(trackbarname, winname):
 
 
 def namedWindow(winname):
-    Tk4Cv2.get_instance(winname)
+    Guibbon.get_instance(winname)
 
 
-def create_window(winname: str) -> "Tk4Cv2":
-    return Tk4Cv2.get_instance(winname)
+def create_window(winname: str) -> "Guibbon":
+    return Guibbon.get_instance(winname)
 
 
 def create_radio_buttons(winname: str, name: str, options: List[str], on_change: CallbackRadioButtons) -> RadioButtonsWidget:
-    return Tk4Cv2.get_instance(winname).create_radio_buttons(name, options, on_change)
+    return Guibbon.get_instance(winname).create_radio_buttons(name, options, on_change)
 
 
 def get_radio_buttons(winname: str, name: str) -> RadioButtonsWidget:
-    return Tk4Cv2.get_instance(winname).get_radio_buttons_instance(name)
+    return Guibbon.get_instance(winname).get_radio_buttons_instance(name)
 
 
 def create_check_button(winname: str, name: str, on_change: CallbackCheckButton, initial_value: bool = False) -> CheckButtonWidget:
-    return Tk4Cv2.get_instance(winname).create_check_button(name, on_change, initial_value)
+    return Guibbon.get_instance(winname).create_check_button(name, on_change, initial_value)
 
 
 def create_check_button_list(winname: str, name: str, options: List[str], on_change: CallbackCheckButtonList, initial_values: Optional[List[bool]] = None) -> CheckButtonListWidget:
-    return Tk4Cv2.get_instance(winname).create_check_button_list(name, options, on_change, initial_values)
+    return Guibbon.get_instance(winname).create_check_button_list(name, options, on_change, initial_values)
 
 
 def create_color_picker(winname: str, name: str, on_change: CallbackColorPicker, initial_color_rgb: Optional[Tuple[int, int, int]] = None) -> ColorPickerWidget:
-    return Tk4Cv2.get_instance(winname).create_color_picker(name, on_change, initial_color_rgb)
+    return Guibbon.get_instance(winname).create_color_picker(name, on_change, initial_color_rgb)
 
 
 def createInteractivePoint(
@@ -187,7 +187,7 @@ def createInteractivePoint(
         on_release: CallbackPoint = None,
         magnet_points: Optional[Point2DList] = None,
 ):
-    Tk4Cv2.get_instance(windowName).image_viewer.createInteractivePoint(point_xy, label, on_click, on_drag, on_release, magnet_points)
+    Guibbon.get_instance(windowName).image_viewer.createInteractivePoint(point_xy, label, on_click, on_drag, on_release, magnet_points)
 
 
 def createInteractivePolygon(
@@ -200,7 +200,7 @@ def createInteractivePolygon(
         magnet_points: Optional[Point2DList] = None,
 ) -> InteractivePolygon:
     ipolygon: InteractivePolygon
-    ipolygon = Tk4Cv2.get_instance(windowName).image_viewer.createInteractivePolygon(point_xy_list, label, on_click, on_drag, on_release, magnet_points)
+    ipolygon = Guibbon.get_instance(windowName).image_viewer.createInteractivePolygon(point_xy_list, label, on_click, on_drag, on_release, magnet_points)
     return ipolygon
 
 
@@ -215,73 +215,73 @@ def createInteractiveRectangle(
         magnet_points: Optional[Point2DList] = None,
 ) -> InteractivePolygon:
     irect: InteractivePolygon
-    irect = Tk4Cv2.get_instance(windowName).image_viewer.createInteractiveRectangle(point0_xy, point1_xy, label, on_click, on_drag, on_release, magnet_points)
+    irect = Guibbon.get_instance(windowName).image_viewer.createInteractiveRectangle(point0_xy, point1_xy, label, on_click, on_drag, on_release, magnet_points)
     return irect
 
 
-class Tk4Cv2:
+class Guibbon:
     root: tk.Tk
     is_alive: bool = False
-    instances: Dict[str, "Tk4Cv2"] = {}
+    instances: Dict[str, "Guibbon"] = {}
     active_instance_name: Optional[str]
     is_timeout: bool
     keyboard: KeyboardEventHandler
 
     @staticmethod
     def init():
-        Tk4Cv2.root = tk.Tk()
-        Tk4Cv2.is_alive = True
-        Tk4Cv2.keyboard = KeyboardEventHandler()
-        Tk4Cv2.root.withdraw()
-        Tk4Cv2.reset()
+        Guibbon.root = tk.Tk()
+        Guibbon.is_alive = True
+        Guibbon.keyboard = KeyboardEventHandler()
+        Guibbon.root.withdraw()
+        Guibbon.reset()
 
     @staticmethod
     def reset():
-        Tk4Cv2.is_timeout = False
+        Guibbon.is_timeout = False
 
     @staticmethod
     def on_timeout():
-        Tk4Cv2.is_timeout = True
+        Guibbon.is_timeout = True
 
     @staticmethod
     def is_instance(winname: str) -> bool:
         assert isinstance(winname, str)
-        return winname in Tk4Cv2.instances.keys()
+        return winname in Guibbon.instances.keys()
 
     @staticmethod
-    def get_instance(winname) -> "Tk4Cv2":
+    def get_instance(winname) -> "Guibbon":
         assert isinstance(winname, str)
-        if winname not in Tk4Cv2.instances.keys():
-            Tk4Cv2.instances[winname] = Tk4Cv2(winname)
-        Tk4Cv2.active_instance_name = winname
-        return Tk4Cv2.instances[winname]
+        if winname not in Guibbon.instances.keys():
+            Guibbon.instances[winname] = Guibbon(winname)
+        Guibbon.active_instance_name = winname
+        return Guibbon.instances[winname]
 
     @staticmethod
-    def get_active_instance() -> "Tk4Cv2":
-        return Tk4Cv2.get_instance(Tk4Cv2.active_instance_name)
+    def get_active_instance() -> "Guibbon":
+        return Guibbon.get_instance(Guibbon.active_instance_name)
 
     @staticmethod
     def waitKeyEx(delay, track_keypress=True, track_keyrelease=False) -> int:
-        Tk4Cv2.reset()
+        Guibbon.reset()
 
         if delay > 0:
-            Tk4Cv2.get_active_instance().window.after(delay, Tk4Cv2.on_timeout)  # TODO: make threadsafe
+            Guibbon.get_active_instance().window.after(delay, Guibbon.on_timeout)  # TODO: make threadsafe
 
         tic = time.time()
         while True:
-            Tk4Cv2.root.update_idletasks()
-            Tk4Cv2.root.update()  # root can be destroyed at this line
+            Guibbon.root.update_idletasks()
+            Guibbon.root.update()  # root can be destroyed at this line
 
-            if not Tk4Cv2.is_alive:
+            if not Guibbon.is_alive:
                 return -1
 
-            if track_keypress and Tk4Cv2.keyboard.is_keypress_updated:
-                Tk4Cv2.keyboard.is_keypress_updated = False
-                return Tk4Cv2.keyboard.last_keypressed
-            if track_keyrelease and Tk4Cv2.keyboard.is_keyrelease_updated:
-                Tk4Cv2.keyboard.is_keyrelease_updated = False
-                return Tk4Cv2.keyboard.last_keyreleased
-            if Tk4Cv2.is_timeout:
+            if track_keypress and Guibbon.keyboard.is_keypress_updated:
+                Guibbon.keyboard.is_keypress_updated = False
+                return Guibbon.keyboard.last_keypressed
+            if track_keyrelease and Guibbon.keyboard.is_keyrelease_updated:
+                Guibbon.keyboard.is_keyrelease_updated = False
+                return Guibbon.keyboard.last_keyreleased
+            if Guibbon.is_timeout:
                 return -1
 
             dt = time.time() - tic
@@ -290,17 +290,17 @@ class Tk4Cv2:
             tic = time.time()
 
     def __init__(self, winname):
-        if not Tk4Cv2.is_alive:
-            Tk4Cv2.init()
+        if not Guibbon.is_alive:
+            Guibbon.init()
 
         # Make master root windows invisible
-        self.window = tk.Toplevel(Tk4Cv2.root)  # type: ignore
+        self.window = tk.Toplevel(Guibbon.root)  # type: ignore
         self.window.protocol("WM_DELETE_WINDOW", self.on_closing)  # add callback when user closes the window
         self.winname = winname
         self.window.title(self.winname)
 
-        self.window.bind("<KeyPress>", Tk4Cv2.keyboard.on_event)
-        self.window.bind("<KeyRelease>", Tk4Cv2.keyboard.on_event)
+        self.window.bind("<KeyPress>", Guibbon.keyboard.on_event)
+        self.window.bind("<KeyRelease>", Guibbon.keyboard.on_event)
 
         self.frame = tk.Frame(master=self.window, bg=COLORS.background)
 
@@ -328,15 +328,15 @@ class Tk4Cv2:
 
     def on_closing(self):
         print("Destroy Root", self.winname)
-        Tk4Cv2.instances.pop(self.winname)
+        Guibbon.instances.pop(self.winname)
         self.window.destroy()
 
-        if len(Tk4Cv2.instances) == 0:
+        if len(Guibbon.instances) == 0:
             print("destroy root master")
-            Tk4Cv2.root.destroy()
-            Tk4Cv2.is_alive = False
-        elif Tk4Cv2.active_instance_name == self.winname:
-            Tk4Cv2.active_instance_name = list(Tk4Cv2.instances.keys())[-1]
+            Guibbon.root.destroy()
+            Guibbon.is_alive = False
+        elif Guibbon.active_instance_name == self.winname:
+            Guibbon.active_instance_name = list(Guibbon.instances.keys())[-1]
 
     def create_button(self, text: str, on_click: CallbackButton) -> ButtonWidget:
         tk_frame = tk.Frame(self.ctrl_frame, bg=COLORS.ctrl_panel)
@@ -411,7 +411,7 @@ class Tk4Cv2:
             return 1.0 if self.window.state() == "normal" else 0.0
         else:
             raise NotImplementedError(
-                f"Function getWindowProperty is not fully implemented in current version of Tk4Cv2 and does not support the provided "
+                f"Function getWindowProperty is not fully implemented in current version of Guibbon and does not support the provided "
                 f"flag: prop_id={prop_id}"
             )
 

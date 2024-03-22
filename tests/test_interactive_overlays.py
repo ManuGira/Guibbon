@@ -2,9 +2,9 @@ import dataclasses
 import sys
 import tkinter
 import unittest
-from tk4cv2 import interactive_overlays
-from tk4cv2 import transform_matrix as tmat
-from tk4cv2.typedef import InteractivePoint, InteractivePolygon
+from guibbon import interactive_overlays
+from guibbon import transform_matrix as tmat
+from guibbon.typedef import InteractivePoint, InteractivePolygon
 
 eps = sys.float_info.epsilon
 

@@ -60,7 +60,7 @@ class ImageViewer:
         if not isinstance(onMouse, types.FunctionType) and not isinstance(onMouse, types.MethodType):
             raise TypeError(f"onMouse must be a function, got {type(onMouse)} instead")
         if userdata is not None:
-            raise NotImplementedError("userdata argument of function setMouseCallback is not handled in current version of tk4cv2")
+            raise NotImplementedError("userdata argument of function setMouseCallback is not handled in current version of guibbon")
 
         if self.onMouse is None:
             # <MODIFIER-MODIFIER-TYPE-DETAIL>

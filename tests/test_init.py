@@ -1,17 +1,17 @@
 import sys
 import unittest
 import cv2
-import tk4cv2 as tcv2
+import guibbon as tcv2
 import numpy as np
 from typing import Tuple
 
 eps = sys.float_info.epsilon
 
 
-class TestTk4Cv2(unittest.TestCase):
+class TestGuibbon(unittest.TestCase):
     def tearDown(self) -> None:
-        tcv2.Tk4Cv2.instances = {}
-        tcv2.Tk4Cv2.active_instance_name = None
+        tcv2.Guibbon.instances = {}
+        tcv2.Guibbon.active_instance_name = None
 
     def test_package(self):
         self.assertIsNotNone(tcv2.__version__)
@@ -25,56 +25,56 @@ class TestTk4Cv2(unittest.TestCase):
         self.assertEqual(cv2.namedWindow, tcv2_func, msg="tcv2.inject must correctly inject function to cv2")
 
     def test_namedWindow(self):
-        self.assertEqual(len(tcv2.Tk4Cv2.instances), 0, msg="At initialisation, number of instances must be 0.")
+        self.assertEqual(len(tcv2.Guibbon.instances), 0, msg="At initialisation, number of instances must be 0.")
         res = tcv2.namedWindow("win0")
         self.assertIsNone(res, msg="function tcv2.namedWindow(winname) must return None")
-        self.assertEqual(len(tcv2.Tk4Cv2.instances), 1, msg="After first use of tcv2.namedWindow(...), number of instances must be 1.")
-        self.assertIsNotNone(tcv2.Tk4Cv2.instances["win0"], msg='After use of tcv2.namedWindow("win0"), tcv2.Tk4Cv2.instances["win0"] must not be None')
+        self.assertEqual(len(tcv2.Guibbon.instances), 1, msg="After first use of tcv2.namedWindow(...), number of instances must be 1.")
+        self.assertIsNotNone(tcv2.Guibbon.instances["win0"], msg='After use of tcv2.namedWindow("win0"), tcv2.Guibbon.instances["win0"] must not be None')
 
     def test_multiple_instances(self):
-        self.assertEqual(len(tcv2.Tk4Cv2.instances), 0, msg="At initialisation, number of instances must be 0.")
+        self.assertEqual(len(tcv2.Guibbon.instances), 0, msg="At initialisation, number of instances must be 0.")
         tcv2.namedWindow("win0")
         tcv2.namedWindow("win1")
-        self.assertEqual(len(tcv2.Tk4Cv2.instances), 2, msg="After 2 uses of tcv2.namedWindow(...), number of instances must be 2.")
+        self.assertEqual(len(tcv2.Guibbon.instances), 2, msg="After 2 uses of tcv2.namedWindow(...), number of instances must be 2.")
 
     def test_imshow_and_getWindowProperty(self):
         img = np.zeros((10, 10), dtype=np.uint8)
         winname = "win0"
-        self.assertEqual(len(tcv2.Tk4Cv2.instances), 0, msg="At initialisation, number of instances must be 0.")
+        self.assertEqual(len(tcv2.Guibbon.instances), 0, msg="At initialisation, number of instances must be 0.")
         res = tcv2.getWindowProperty(winname, cv2.WND_PROP_VISIBLE)
         self.assertTrue(abs(res - 0.0) <= eps, msg="Non existant windows must have property WND_PROP_VISIBLE set to 0.0")
-        self.assertFalse(tcv2.Tk4Cv2.is_instance(winname), msg="tcv2.Tk4Cv2.is_instance must return false for non-existant windows")
-        self.assertEqual(len(tcv2.Tk4Cv2.instances), 0, msg="getWindowProperty should not be able to create new window")
+        self.assertFalse(tcv2.Guibbon.is_instance(winname), msg="tcv2.Guibbon.is_instance must return false for non-existant windows")
+        self.assertEqual(len(tcv2.Guibbon.instances), 0, msg="getWindowProperty should not be able to create new window")
 
         res = tcv2.imshow(winname, img)
-        self.assertEqual(len(tcv2.Tk4Cv2.instances), 1, msg="tcv2.imshow must be able to create new window")
-        self.assertTrue(tcv2.Tk4Cv2.is_instance(winname), msg="tcv2.imshow must be able to create new window with given name")
+        self.assertEqual(len(tcv2.Guibbon.instances), 1, msg="tcv2.imshow must be able to create new window")
+        self.assertTrue(tcv2.Guibbon.is_instance(winname), msg="tcv2.imshow must be able to create new window with given name")
         self.assertIsNone(res, msg="tcv2.imshow must return None")
 
         res = tcv2.getWindowProperty(winname, cv2.WND_PROP_VISIBLE)
         self.assertTrue(abs(res - 1.0) <= eps, msg="Existant and visible windows must have property WND_PROP_VISIBLE set to 1.0")
-        tcv2.Tk4Cv2.instances = {}  # TODO: use
+        tcv2.Guibbon.instances = {}  # TODO: use
         res = tcv2.getWindowProperty(winname, cv2.WND_PROP_VISIBLE)
         self.assertTrue(abs(res - 0.0) <= eps, msg="Deleting instance of a windows must destroy it. getWindowProperty must return 0")
 
 
-def find_widget_by_name(tk4cv2_instance, widgetname):
-    last_tk4cv2_widget = list(tk4cv2_instance.ctrl_frame.children.values())[-1]
+def find_widget_by_name(guibbon_instance, widgetname):
+    last_guibbon_widget = list(guibbon_instance.ctrl_frame.children.values())[-1]
 
     # Not sure if this is good practice because this line depends on how the widget is implemented.
     # Any minor modification of implementation could make this line raise an exception.
-    widgetname_list = [key for key in last_tk4cv2_widget.children.keys() if widgetname in key]
+    widgetname_list = [key for key in last_guibbon_widget.children.keys() if widgetname in key]
     assert len(widgetname_list) == 1
     widgetname = widgetname_list[0]
-    widget = last_tk4cv2_widget.children[widgetname]
+    widget = last_guibbon_widget.children[widgetname]
     return widget
 
 
-class TestTk4Cv2_checkbutton(unittest.TestCase):
+class TestGuibbon_checkbutton(unittest.TestCase):
     def setUp(self):
         self.winname = "win0"
         tcv2.namedWindow(self.winname)
-        self.tk4cv2_instance = tcv2.Tk4Cv2.instances["win0"]
+        self.guibbon_instance = tcv2.Guibbon.instances["win0"]
         self.triggered = None
         self.args: Tuple[bool, ...]
 
@@ -99,11 +99,11 @@ class TestTk4Cv2_checkbutton(unittest.TestCase):
         self.assertTupleEqual(self.args, (False,))
 
 
-class TestTk4Cv2_TrackBar(unittest.TestCase):
+class TestGuibbon_TrackBar(unittest.TestCase):
     def setUp(self):
         self.winname = "win0"
         tcv2.namedWindow(self.winname)
-        self.tk4cv2_instance = tcv2.Tk4Cv2.instances["win0"]
+        self.guibbon_instance = tcv2.Guibbon.instances["win0"]
         self.triggered = None
 
     def callback(self, *args):
@@ -156,7 +156,7 @@ class TestTk4Cv2_TrackBar(unittest.TestCase):
         self.assertEqual(new_max, 20)
 
 
-class TestTk4Cv2_other(unittest.TestCase):
+class TestGuibbon_other(unittest.TestCase):
     def test_not_implemented(self):
         with self.assertRaises(NotImplementedError):
             tcv2.not_implemented_error()

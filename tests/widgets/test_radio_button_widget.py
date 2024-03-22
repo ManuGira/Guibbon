@@ -1,12 +1,12 @@
 import unittest
-import tk4cv2 as tcv2
+import guibbon as tcv2
 
 
-class TestTk4Cv2_RadioButtons(unittest.TestCase):
+class TestGuibbon_RadioButtons(unittest.TestCase):
     def setUp(self):
         self.winname = "win0"
         tcv2.namedWindow(self.winname)
-        self.tk4cv2_instance = tcv2.Tk4Cv2.instances["win0"]
+        self.guibbon_instance = tcv2.Guibbon.instances["win0"]
         self.triggered = None
 
     def callback(self, *args):

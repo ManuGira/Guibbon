@@ -1,7 +1,7 @@
 import tkinter as tk
 from typing import Callable, NoReturn, List, Tuple
 
-from tk4cv2.colors import COLORS
+from guibbon.colors import COLORS
 
 CallbackRadioButtons = Callable[[int, str], None]
 

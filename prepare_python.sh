@@ -13,7 +13,7 @@ rm -rf ./.venv
 rm -f poetry.lock
 poetry.exe install
 
-# export requirements for tk4cv2
+# export requirements for guibbon
 rm -f requirements.txt
 poetry export --without-hashes -f requirements.txt --output requirements.txt
 cat requirements.txt

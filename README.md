@@ -1,12 +1,12 @@
-# Tk4Cv2
-![Tests](https://github.com/ManuGira/Tk4Cv2/actions/workflows/tests.yml/badge.svg)
+# Guibbon
+![Tests](https://github.com/ManuGira/Guibbon/actions/workflows/tests.yml/badge.svg)
 
 The TkInter wrapper that mimics the HighGUI of OpenCV
 
 ## User Installation
 This package is not hosted on PyPl, but you can still install this repo as a package with pip:
 ```
-pip install git+https://github.com/ManuGira/Tk4Cv2.git@master
+pip install git+https://github.com/ManuGira/Guibbon.git@master
 ```
 ## Development 
 
@@ -67,7 +67,7 @@ $ ruff check --fix .
 ## Documentation
 
 #### Class hierarchy
-* Tk4Cv2
+* Guibbon
   * keyboard_event_hander: *static KeyboardEventHandler*
   * root: *static tk.Tk*
   * self.window: *tk.Frame*
@@ -82,8 +82,8 @@ $ ruff check --fix .
         * 
 
 #### TkInter hierarchy
-* Tk4Cv2.root: *static Tk*
-  * tk4cv2.window: *TopLevel*
+* Guibbon.root: *static Tk*
+  * guibbon.window: *TopLevel*
     * tkcv2.frame: *Frame*
       * tkcv2.ctrl_frame: *Frame*
         * controller: *Frame*

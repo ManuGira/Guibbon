@@ -1,8 +1,8 @@
 import dataclasses
 import numpy as np
 import cv2
-import tk4cv2 as tcv2
-from tk4cv2.typedef import Image_t
+import guibbon as tcv2
+from guibbon.typedef import Image_t
 import threading
 
 
