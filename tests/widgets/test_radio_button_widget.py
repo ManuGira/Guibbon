@@ -17,7 +17,7 @@ class TestTk4Cv2_RadioButtons(unittest.TestCase):
         name = "RadioButtons"
         rb_abc = tcv2.create_radio_buttons(winname=self.winname, name=name, options=["A", "B", "C"], on_change=self.callback)
         self.assertIsNotNone(rb_abc, msg="function tcv2.create_radio_buttons() must return None")
-        self.assertIsInstance(rb_abc, tcv2.RadioButtonWidget)
+        self.assertIsInstance(rb_abc, tcv2.RadioButtonsWidget)
 
         i, opt = rb_abc.get_current_selection()
         self.assertEqual(i, 0, msg="function get_current_selection() must return correct index")

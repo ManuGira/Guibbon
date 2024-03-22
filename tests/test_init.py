@@ -84,7 +84,7 @@ class TestTk4Cv2_checkbutton(unittest.TestCase):
         self.args = args
 
     def test_create_check_button(self):
-        widget = tcv2.create_check_button(winname=self.winname, name="CheckButton", value=False, on_change=self.callback)
+        widget = tcv2.create_check_button(winname=self.winname, name="CheckButton", on_change=self.callback, initial_value=False)
         self.assertIsNotNone(widget, msg="function tcv2.create_check_button must not return None")
         self.assertIsInstance(widget, tcv2.CheckButtonWidget, msg="function tcv2.create_check_button must return instance of CheckButtonWidget")
 

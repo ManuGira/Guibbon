@@ -11,8 +11,8 @@ from .image_viewer import ImageViewer
 from .keyboard_event_handler import KeyboardEventHandler
 from .typedef import Image_t, CallbackPoint, CallbackPolygon, CallbackRect, Point2DList, InteractivePolygon, CallbackMouse
 from .widgets.button_widget import ButtonWidget, CallbackButton
-from .widgets.radio_button_widget import RadioButtonWidget, CallbackRadioButton
 from .widgets.check_button_widget import CheckButtonWidget, CallbackCheckButton
+from .widgets.radio_buttons_widget import RadioButtonsWidget, CallbackRadioButtons
 from .widgets.slider_widget import SliderWidget, CallbackSlider
 from .widgets.widget import WidgetInterface
 
@@ -90,8 +90,8 @@ def create_custom_widget(winname, CustomWidgetClass: Type[WidgetInterface], *par
     return widget_instance
 
 
-def create_slider(winname: str, slider_name: str, values: Sequence[Any], initial_index: int, on_change: CallbackSlider) -> SliderWidget:
-    slider_instance: SliderWidget = Tk4Cv2.get_instance(winname).create_slider(slider_name, values, initial_index, on_change)
+def create_slider(winname: str, slider_name: str, values: Sequence[Any], on_change: CallbackSlider, initial_index: int = 0) -> SliderWidget:
+    slider_instance: SliderWidget = Tk4Cv2.get_instance(winname).create_slider(slider_name, values, on_change, initial_index)
     return slider_instance
 
 
@@ -110,7 +110,7 @@ def createTrackbar(trackbarName, windowName, value, count, onChange):
     def on_change(index, val):
         return onChange(val)
 
-    Tk4Cv2.get_instance(windowName).create_slider(trackbarName, values, initial_index, on_change)
+    Tk4Cv2.get_instance(windowName).create_slider(trackbarName, values, on_change, initial_index)
 
 
 def setTrackbarPos(trackbarname, winname, pos):
@@ -157,24 +157,24 @@ def create_window(winname: str) -> "Tk4Cv2":
     return Tk4Cv2.get_instance(winname)
 
 
-def create_radio_buttons(winname: str, name: str, options: List[str], on_change: CallbackRadioButton) -> RadioButtonWidget:
+def create_radio_buttons(winname: str, name: str, options: List[str], on_change: CallbackRadioButtons) -> RadioButtonsWidget:
     return Tk4Cv2.get_instance(winname).create_radio_buttons(name, options, on_change)
 
 
-def get_radio_buttons(winname: str, name: str) -> RadioButtonWidget:
-    return Tk4Cv2.get_instance(winname)._get_radio_buttons_instance(name)
+def get_radio_buttons(winname: str, name: str) -> RadioButtonsWidget:
+    return Tk4Cv2.get_instance(winname).get_radio_buttons_instance(name)
 
 
-def create_check_button(winname: str, name: str, value: bool, on_change: CallbackCheckButton) -> CheckButtonWidget:
-    return Tk4Cv2.get_instance(winname).create_check_button(name, value, on_change)
+def create_check_button(winname: str, name: str, on_change: CallbackCheckButton, initial_value: bool = False) -> CheckButtonWidget:
+    return Tk4Cv2.get_instance(winname).create_check_button(name, on_change, initial_value)
 
 
-def createCheckbuttons(name, options, windowName, values, onChange):
-    Tk4Cv2.get_instance(windowName)._createCheckbuttons(name, options, values, onChange)
+def create_check_button_list(winname: str, name: str, options: List[str], on_change, initial_values: Optional[List[bool]] = None):
+    Tk4Cv2.get_instance(winname).create_check_button_list(name, options, initial_values, on_change)
 
 
-def createColorPicker(name, windowName, values, onChange):
-    Tk4Cv2.get_instance(windowName)._createColorPicker(name, values, onChange)
+def create_color_picker(winname: str, name:str, on_change, initial_color_rgb:Optional[List[int]]=None):
+    Tk4Cv2.get_instance(winname).create_color_picker(name, on_change, initial_color_rgb)
 
 
 def createInteractivePoint(
@@ -317,7 +317,7 @@ class Tk4Cv2:
 
         self.sliders_by_names: Dict[str, SliderWidget] = {}
         self.custom_widtgets_by_names: Dict[str, WidgetInterface] = {}
-        self.radio_buttons_by_names: Dict[str, RadioButtonWidget] = {}
+        self.radio_buttons_by_names: Dict[str, RadioButtonsWidget] = {}
         self.buttons_by_names: Dict[str, ButtonWidget] = {}
 
         self.frame.pack()
@@ -348,7 +348,7 @@ class Tk4Cv2:
     def get_button_instance(self, text: str) -> ButtonWidget:
         return self.buttons_by_names[text]
 
-    def create_slider(self, slider_name: str, values: Sequence[Any], initial_index: int, on_change: CallbackSlider):
+    def create_slider(self, slider_name: str, values: Sequence[Any], on_change: CallbackSlider, initial_index: int = 0):
         tk_frame = tk.Frame(self.ctrl_frame, bg=COLORS.widget)
         slider = SliderWidget(tk_frame, slider_name, values, initial_index, on_change, COLORS.widget)
         self.sliders_by_names[slider_name] = slider
@@ -364,23 +364,26 @@ class Tk4Cv2:
         tk_frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
         return widget_instance
 
-    def create_radio_buttons(self, name: str, options: List[str], on_change: CallbackRadioButton) -> RadioButtonWidget:
+    def create_radio_buttons(self, name: str, options: List[str], on_change: CallbackRadioButtons) -> RadioButtonsWidget:
         tk_frame = tk.Frame(self.ctrl_frame, bg=COLORS.widget)
-        radio_buttons = RadioButtonWidget(tk_frame, name, options, on_change)
+        radio_buttons = RadioButtonsWidget(tk_frame, name, options, on_change)
         self.radio_buttons_by_names[name] = radio_buttons
         tk_frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
         return radio_buttons
 
-    def _get_radio_buttons_instance(self, name: str) -> RadioButtonWidget:
+    def get_radio_buttons_instance(self, name: str) -> RadioButtonsWidget:
         return self.radio_buttons_by_names[name]
 
-    def create_check_button(self, name, value, on_change) -> CheckButtonWidget:
+    def create_check_button(self, name, on_change, initial_value:bool=False) -> CheckButtonWidget:
         tk_frame = tk.Frame(self.ctrl_frame, bg=COLORS.widget)
-        cb = CheckButtonWidget(tk_frame, name, value, on_change)
+        cb = CheckButtonWidget(tk_frame, name, on_change, initial_value)
         tk_frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
         return cb
 
-    def _createCheckbuttons(self, name, options, values, onChange):
+    def create_check_button_list(self, name: str, options: List[str], on_change, initial_values: Optional[List[bool]] = None):
+        if initial_values is None:
+            initial_values = [False]*len(options)
+
         frame = tk.Frame(self.ctrl_frame)
         tk.Label(frame, text=name).pack(padx=2, side=tk.TOP, anchor=tk.W)
         checkframeborder = tk.Frame(frame, bg="grey")
@@ -391,12 +394,12 @@ class Tk4Cv2:
 
         def callback():
             res = [var.get() for var in vars]
-            onChange(res)
+            on_change(res)
 
         for i, opt in enumerate(options):
             checkvar = vars[i]
             cb = tk.Checkbutton(checkframe, text=str(opt), variable=checkvar, onvalue=True, offvalue=False, command=callback)
-            if values[i]:
+            if initial_values[i]:
                 cb.select()
             cb.pack(side=tk.TOP, anchor=tk.W)
 
@@ -404,7 +407,7 @@ class Tk4Cv2:
         checkframeborder.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X)
         frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
 
-    def _createColorPicker(self, name, values, onChange):
+    def create_color_picker(self, name:str, on_change, initial_color_rgb:Optional[List[int]]=None):
         frame = tk.Frame(self.ctrl_frame)
         label = tk.Label(frame, text=name)
         label.pack(padx=2, side=tk.LEFT, anchor=tk.W)
@@ -412,7 +415,7 @@ class Tk4Cv2:
         def callback_canvas_click(event):
             colors = askcolor(title="Tkinter Color Chooser")
             canvas["bg"] = colors[1]
-            onChange(colors)
+            on_change(colors)
 
         canvas = tk.Canvas(frame, bg=COLORS.widget, bd=2, height=10)
         canvas.bind("<Button-1>", callback_canvas_click)
@@ -423,13 +426,6 @@ class Tk4Cv2:
     def imshow(self, mat: Image_t, mode: Optional[str] = None, cv2_interpolation: Optional[int] = None):
         self.image_viewer.imshow(mat, mode, cv2_interpolation)
 
-    # def keydown(self, event):
-    #     def printkey(event, keywords):
-    #         print(", ".join([f"{kw}: {event.__getattribute__(kw)}".ljust(5) for kw in keywords]))
-    #
-    #     printkey(event, "char delta keycode keysym keysym_num num state type".split())
-    #     self.is_keypressed = True
-    #     self.keypressed = event.keycode  # TODO: make threadsafe
 
     def getWindowProperty(self, prop_id: int) -> float:
         """

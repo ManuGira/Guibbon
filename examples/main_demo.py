@@ -69,9 +69,9 @@ def demo_cv():
         tcv2.create_button(winname, "hide", lambda : button.set_visible(False))
         tcv2.create_button(winname, "show", lambda : tcv2.get_button_instance(winname, "more fruit").set_visible(True))
 
-        tcv2.createCheckbuttons("check multi", ["roue", "volant"], winname, [False, True], on_check_buttons)
-        tcv2.create_check_button(winname, "check single", True, on_check_button)
-        tcv2.createColorPicker("Color picker", winname, "yellow", on_color_pick)
+        tcv2.create_check_button_list(winname, "check multi", ["roue", "volant"], [False, True], on_check_buttons)
+        tcv2.create_check_button(winname, "check single", on_check_button, initial_value=True)
+        tcv2.create_color_picker(winname, "Color picker", on_color_pick)
         tcv2.createInteractivePoint(winname, (100, 100), "point", on_click=on_point_click, on_drag=on_point_drag, on_release=on_point_release)
 
     cv2.namedWindow("ok")

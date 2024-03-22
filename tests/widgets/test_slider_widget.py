@@ -16,7 +16,7 @@ class Test_SliderWidget(unittest.TestCase):
     def test_Slider(self):
         values = [10, 13, 100]
         name = "Slider"
-        slider = tcv2.create_slider(winname=self.winname, slider_name=name, values=values + [], initial_index=2, on_change=self.callback)
+        slider = tcv2.create_slider(winname=self.winname, slider_name=name, values=values + [], on_change=self.callback, initial_index=2)
         self.assertIsInstance(slider, tcv2.SliderWidget, msg="function tcv2.create_slider must return an instance of a SliderWidget")
 
         slider = tcv2.get_slider_instance(self.winname, name)
