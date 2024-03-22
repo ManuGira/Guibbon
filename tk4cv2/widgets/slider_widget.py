@@ -1,8 +1,9 @@
 import tkinter as tk
+from typing import Callable, Any, Sequence
 
-
+CallbackSlider = Callable[[int, Any], None]
 class SliderWidget:
-    def __init__(self, tk_frame, slider_name, values, initial_index, on_change, widget_color):
+    def __init__(self, tk_frame: tk.Frame, slider_name: str, values: Sequence[Any], initial_index: int, on_change: CallbackSlider, widget_color):
         self.name = slider_name
         self.values = values
         self.on_change = on_change

@@ -1,11 +1,10 @@
-from typing import Optional
 import numpy as np
 import numpy.typing as npt
 import cv2
 import tk4cv2 as tcv2
 import tkinter as tk
 
-Image_t = Optional[npt.NDArray[np.uint8]]
+Image_t = npt.NDArray[np.uint8]
 
 
 class MyCustomWidget(tcv2.WidgetInterface):
@@ -20,12 +19,12 @@ class MyCustomWidget(tcv2.WidgetInterface):
 
 class DemoMVCApp:
     def __init__(self, filename):
-        self.img = cv2.imread(filename)
+        self.img: Image_t = cv2.imread(filename).astype(np.uint8)
         self.winname = "demo app"
         tcv2.namedWindow(self.winname)
         tcv2.createInteractivePoint(self.winname, (100, 100), "point", on_drag=self.on_drag)
 
-        slider = tcv2.create_slider(self.winname, "slider", [0, 10, 20, 30], 2, lambda index, val: print("slider", index, val))
+        slider = tcv2.create_slider(self.winname, "slider", [0, 10, 20, 30], lambda index, val: print("slider", index, val), 2)
         my_widget = tcv2.create_custom_widget(self.winname, MyCustomWidget, "Are you all right?", lambda: print("no"), lambda: print("yes"))
         print(my_widget)
         slider.set_index(1)
@@ -39,7 +38,7 @@ class DemoMVCApp:
         self.x = 0
         self.y = 0
 
-        self.res: Image_t = None
+        self.res: Image_t
         self.is_update_needed: bool = True
 
     def update(self):

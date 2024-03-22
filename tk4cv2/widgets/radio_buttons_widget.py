@@ -3,20 +3,21 @@ from typing import Callable, NoReturn, List, Tuple
 
 from tk4cv2.colors import COLORS
 
+CallbackRadioButtons = Callable[[int, str], None]
 
-class RadioButtonWidget:
+class RadioButtonsWidget:
 
-    def __init__(self, tk_frame, name, options, on_change):
+    def __init__(self, tk_frame, name, options, on_change: CallbackRadioButtons):
         self.name = name
         self.options = options + []  # copy
-        self.on_change = on_change
+        self.on_change: CallbackRadioButtons = on_change
         self.frame = tk.Frame(tk_frame)
         tk.Label(self.frame, text=self.name).pack(padx=2, side=tk.TOP, anchor=tk.W)
 
         self.int_var = tk.IntVar()
         self.buttons_list: List[tk.Radiobutton] = []
 
-        self.radioframeborder, self.buttons_list = RadioButtonWidget._create_rb_list(self.frame, self.int_var, self.options, self.callback)
+        self.radioframeborder, self.buttons_list = RadioButtonsWidget._create_rb_list(self.frame, self.int_var, self.options, self.callback)
 
         self.frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
 
@@ -59,5 +60,5 @@ class RadioButtonWidget:
                 rb.config(text=opt)
         else:
             self.radioframeborder.destroy()
-            self.radioframeborder, self.buttons_list = RadioButtonWidget._create_rb_list(self.frame, self.int_var, new_options, self.callback)
+            self.radioframeborder, self.buttons_list = RadioButtonsWidget._create_rb_list(self.frame, self.int_var, new_options, self.callback)
         self.options = new_options + []

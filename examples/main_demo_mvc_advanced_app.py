@@ -15,10 +15,10 @@ class DemoMVCAdvApp:
 
     @dataclasses.dataclass
     class Result:
-        img: Image_t = None
+        img: Image_t = np.array([])
 
     def __init__(self, filename):
-        self.img = cv2.imread(filename)
+        self.img: Image_t = cv2.imread(filename).astype(np.uint8)
         self.winname = "demo app"
         self.lock = threading.Lock()
         tcv2.namedWindow(self.winname)
