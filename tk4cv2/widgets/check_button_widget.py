@@ -1,7 +1,6 @@
 import tkinter as tk
 from typing import Callable
 
-
 CallbackCheckButton = Callable[[bool], None]
 
 

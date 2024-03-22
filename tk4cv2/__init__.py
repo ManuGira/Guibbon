@@ -11,6 +11,7 @@ from .image_viewer import ImageViewer
 from .keyboard_event_handler import KeyboardEventHandler
 from .typedef import Image_t, CallbackPoint, CallbackPolygon, CallbackRect, Point2DList, InteractivePolygon, CallbackMouse
 from .widgets.button_widget import ButtonWidget, CallbackButton
+from .widgets.check_button_list_widget import CheckButtonListWidget, CallbackCheckButtonList
 from .widgets.check_button_widget import CheckButtonWidget, CallbackCheckButton
 from .widgets.radio_buttons_widget import RadioButtonsWidget, CallbackRadioButtons
 from .widgets.slider_widget import SliderWidget, CallbackSlider
@@ -169,11 +170,11 @@ def create_check_button(winname: str, name: str, on_change: CallbackCheckButton,
     return Tk4Cv2.get_instance(winname).create_check_button(name, on_change, initial_value)
 
 
-def create_check_button_list(winname: str, name: str, options: List[str], on_change, initial_values: Optional[List[bool]] = None):
-    Tk4Cv2.get_instance(winname).create_check_button_list(name, options, initial_values, on_change)
+def create_check_button_list(winname: str, name: str, options: List[str], on_change: CallbackCheckButtonList, initial_values: Optional[List[bool]] = None) -> CheckButtonListWidget:
+    return Tk4Cv2.get_instance(winname).create_check_button_list(name, options, on_change, initial_values)
 
 
-def create_color_picker(winname: str, name:str, on_change, initial_color_rgb:Optional[List[int]]=None):
+def create_color_picker(winname: str, name: str, on_change, initial_color_rgb: Optional[List[int]] = None):
     Tk4Cv2.get_instance(winname).create_color_picker(name, on_change, initial_color_rgb)
 
 
@@ -374,40 +375,19 @@ class Tk4Cv2:
     def get_radio_buttons_instance(self, name: str) -> RadioButtonsWidget:
         return self.radio_buttons_by_names[name]
 
-    def create_check_button(self, name, on_change, initial_value:bool=False) -> CheckButtonWidget:
+    def create_check_button(self, name: str, on_change: CallbackCheckButton, initial_value: bool = False) -> CheckButtonWidget:
         tk_frame = tk.Frame(self.ctrl_frame, bg=COLORS.widget)
         cb = CheckButtonWidget(tk_frame, name, on_change, initial_value)
         tk_frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
         return cb
 
-    def create_check_button_list(self, name: str, options: List[str], on_change, initial_values: Optional[List[bool]] = None):
-        if initial_values is None:
-            initial_values = [False]*len(options)
+    def create_check_button_list(self, name: str, options: List[str], on_change: CallbackCheckButtonList, initial_values: Optional[List[bool]] = None) -> CheckButtonListWidget:
+        tk_frame = tk.Frame(self.ctrl_frame)
+        cb = CheckButtonListWidget(tk_frame, name, options, on_change, initial_values)
+        tk_frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
+        return cb
 
-        frame = tk.Frame(self.ctrl_frame)
-        tk.Label(frame, text=name).pack(padx=2, side=tk.TOP, anchor=tk.W)
-        checkframeborder = tk.Frame(frame, bg="grey")
-        borderwidth = 1
-        checkframe = tk.Frame(checkframeborder)
-
-        vars = [tk.BooleanVar() for opt in options]
-
-        def callback():
-            res = [var.get() for var in vars]
-            on_change(res)
-
-        for i, opt in enumerate(options):
-            checkvar = vars[i]
-            cb = tk.Checkbutton(checkframe, text=str(opt), variable=checkvar, onvalue=True, offvalue=False, command=callback)
-            if initial_values[i]:
-                cb.select()
-            cb.pack(side=tk.TOP, anchor=tk.W)
-
-        checkframe.pack(padx=borderwidth, pady=borderwidth, side=tk.TOP, fill=tk.X)
-        checkframeborder.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X)
-        frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
-
-    def create_color_picker(self, name:str, on_change, initial_color_rgb:Optional[List[int]]=None):
+    def create_color_picker(self, name: str, on_change, initial_color_rgb: Optional[List[int]] = None):
         frame = tk.Frame(self.ctrl_frame)
         label = tk.Label(frame, text=name)
         label.pack(padx=2, side=tk.LEFT, anchor=tk.W)
@@ -425,7 +405,6 @@ class Tk4Cv2:
 
     def imshow(self, mat: Image_t, mode: Optional[str] = None, cv2_interpolation: Optional[int] = None):
         self.image_viewer.imshow(mat, mode, cv2_interpolation)
-
 
     def getWindowProperty(self, prop_id: int) -> float:
         """
