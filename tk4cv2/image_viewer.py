@@ -225,7 +225,7 @@ class ImageViewer:
 
         canh, canw = self.canvas_shape_hw
         imgh, imgw = mat.shape[:2]
-        mat = cv2.cvtColor(mat, cv2.COLOR_BGR2RGB)
+        mat = cv2.cvtColor(mat, cv2.COLOR_BGR2RGB)  # type: ignore
 
         img_space_matrix: TransformMatrix
         can_space_matrix: TransformMatrix
@@ -239,7 +239,7 @@ class ImageViewer:
             raise ValueError(f'Don\'t know mode: "{mode}"')
 
         self.set_img2can_matrix(can_space_matrix @ np.linalg.inv(img_space_matrix))
-        mat = cv2.warpPerspective(mat, self.img2can_matrix, dsize=(canh, canw), flags=cv2_interpolation)
+        mat = cv2.warpPerspective(mat, self.img2can_matrix, dsize=(canh, canw), flags=cv2_interpolation)  # type: ignore
 
         self.imgtk = ImageTk.PhotoImage(image=Image.fromarray(mat))
         self.canvas.create_image(canw // 2, canh // 2, anchor=tk.CENTER, image=self.imgtk)

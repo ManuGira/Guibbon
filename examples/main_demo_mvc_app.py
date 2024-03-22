@@ -19,7 +19,7 @@ class MyCustomWidget(tcv2.WidgetInterface):
 
 class DemoMVCApp:
     def __init__(self, filename):
-        self.img = cv2.imread(filename)
+        self.img: Image_t = cv2.imread(filename).astype(np.uint8)
         self.winname = "demo app"
         tcv2.namedWindow(self.winname)
         tcv2.createInteractivePoint(self.winname, (100, 100), "point", on_drag=self.on_drag)
