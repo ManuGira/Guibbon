@@ -1,7 +1,7 @@
 import dataclasses
 import numpy as np
 import cv2
-import guibbon as tcv2
+import guibbon as gbn
 from guibbon.typedef import Image_t
 import threading
 
@@ -21,15 +21,15 @@ class DemoMVCAdvApp:
         self.img: Image_t = cv2.imread(filename).astype(np.uint8)
         self.winname = "demo app"
         self.lock = threading.Lock()
-        tcv2.namedWindow(self.winname)
-        tcv2.createInteractivePoint(self.winname, (100, 100), "point", on_drag=self.on_drag, magnet_points=[(200, 220), (30, 30)])
+        gbn.namedWindow(self.winname)
+        gbn.createInteractivePoint(self.winname, (100, 100), "point", on_drag=self.on_drag, magnet_points=[(200, 220), (30, 30)])
 
         point_xy_list = [(300, 300), (300, 500), (500, 400), (400, 300)]
-        tcv2.createInteractivePolygon(self.winname, point_xy_list, "polygon", on_drag=self.on_drag_poly, magnet_points=[(100, 300), (170, 300)])
+        gbn.createInteractivePolygon(self.winname, point_xy_list, "polygon", on_drag=self.on_drag_poly, magnet_points=[(100, 300), (170, 300)])
 
         point0_xy = (200, 200)
         point1_xy = (300, 250)
-        tcv2.createInteractiveRectangle(self.winname, point0_xy, point1_xy, "rectangle", on_drag=self.on_drag_rect, magnet_points=[(100, 300), (150, 300)])
+        gbn.createInteractiveRectangle(self.winname, point0_xy, point1_xy, "rectangle", on_drag=self.on_drag_rect, magnet_points=[(100, 300), (150, 300)])
 
         self.model = DemoMVCAdvApp.Model()
         self.result = DemoMVCAdvApp.Result()
@@ -61,9 +61,9 @@ class DemoMVCAdvApp:
         while True:
             if self.is_update_needed:
                 self.update()
-                tcv2.imshow(self.winname, self.result.img, mode="fit")
+                gbn.imshow(self.winname, self.result.img, mode="fit")
                 self.is_update_needed = False
-            tcv2.waitKeyEx(10)
+            gbn.waitKeyEx(10)
 
     def on_drag(self, event):
         print(f"user.on_drag: ({event.x}, {event.y})")

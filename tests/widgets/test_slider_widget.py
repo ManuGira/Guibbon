@@ -1,12 +1,12 @@
-import guibbon as tcv2
+import guibbon as gbn
 import unittest
 
 
 class Test_SliderWidget(unittest.TestCase):
     def setUp(self):
         self.winname = "win0"
-        tcv2.namedWindow(self.winname)
-        self.guibbon_instance = tcv2.Guibbon.instances["win0"]
+        gbn.namedWindow(self.winname)
+        self.guibbon_instance = gbn.Guibbon.instances["win0"]
         self.triggered = None
 
     def callback(self, *args):
@@ -16,11 +16,11 @@ class Test_SliderWidget(unittest.TestCase):
     def test_Slider(self):
         values = [10, 13, 100]
         name = "Slider"
-        slider = tcv2.create_slider(winname=self.winname, slider_name=name, values=values + [], on_change=self.callback, initial_index=2)
-        self.assertIsInstance(slider, tcv2.SliderWidget, msg="function tcv2.create_slider must return an instance of a SliderWidget")
+        slider = gbn.create_slider(winname=self.winname, slider_name=name, values=values + [], on_change=self.callback, initial_index=2)
+        self.assertIsInstance(slider, gbn.SliderWidget, msg="function gbn.create_slider must return an instance of a SliderWidget")
 
-        slider = tcv2.get_slider_instance(self.winname, name)
-        self.assertIsInstance(slider, tcv2.SliderWidget, msg="function tcv2.get_slider_instance must return an instance of a SliderWidget")
+        slider = gbn.get_slider_instance(self.winname, name)
+        self.assertIsInstance(slider, gbn.SliderWidget, msg="function gbn.get_slider_instance must return an instance of a SliderWidget")
 
         index = slider.get_index()
         self.assertEqual(index, 2, msg="function get_values of SliderWidget instance must return correct value")

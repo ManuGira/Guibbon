@@ -1,4 +1,4 @@
-# Guibbon
+# Guibbon with U
 ![Tests](https://github.com/ManuGira/Guibbon/actions/workflows/tests.yml/badge.svg)
 
 The TkInter wrapper that mimics the HighGUI of OpenCV
@@ -28,7 +28,6 @@ All requirements files and poetry.lock have been generated with the `prepare_pyt
 ```
 
 ### Continuous Integration
-This repo
 #### Testing with pytest 
 Run tests and generate coverage report:
 ```

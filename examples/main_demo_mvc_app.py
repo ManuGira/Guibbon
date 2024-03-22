@@ -1,13 +1,13 @@
 import numpy as np
 import numpy.typing as npt
 import cv2
-import guibbon as tcv2
+import guibbon as gbn
 import tkinter as tk
 
 Image_t = npt.NDArray[np.uint8]
 
 
-class MyCustomWidget(tcv2.WidgetInterface):
+class MyCustomWidget(gbn.WidgetInterface):
     def __init__(self, master: tk.Frame, text: str, on_click_no, on_clik_yes):
         tk.Label(master, text=text).pack(padx=2, side=tk.TOP)
 
@@ -21,19 +21,19 @@ class DemoMVCApp:
     def __init__(self, filename):
         self.img: Image_t = cv2.imread(filename).astype(np.uint8)
         self.winname = "demo app"
-        tcv2.namedWindow(self.winname)
-        tcv2.createInteractivePoint(self.winname, (100, 100), "point", on_drag=self.on_drag)
+        gbn.namedWindow(self.winname)
+        gbn.createInteractivePoint(self.winname, (100, 100), "point", on_drag=self.on_drag)
 
-        slider = tcv2.create_slider(self.winname, "slider", [0, 10, 20, 30], lambda index, val: print("slider", index, val), 2)
-        my_widget = tcv2.create_custom_widget(self.winname, MyCustomWidget, "Are you all right?", lambda: print("no"), lambda: print("yes"))
+        slider = gbn.create_slider(self.winname, "slider", [0, 10, 20, 30], lambda index, val: print("slider", index, val), 2)
+        my_widget = gbn.create_custom_widget(self.winname, MyCustomWidget, "Are you all right?", lambda: print("no"), lambda: print("yes"))
         print(my_widget)
         slider.set_index(1)
 
-        tcv2.createTrackbar("trackbar", self.winname, 2, 4, lambda val: print("trackbar", val))
-        tcv2.setTrackbarPos("trackbar", self.winname, 1)
-        tcv2.setTrackbarPos("trackbar", self.winname, 2)
+        gbn.createTrackbar("trackbar", self.winname, 2, 4, lambda val: print("trackbar", val))
+        gbn.setTrackbarPos("trackbar", self.winname, 1)
+        gbn.setTrackbarPos("trackbar", self.winname, 2)
 
-        tcv2.create_button(self.winname, "+2", self.add2)
+        gbn.create_button(self.winname, "+2", self.add2)
 
         self.x = 0
         self.y = 0
@@ -61,9 +61,9 @@ class DemoMVCApp:
         while True:
             if self.is_update_needed:
                 self.update()
-                tcv2.imshow(self.winname, self.res)
+                gbn.imshow(self.winname, self.res)
                 self.is_update_needed = False
-            tcv2.waitKeyEx(20)
+            gbn.waitKeyEx(20)
 
     def on_drag(self, event):
         self.x = event.x
@@ -71,10 +71,10 @@ class DemoMVCApp:
         self.is_update_needed = True
 
     def add2(self):
-        slider = tcv2.get_slider_instance(self.winname, "slider")
+        slider = gbn.get_slider_instance(self.winname, "slider")
         slider.set_values(slider.get_values() + [100])
 
-        tcv2.setTrackbarMin("trackbar", self.winname, 2)
+        gbn.setTrackbarMin("trackbar", self.winname, 2)
 
 
 if __name__ == "__main__":

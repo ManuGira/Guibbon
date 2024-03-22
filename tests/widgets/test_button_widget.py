@@ -1,12 +1,12 @@
-import guibbon as tcv2
+import guibbon as gbn
 import unittest
 
 
 class Test_ButtonWidget(unittest.TestCase):
     def setUp(self):
         self.winname = "win0"
-        tcv2.namedWindow(self.winname)
-        self.guibbon_instance = tcv2.Guibbon.instances["win0"]
+        gbn.namedWindow(self.winname)
+        self.guibbon_instance = gbn.Guibbon.instances["win0"]
         self.triggered = None
 
     def callback(self, *args):
@@ -14,8 +14,8 @@ class Test_ButtonWidget(unittest.TestCase):
         self.triggered = True
 
     def test_create_button(self):
-        button = tcv2.create_button(winname=self.winname, text="Button", on_click=self.callback)
-        self.assertIsInstance(button, tcv2.ButtonWidget, msg="function tcv2.create_button must return an instance of ButtonWidget")
+        button = gbn.create_button(winname=self.winname, text="Button", on_click=self.callback)
+        self.assertIsInstance(button, gbn.ButtonWidget, msg="function gbn.create_button must return an instance of ButtonWidget")
 
         # widget = find_widget_by_name(self.guibbon_instance, "button")
 

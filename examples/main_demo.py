@@ -3,10 +3,10 @@
 import sys
 import numpy as np
 import cv2
-import guibbon as tcv2
+import guibbon as gbn
 
 if "guibbon" in sys.modules:
-    tcv2.inject(cv2)
+    gbn.inject(cv2)
 
 
 def on_trackbar(val):
@@ -63,23 +63,23 @@ def demo_cv():
 
     if "guibbon" in sys.modules:
         # type: ignore
-        radio_buttons = tcv2.create_radio_buttons(winname, "radio2", ["peche", "prune"], on_radio_button)
-        # tcv2.createButton("more fruit", lambda : radio_buttons.set_options_list(["oups", "ok", "voilà"]), winname)
-        button = tcv2.create_button(winname, "more fruit", lambda: radio_buttons.set_options_list(["oups", "ok", "voilà"]))
-        tcv2.create_button(winname, "hide", lambda: button.set_visible(False))
-        tcv2.create_button(winname, "show", lambda: tcv2.get_button_instance(winname, "more fruit").set_visible(True))
+        radio_buttons = gbn.create_radio_buttons(winname, "radio2", ["peche", "prune"], on_radio_button)
+        # gbn.createButton("more fruit", lambda : radio_buttons.set_options_list(["oups", "ok", "voilà"]), winname)
+        button = gbn.create_button(winname, "more fruit", lambda: radio_buttons.set_options_list(["oups", "ok", "voilà"]))
+        gbn.create_button(winname, "hide", lambda: button.set_visible(False))
+        gbn.create_button(winname, "show", lambda: gbn.get_button_instance(winname, "more fruit").set_visible(True))
 
-        tcv2.create_check_button_list(winname, "check multi", ["roue", "volant"], on_check_buttons, [False, True])
-        tcv2.create_check_button(winname, "check single", on_check_button, initial_value=True)
-        tcv2.create_color_picker(winname, "Color picker", on_color_pick, (255, 0, 0))
-        tcv2.createInteractivePoint(winname, (100, 100), "point", on_click=on_point_click, on_drag=on_point_drag, on_release=on_point_release)
+        gbn.create_check_button_list(winname, "check multi", ["roue", "volant"], on_check_buttons, [False, True])
+        gbn.create_check_button(winname, "check single", on_check_button, initial_value=True)
+        gbn.create_color_picker(winname, "Color picker", on_color_pick, (255, 0, 0))
+        gbn.createInteractivePoint(winname, (100, 100), "point", on_click=on_point_click, on_drag=on_point_drag, on_release=on_point_release)
 
     cv2.namedWindow("ok")
 
-    while tcv2.Guibbon.is_instance(winname):  # cv2.getWindowProperty(title, cv2.WND_PROP_VISIBLE) > 0.5:
+    while gbn.Guibbon.is_instance(winname):  # cv2.getWindowProperty(title, cv2.WND_PROP_VISIBLE) > 0.5:
         k += 1
         cv2.imshow(winname, img * np.uint8(k))
-        # tcv2.imshow("ok", img * np.uint8(k))
+        # gbn.imshow("ok", img * np.uint8(k))
         print(cv2.waitKeyEx(0), end=", ")
 
 

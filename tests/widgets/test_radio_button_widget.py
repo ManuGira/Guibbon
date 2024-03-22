@@ -1,12 +1,12 @@
 import unittest
-import guibbon as tcv2
+import guibbon as gbn
 
 
 class TestGuibbon_RadioButtons(unittest.TestCase):
     def setUp(self):
         self.winname = "win0"
-        tcv2.namedWindow(self.winname)
-        self.guibbon_instance = tcv2.Guibbon.instances["win0"]
+        gbn.namedWindow(self.winname)
+        self.guibbon_instance = gbn.Guibbon.instances["win0"]
         self.triggered = None
 
     def callback(self, *args):
@@ -15,9 +15,9 @@ class TestGuibbon_RadioButtons(unittest.TestCase):
 
     def test_RadioButtons(self):
         name = "RadioButtons"
-        rb_abc = tcv2.create_radio_buttons(winname=self.winname, name=name, options=["A", "B", "C"], on_change=self.callback)
-        self.assertIsNotNone(rb_abc, msg="function tcv2.create_radio_buttons() must return None")
-        self.assertIsInstance(rb_abc, tcv2.RadioButtonsWidget)
+        rb_abc = gbn.create_radio_buttons(winname=self.winname, name=name, options=["A", "B", "C"], on_change=self.callback)
+        self.assertIsNotNone(rb_abc, msg="function gbn.create_radio_buttons() must return None")
+        self.assertIsInstance(rb_abc, gbn.RadioButtonsWidget)
 
         i, opt = rb_abc.get_current_selection()
         self.assertEqual(i, 0, msg="function get_current_selection() must return correct index")
@@ -39,7 +39,7 @@ class TestGuibbon_RadioButtons(unittest.TestCase):
     def test_RadioButtons_option_getter_setter(self):
         name = "RadioButtons"
         expected = ["A", "B", "C"]
-        rbs = tcv2.create_radio_buttons(winname=self.winname, name=name, options=expected + [], on_change=self.callback)
+        rbs = gbn.create_radio_buttons(winname=self.winname, name=name, options=expected + [], on_change=self.callback)
         result = rbs.get_options_list()
         self.assertListEqual(expected, result, "function get_options_list() must return correct result")
 

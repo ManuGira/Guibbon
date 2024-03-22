@@ -1,7 +1,7 @@
 import sys
 import unittest
 import cv2
-import guibbon as tcv2
+import guibbon as gbn
 import numpy as np
 from typing import Tuple
 
@@ -10,51 +10,51 @@ eps = sys.float_info.epsilon
 
 class TestGuibbon(unittest.TestCase):
     def tearDown(self) -> None:
-        tcv2.Guibbon.instances = {}
-        tcv2.Guibbon.active_instance_name = None
+        gbn.Guibbon.instances = {}
+        gbn.Guibbon.active_instance_name = None
 
     def test_package(self):
-        self.assertIsNotNone(tcv2.__version__)
-        self.assertIsNotNone(tcv2.__version_info__)
+        self.assertIsNotNone(gbn.__version__)
+        self.assertIsNotNone(gbn.__version_info__)
 
     def test_inject(self):
         cv2_func = cv2.namedWindow
-        tcv2_func = tcv2.namedWindow
-        self.assertNotEqual(cv2_func, tcv2_func)
-        tcv2.inject(cv2)
-        self.assertEqual(cv2.namedWindow, tcv2_func, msg="tcv2.inject must correctly inject function to cv2")
+        gbn_func = gbn.namedWindow
+        self.assertNotEqual(cv2_func, gbn_func)
+        gbn.inject(cv2)
+        self.assertEqual(cv2.namedWindow, gbn_func, msg="gbn.inject must correctly inject function to cv2")
 
     def test_namedWindow(self):
-        self.assertEqual(len(tcv2.Guibbon.instances), 0, msg="At initialisation, number of instances must be 0.")
-        res = tcv2.namedWindow("win0")
-        self.assertIsNone(res, msg="function tcv2.namedWindow(winname) must return None")
-        self.assertEqual(len(tcv2.Guibbon.instances), 1, msg="After first use of tcv2.namedWindow(...), number of instances must be 1.")
-        self.assertIsNotNone(tcv2.Guibbon.instances["win0"], msg='After use of tcv2.namedWindow("win0"), tcv2.Guibbon.instances["win0"] must not be None')
+        self.assertEqual(len(gbn.Guibbon.instances), 0, msg="At initialisation, number of instances must be 0.")
+        res = gbn.namedWindow("win0")
+        self.assertIsNone(res, msg="function gbn.namedWindow(winname) must return None")
+        self.assertEqual(len(gbn.Guibbon.instances), 1, msg="After first use of gbn.namedWindow(...), number of instances must be 1.")
+        self.assertIsNotNone(gbn.Guibbon.instances["win0"], msg='After use of gbn.namedWindow("win0"), gbn.Guibbon.instances["win0"] must not be None')
 
     def test_multiple_instances(self):
-        self.assertEqual(len(tcv2.Guibbon.instances), 0, msg="At initialisation, number of instances must be 0.")
-        tcv2.namedWindow("win0")
-        tcv2.namedWindow("win1")
-        self.assertEqual(len(tcv2.Guibbon.instances), 2, msg="After 2 uses of tcv2.namedWindow(...), number of instances must be 2.")
+        self.assertEqual(len(gbn.Guibbon.instances), 0, msg="At initialisation, number of instances must be 0.")
+        gbn.namedWindow("win0")
+        gbn.namedWindow("win1")
+        self.assertEqual(len(gbn.Guibbon.instances), 2, msg="After 2 uses of gbn.namedWindow(...), number of instances must be 2.")
 
     def test_imshow_and_getWindowProperty(self):
         img = np.zeros((10, 10), dtype=np.uint8)
         winname = "win0"
-        self.assertEqual(len(tcv2.Guibbon.instances), 0, msg="At initialisation, number of instances must be 0.")
-        res = tcv2.getWindowProperty(winname, cv2.WND_PROP_VISIBLE)
+        self.assertEqual(len(gbn.Guibbon.instances), 0, msg="At initialisation, number of instances must be 0.")
+        res = gbn.getWindowProperty(winname, cv2.WND_PROP_VISIBLE)
         self.assertTrue(abs(res - 0.0) <= eps, msg="Non existant windows must have property WND_PROP_VISIBLE set to 0.0")
-        self.assertFalse(tcv2.Guibbon.is_instance(winname), msg="tcv2.Guibbon.is_instance must return false for non-existant windows")
-        self.assertEqual(len(tcv2.Guibbon.instances), 0, msg="getWindowProperty should not be able to create new window")
+        self.assertFalse(gbn.Guibbon.is_instance(winname), msg="gbn.Guibbon.is_instance must return false for non-existant windows")
+        self.assertEqual(len(gbn.Guibbon.instances), 0, msg="getWindowProperty should not be able to create new window")
 
-        res = tcv2.imshow(winname, img)
-        self.assertEqual(len(tcv2.Guibbon.instances), 1, msg="tcv2.imshow must be able to create new window")
-        self.assertTrue(tcv2.Guibbon.is_instance(winname), msg="tcv2.imshow must be able to create new window with given name")
-        self.assertIsNone(res, msg="tcv2.imshow must return None")
+        res = gbn.imshow(winname, img)
+        self.assertEqual(len(gbn.Guibbon.instances), 1, msg="gbn.imshow must be able to create new window")
+        self.assertTrue(gbn.Guibbon.is_instance(winname), msg="gbn.imshow must be able to create new window with given name")
+        self.assertIsNone(res, msg="gbn.imshow must return None")
 
-        res = tcv2.getWindowProperty(winname, cv2.WND_PROP_VISIBLE)
+        res = gbn.getWindowProperty(winname, cv2.WND_PROP_VISIBLE)
         self.assertTrue(abs(res - 1.0) <= eps, msg="Existant and visible windows must have property WND_PROP_VISIBLE set to 1.0")
-        tcv2.Guibbon.instances = {}  # TODO: use
-        res = tcv2.getWindowProperty(winname, cv2.WND_PROP_VISIBLE)
+        gbn.Guibbon.instances = {}  # TODO: use
+        res = gbn.getWindowProperty(winname, cv2.WND_PROP_VISIBLE)
         self.assertTrue(abs(res - 0.0) <= eps, msg="Deleting instance of a windows must destroy it. getWindowProperty must return 0")
 
 
@@ -73,8 +73,8 @@ def find_widget_by_name(guibbon_instance, widgetname):
 class TestGuibbon_checkbutton(unittest.TestCase):
     def setUp(self):
         self.winname = "win0"
-        tcv2.namedWindow(self.winname)
-        self.guibbon_instance = tcv2.Guibbon.instances["win0"]
+        gbn.namedWindow(self.winname)
+        self.guibbon_instance = gbn.Guibbon.instances["win0"]
         self.triggered = None
         self.args: Tuple[bool, ...]
 
@@ -84,9 +84,9 @@ class TestGuibbon_checkbutton(unittest.TestCase):
         self.args = args
 
     def test_create_check_button(self):
-        widget = tcv2.create_check_button(winname=self.winname, name="CheckButton", on_change=self.callback, initial_value=False)
-        self.assertIsNotNone(widget, msg="function tcv2.create_check_button must not return None")
-        self.assertIsInstance(widget, tcv2.CheckButtonWidget, msg="function tcv2.create_check_button must return instance of CheckButtonWidget")
+        widget = gbn.create_check_button(winname=self.winname, name="CheckButton", on_change=self.callback, initial_value=False)
+        self.assertIsNotNone(widget, msg="function gbn.create_check_button must not return None")
+        self.assertIsInstance(widget, gbn.CheckButtonWidget, msg="function gbn.create_check_button must return instance of CheckButtonWidget")
 
         self.assertIsNone(self.triggered)
 
@@ -102,8 +102,8 @@ class TestGuibbon_checkbutton(unittest.TestCase):
 class TestGuibbon_TrackBar(unittest.TestCase):
     def setUp(self):
         self.winname = "win0"
-        tcv2.namedWindow(self.winname)
-        self.guibbon_instance = tcv2.Guibbon.instances["win0"]
+        gbn.namedWindow(self.winname)
+        self.guibbon_instance = gbn.Guibbon.instances["win0"]
         self.triggered = None
 
     def callback(self, *args):
@@ -118,17 +118,17 @@ class TestGuibbon_TrackBar(unittest.TestCase):
          - setTrackBarPos
         """
         name = "TrackBar"
-        res = tcv2.createTrackbar(trackbarName=name, windowName=self.winname, value=1, count=10, onChange=self.callback)
-        self.assertIsNone(res, msg="function tcv2.createTrackBar must return None")
+        res = gbn.createTrackbar(trackbarName=name, windowName=self.winname, value=1, count=10, onChange=self.callback)
+        self.assertIsNone(res, msg="function gbn.createTrackBar must return None")
 
-        value = tcv2.getTrackbarPos(name, self.winname)
-        self.assertEqual(value, 1, msg="function tcv2.getTrackbarPos must return correct value")
+        value = gbn.getTrackbarPos(name, self.winname)
+        self.assertEqual(value, 1, msg="function gbn.getTrackbarPos must return correct value")
 
         self.triggered = False
-        tcv2.setTrackbarPos(name, self.winname, 8)
-        self.assertTrue(self.triggered, "function tcv2.setTrackbarPos must trigger callback")
-        value = tcv2.getTrackbarPos(name, self.winname)
-        self.assertEqual(value, 8, msg="function tcv2.getTrackbarPos must return correct value")
+        gbn.setTrackbarPos(name, self.winname, 8)
+        self.assertTrue(self.triggered, "function gbn.setTrackbarPos must trigger callback")
+        value = gbn.getTrackbarPos(name, self.winname)
+        self.assertEqual(value, 8, msg="function gbn.getTrackbarPos must return correct value")
 
     def test_TrackBar_min_max(self):
         """
@@ -139,18 +139,18 @@ class TestGuibbon_TrackBar(unittest.TestCase):
          - getTrackbarMin
         """
         name = "TrackBar"
-        tcv2.createTrackbar(trackbarName=name, windowName=self.winname, value=1, count=10, onChange=self.callback)
-        initial_min = tcv2.getTrackbarMin(trackbarname=name, winname=self.winname)
-        initial_max = tcv2.getTrackbarMax(trackbarname=name, winname=self.winname)
+        gbn.createTrackbar(trackbarName=name, windowName=self.winname, value=1, count=10, onChange=self.callback)
+        initial_min = gbn.getTrackbarMin(trackbarname=name, winname=self.winname)
+        initial_max = gbn.getTrackbarMax(trackbarname=name, winname=self.winname)
 
         self.assertEqual(initial_min, 0)
         self.assertEqual(initial_max, 10)
 
-        tcv2.setTrackbarMin(trackbarname=name, winname=self.winname, minval=5)
-        tcv2.setTrackbarMax(trackbarname=name, winname=self.winname, maxval=20)
+        gbn.setTrackbarMin(trackbarname=name, winname=self.winname, minval=5)
+        gbn.setTrackbarMax(trackbarname=name, winname=self.winname, maxval=20)
 
-        new_min = tcv2.getTrackbarMin(trackbarname=name, winname=self.winname)
-        new_max = tcv2.getTrackbarMax(trackbarname=name, winname=self.winname)
+        new_min = gbn.getTrackbarMin(trackbarname=name, winname=self.winname)
+        new_max = gbn.getTrackbarMax(trackbarname=name, winname=self.winname)
 
         self.assertEqual(new_min, 5)
         self.assertEqual(new_max, 20)
@@ -159,7 +159,7 @@ class TestGuibbon_TrackBar(unittest.TestCase):
 class TestGuibbon_other(unittest.TestCase):
     def test_not_implemented(self):
         with self.assertRaises(NotImplementedError):
-            tcv2.not_implemented_error()
+            gbn.not_implemented_error()
 
 
 if __name__ == "__main__":

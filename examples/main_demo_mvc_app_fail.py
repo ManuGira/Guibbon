@@ -1,7 +1,7 @@
 import numpy as np
 import numpy.typing as npt
 import cv2
-import guibbon as tcv2
+import guibbon as gbn
 
 Image_t = npt.NDArray[np.uint8]
 
@@ -16,8 +16,8 @@ class DemoMVCAppFail:
     def __init__(self, filename):
         self.img: Image_t = cv2.imread(filename).astype(np.uint8)
         self.winname = "demo app"
-        tcv2.namedWindow(self.winname)
-        tcv2.createInteractivePoint(self.winname, (100, 100), "point", on_drag=self.on_drag)
+        gbn.namedWindow(self.winname)
+        gbn.createInteractivePoint(self.winname, (100, 100), "point", on_drag=self.on_drag)
 
         self.x = 0
         self.y = 0
@@ -41,8 +41,8 @@ class DemoMVCAppFail:
         self.res = res
 
     def show(self):
-        tcv2.imshow(self.winname, self.res)
-        tcv2.waitKeyEx(0)
+        gbn.imshow(self.winname, self.res)
+        gbn.waitKeyEx(0)
 
     def on_drag(self, event):
         self.x = event.x
