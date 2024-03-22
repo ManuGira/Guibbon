@@ -1,10 +1,29 @@
 # Guibbon with U
 ![Tests](https://github.com/ManuGira/Guibbon/actions/workflows/tests.yml/badge.svg)
 
-The TkInter wrapper that mimics the HighGUI of OpenCV
+High-level GUI with an api similar to the HighGUI of OpenCV. It allows to display an image and add GUI controllers such as
+ - Sliders (trackbar)
+ - Buttons
+ - Radio buttons
+ - Check boxes
+ - Color picker
+ - Draggable points and polygons on the displayed image
+ - Any custom widget that you write in TkInter
+
+If you know how to use the GUI of OpenCV, then you already know how to use Guibbon. 
+
+Reasons why you want to use Guibbon:
+ - It's using TkInter which is natively installed in your python distribution
+ - Beside TkInter, it only has 3 dependencies: numpy, opencv-python and pillow
+ - You just need to display an image and add a few controllers to play with parameters
+
 
 ## User Installation
-This package is not hosted on PyPl, but you can still install this repo as a package with pip:
+This package is hosted on PyPl, you can install the latests stable release with pip:
+```
+pip install guibbon
+```
+If you feel adventurous you can also install the most recent commit of this repo:
 ```
 pip install git+https://github.com/ManuGira/Guibbon.git@master
 ```
