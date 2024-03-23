@@ -1,9 +1,9 @@
 [tool.poetry]
 name = "guibbon"
-version = "0.1.1"
+version = "0.1.2"
 description = "Very high level GUI with an API similar to the HighGUI of OpenCV"
 authors = ["Manu Gira <manu.gira@outlook.com>"]
-readme = "README.md"
+readme = "README_user.md"
 
 [build-system]
 requires = ["poetry-core"]

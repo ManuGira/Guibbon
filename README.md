@@ -29,7 +29,7 @@ pip install git+https://github.com/ManuGira/Guibbon.git@master
 ```
 ## Development 
 
-The project is configureed in `pyproject.toml`. It contains dependecies, and configs for continuous integration.
+The project is configured in `pyproject.toml`. It contains dependecies, and configs for continuous integration.
 
 ### Dev Installation
 Install development requirements with poetry:
@@ -67,13 +67,24 @@ Linter fix:
 $ ruff check --fix .
 ```
 
+### Publishing to PyPI with poetry
+First, update the version number in the `pyproject.toml`  
+Then build tarball and wheel:
+```
+$ poetry build
+```
+Publish to PyPI:
+```
+$ poetry publish -r pypi -u __token__ -p <paste the secret token here (very long string starting with "pypi-")>
+```
+
 ## TODO
 
 #### Image Viewer
 * **Feature**: Handle double clicks
 * **Feature**: Handle **param** field of mouse callback
 * **Feature**: Scroll delta is missing
-* **Feature**: Linux and Mac support
+* **Feature**: Mac support
 
 #### Demos
 * **Feature**: Make sure that the failing demo also fails with cv2
