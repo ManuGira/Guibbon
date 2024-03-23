@@ -1,4 +1,4 @@
-name: Guibbon Continuous Integration
+name: Guibbon CI/CD
 
 on:
   push:
@@ -13,26 +13,26 @@ jobs:
     name: Linter and type checker
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set up Python 3.10
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v4
         with:
           python-version: '3.10'
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install -r requirements_ci_check.txt
-          python -m pip install -e .
+          python -m pip install poetry
+          python -m poetry install
 
       - name: Type check with mypy
         run: |
-          python -m mypy .
+          python -m poetry run mypy .
 
       - name: Lint check with ruff
         run: |
-          python -m ruff check .
+          python -m poetry run ruff check .
 
   tests:
     defaults:
@@ -47,18 +47,18 @@ jobs:
 
     name: "Tests: ${{ matrix.os }}, py ${{ matrix.python-version }}"
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install -r requirements_ci_test.txt
-          python -m pip install -e .
+          python -m pip install poetry
+          python -m poetry install
 
       - name: Tests with pytest
         run: |
@@ -68,4 +68,4 @@ jobs:
             export DISPLAY=:99 
             Xvfb :99 &  
           fi
-          python -m pytest
+          python -m poetry run pytest

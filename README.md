@@ -1,7 +1,7 @@
 # Guibbon with U
 ![Tests](https://github.com/ManuGira/Guibbon/actions/workflows/tests.yml/badge.svg)
 
-High-level GUI with an api similar to the HighGUI of OpenCV. It allows to display an image and add GUI controllers such as
+High-level GUI with an API similar to the HighGUI of OpenCV. It allows to display an image and add GUI controllers such as
  - Sliders (trackbar)
  - Buttons
  - Radio buttons

@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "guibbon"
 version = "0.1.0"
-description = ""
+description = "Very high level GUI with an API similar to the HighGUI of OpenCV"
 authors = ["Emmanuel Girardin <emmanuel.girardin@outlook.com>"]
 readme = "README.md"
 
@@ -14,11 +14,9 @@ python = "^3.7"
 opencv-python = "^4.5.4.60"
 Pillow = "^9.1.0"
 
-[tool.poetry.group.test.dependencies]
+[tool.poetry.group.dev.dependencies]
 pytest = "^7.2.2"
 pytest-cov = "^4.0.0"
-
-[tool.poetry.group.check.dependencies]
 ruff = "^0.1.5"
 mypy = "^1.4.1"
 
