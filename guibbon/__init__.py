@@ -1,3 +1,4 @@
+import os
 import time
 import tkinter as tk
 from typing import Dict, Optional, Type, List, Sequence, Any, Tuple
@@ -298,6 +299,8 @@ class Guibbon:
         self.window.protocol("WM_DELETE_WINDOW", self.on_closing)  # add callback when user closes the window
         self.winname = winname
         self.window.title(self.winname)
+        icon = tk.PhotoImage(file=os.path.join(os.path.dirname(__file__), "icons", "icon32.png"))
+        self.window.iconphoto(False, icon)
 
         self.window.bind("<KeyPress>", Guibbon.keyboard.on_event)
         self.window.bind("<KeyRelease>", Guibbon.keyboard.on_event)
