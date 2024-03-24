@@ -8,13 +8,13 @@ High-level GUI with an API similar to the HighGUI of OpenCV. It allows to displa
  - Check boxes
  - Color picker
  - Draggable points and polygons on the displayed image
- - Any custom widget that you write in TkInter
+ - Any custom widget that you write in Tkinter
 
 If you know how to use the GUI of OpenCV, then you already know how to use Guibbon. 
 
 Reasons why you want to use Guibbon:
- - It's using TkInter which is natively installed in your python distribution
- - Beside TkInter, it only has 3 dependencies: numpy, opencv-python and pillow
+ - It's using Tkinter which is natively installed in your python distribution
+ - Beside Tkinter, it only has 3 dependencies: numpy, opencv-python and pillow
  - You just need to display an image and add a few controllers to play with parameters
 
 
@@ -110,7 +110,7 @@ $ poetry publish -r pypi -u __token__ -p <paste the secret token here (very long
         * circle_id: *id of canvas oval*
         * 
 
-#### TkInter hierarchy
+#### Tkinter hierarchy
 * Guibbon.root: *static Tk*
   * guibbon.window: *TopLevel*
     * tkcv2.frame: *Frame*
