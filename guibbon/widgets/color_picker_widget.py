@@ -40,13 +40,14 @@ class ColorPickerWidget:
         self.color_rgb: Tuple[int, int, int] = initial_color_rgb
 
         color_hex = convert_color_tuple3i_to_hexastr(self.color_rgb)
-        self.canvas = tk.Canvas(self.frame, bg=color_hex, bd=2, height=10)
-        self.canvas.bind("<Button-1>", self.callback)
+        self.canvas = tk.Canvas(self.frame, bg=color_hex, bd=3, height=10)
+        self.button = tk.Button(self.frame, text="Edit", command=self.callback)
 
-        self.canvas.pack(side=tk.LEFT, anchor=tk.W)
+        self.canvas.pack(padx=2, side=tk.LEFT, anchor=tk.W)
+        self.button.pack(padx=2, side=tk.LEFT, anchor=tk.W)
         self.frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
 
-    def callback(self, event):
+    def callback(self):
         colors = askcolor(title="Color Chooser")
         if colors[0] is not None:
             r, g, b = colors[0]
