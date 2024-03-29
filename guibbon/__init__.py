@@ -16,6 +16,7 @@ from .widgets.check_button_widget import CheckButtonWidget, CallbackCheckButton
 from .widgets.color_picker_widget import ColorPickerWidget, CallbackColorPicker
 from .widgets.radio_buttons_widget import RadioButtonsWidget, CallbackRadioButtons
 from .widgets.slider_widget import SliderWidget, CallbackSlider
+from .widgets.treeview_widget import TreeviewWidget, CallbackTreeview, TreeNode
 from .widgets.widget import WidgetInterface
 
 __version__ = "0.0.0"
@@ -402,6 +403,13 @@ class Guibbon:
         tk_frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
         return cpw
 
+    def create_treeview(self, name: str, tree, on_click: CallbackTreeview) -> TreeviewWidget:
+        tk_frame = tk.Frame(self.ctrl_frame)
+        widget = TreeviewWidget(tk_frame, name, tree, on_click)
+        tk_frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
+        return widget
+
+
     def imshow(self, mat: Image_t, mode: Optional[str] = None, cv2_interpolation: Optional[int] = None):
         self.image_viewer.imshow(mat, mode, cv2_interpolation)
 
@@ -426,3 +434,4 @@ class Guibbon:
 
     def setMouseCallback(self, onMouse: CallbackMouse, userdata=None):
         self.image_viewer.setMouseCallback(onMouse, userdata)
+
