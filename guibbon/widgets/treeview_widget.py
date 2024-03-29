@@ -1,29 +1,46 @@
 import tkinter as tk
 from tkinter import ttk
-from typing import Callable
+from typing import Callable, List
 
-CallbackTreeview = Callable[[], None]
+CallbackTreeview = Callable[[List[str]], None]
 
 
 class TreeviewWidget:
     def __init__(self, tk_frame, name, tree, on_click: CallbackTreeview):
         self.tk_frame = tk_frame
         self.name = name
-
+        self.on_click = on_click
         self.frame = tk.Frame(self.tk_frame)
         tk.Label(self.frame, text=self.name).pack(padx=2, side=tk.TOP, anchor=tk.W)
         self.tk_treeview = ttk.Treeview(self.frame)
 
         self.build_tree("", tree)
+
+        self.tk_treeview.bind("<Button-1>", self.callback)
+
         self.tk_treeview.pack(padx=2, side=tk.TOP, anchor=tk.W)
         self.frame.pack(padx=2, side=tk.TOP, anchor=tk.W)
 
     def build_tree(self, parent, tree_node):
         assert isinstance(tree_node, TreeNode)
         for subtree_node in tree_node.children.values():
-            tk_node = self.tk_treeview.insert(parent, tk.END, text=subtree_node.name)
-            self.build_tree(tk_node, subtree_node)
+            item = self.tk_treeview.insert(parent, tk.END, text=subtree_node.name)
+            # self.tk_treeview.tag_bind(tk_node, "<Button-1>", self.callback)
+            self.build_tree(item, subtree_node)
 
+    def callback(self, event):
+        try:
+            item = self.tk_treeview.identify('item', event.x, event.y)
+            names = []
+            while item != "":
+                names = [self.tk_treeview.item(item, "text")] + names
+                item = self.tk_treeview.parent(item)
+
+            self.on_click(names)
+            # item = self.tk_treeview.selection()[0]
+            # print("you clicked on", self.tk_treeview.item(item, "text"))
+        except:
+            print("Fail")
 class TreeNode:
     def __init__(self, name="", data=None):
         self.name = name
@@ -76,6 +93,7 @@ def main():
 
     for node in tree.depth_first_walk():
         print(node)
+
 
 if __name__ == '__main__':
     main()

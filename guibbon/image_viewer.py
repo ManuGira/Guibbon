@@ -64,6 +64,7 @@ class ImageViewer:
 
         if self.onMouse is None:
             # <MODIFIER-MODIFIER-TYPE-DETAIL>
+            # see https://dafarry.github.io/tkinterbook/tkinter-events-and-bindings.htm
             self.canvas.bind("<Motion>", self.on_event)
             self.canvas.bind("<ButtonPress>", self.on_event)
             self.canvas.bind("<ButtonRelease>", self.on_event)
