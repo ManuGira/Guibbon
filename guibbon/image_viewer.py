@@ -225,6 +225,10 @@ class ImageViewer:
 
         canh, canw = self.canvas_shape_hw
         imgh, imgw = mat.shape[:2]
+
+        if mat.dtype == float:
+            mat = (np.clip(mat, 0, 1) * 255).astype(np.uint8)
+
         mat = cv2.cvtColor(mat, cv2.COLOR_BGR2RGB)  # type: ignore
 
         img_space_matrix: TransformMatrix
