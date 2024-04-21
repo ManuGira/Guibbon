@@ -23,6 +23,7 @@ More info in the [documentation](https://manugira.github.io/Guibbon/)
 ## Release Notes
 #### v0.1.6* (rolling version)
 ###### Features
+* **Tree View Widget**: Create your tree with `guibbon.TreeNode` and pass it to `guibbon.TreeView(...)`
 * **Custom Icon**: The window has an icon of a smiling guibbon now
 * **Set Slider Name**: Allows to change the name of a Slider Widget after its instantiation
 * **Improve Color Picker UX**: Add an "Edit" button to the Color Picker Widget for better UX
