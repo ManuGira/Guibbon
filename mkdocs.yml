@@ -1,5 +1,9 @@
-site_name: Guibbon with U
+site_name: Guibbon Doc
 site_url: https://example.com/
 nav:
-  - 'README_user.md'
-  - 'about.md'
+  - 'Home': 'index.md'
+  - 'getting_started.md'
+  - 'Documentation':
+    - 'v0.1.6* (rolling verision)': 'versions/v0.1.6/index.md'
+    - 'v0.1.5 (latest stable release)': 'versions/v0.1.5/index.md'
+  - 'release_notes.md'

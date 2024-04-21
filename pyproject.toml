@@ -3,7 +3,7 @@ name = "guibbon"
 version = "0.1.5"
 description = "Very high level GUI with an API similar to the HighGUI of OpenCV"
 authors = ["Manu Gira <manu.gira@outlook.com>"]
-readme = "docs/README_user.md"
+readme = "docs/index.md"
 repository = "https://github.com/ManuGira/Guibbon.git"
 keywords = ["GUI", "Tkinter", "OpenCV"]
 

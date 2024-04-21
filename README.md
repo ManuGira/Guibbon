@@ -18,6 +18,8 @@ Other reasons why you want to use Guibbon:
  - Beside Tkinter, it only has 3 dependencies: numpy, opencv-python and pillow
  - It's less than 200 KB
 
+More info in the [documentation](https://manugira.github.io/Guibbon/)
+
 ## Release Notes
 #### v0.1.6* (rolling version)
 ###### Features
@@ -47,11 +49,11 @@ Other reasons why you want to use Guibbon:
  * **Magnets for Interactive Overlays**: A point cloud that can be injected to an interactive overlay. The overlay will snap to the magnets when dragged by the user.
 
 ## User Installation
-This package is hosted on PyPl, you can install the latests stable release with pip:
+This package is hosted on [PyPl](https://pypi.org/project/guibbon), you can install the **latest stable release** with pip:
 ```
 pip install guibbon
 ```
-If you feel adventurous you can also install the most recent commit of this repo:
+If stability is not for you, install the rolling version from github. You will get early access to new **features**, **bugfixes** and **bugs**:
 ```
 pip install git+https://github.com/ManuGira/Guibbon.git@master
 ```
@@ -106,6 +108,14 @@ Publish to PyPI:
 $ poetry publish -r pypi -u __token__ -p <paste the secret token here (very long string starting with "pypi-")>
 ```
 
+### Publishing Documentation
+The documentation is written with [mkdocs](https://www.mkdocs.org/). Documentation files are placed in folder `./doc/`. You can build and run the website locally:
+* `mkdocs serve` - Start the live-reloading docs server.
+* `mkdocs build` - Build the documentation site.
+
+The documentation can be deployed on github on the page of the Guibbon's project. It can only host a single version of the documentation, so it is important to check out on master before deploying.   
+* `mkdocs gh-deploy`
+
 ## TODO
 
 #### Image Viewer
@@ -119,9 +129,6 @@ $ poetry publish -r pypi -u __token__ -p <paste the secret token here (very long
 
 #### Interactive Overlays
 * **Feature**: Make sure that the failing demo also fails with cv2
-
-
-## Documentation
 
 #### Class hierarchy
 * Guibbon
