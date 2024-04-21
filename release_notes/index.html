@@ -6,9 +6,9 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         
         
-        <link rel="canonical" href="https://example.com/README_user/">
+        <link rel="canonical" href="https://example.com/release_notes/">
         <link rel="shortcut icon" href="../img/favicon.ico">
-        <title> Guibbon with U  - Guibbon with U</title>
+        <title>Release notes - Guibbon Doc</title>
         <link href="../css/bootstrap.min.css" rel="stylesheet">
         <link href="../css/font-awesome.min.css" rel="stylesheet">
         <link href="../css/base.css" rel="stylesheet">
@@ -20,7 +20,7 @@
     <body>
         <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
             <div class="container">
-                <a class="navbar-brand" href="..">Guibbon with U</a>
+                <a class="navbar-brand" href="..">Guibbon Doc</a>
                 <!-- Expander button -->
                 <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
                     <span class="navbar-toggler-icon"></span>
@@ -30,11 +30,27 @@
                 <div id="navbar-collapse" class="navbar-collapse collapse">
                         <!-- Main navigation -->
                         <ul class="nav navbar-nav">
-                            <li class="navitem active">
-                                <a href="./" class="nav-link"> Guibbon with U </a>
+                            <li class="navitem">
+                                <a href=".." class="nav-link">Home</a>
                             </li>
                             <li class="navitem">
-                                <a href="../about/" class="nav-link">About</a>
+                                <a href="../getting_started/" class="nav-link">Getting started</a>
+                            </li>
+                            <li class="dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Documentation <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../versions/v0.1.6/" class="dropdown-item">v0.1.6* (rolling verision)</a>
+</li>
+                                    
+<li>
+    <a href="../versions/v0.1.5/" class="dropdown-item">v0.1.5 (latest stable release)</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="navitem active">
+                                <a href="./" class="nav-link">Release notes</a>
                             </li>
                         </ul>
 
@@ -45,12 +61,12 @@
                             </a>
                         </li>
                             <li class="nav-item">
-                                <a rel="prev" class="nav-link disabled">
+                                <a rel="prev" href="../versions/v0.1.5/" class="nav-link">
                                     <i class="fa fa-arrow-left"></i> Previous
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a rel="next" href="../about/" class="nav-link">
+                                <a rel="next" class="nav-link disabled">
                                     Next <i class="fa fa-arrow-right"></i>
                                 </a>
                             </li>
@@ -72,12 +88,8 @@
     <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
         <ul class="nav flex-column">
             
-            <li class="nav-item" data-level="1"><a href="#guibbon-with-u" class="nav-link">Guibbon with U</a>
-              <ul class="nav flex-column">
             <li class="nav-item" data-level="2"><a href="#release-notes" class="nav-link">Release Notes</a>
               <ul class="nav flex-column">
-              </ul>
-            </li>
               </ul>
             </li>
         </ul>
@@ -85,42 +97,20 @@
 </div></div>
                     <div class="col-md-9" role="main">
 
-<h1 id="guibbon-with-u"><img alt="icon" src="../images/icon32.png" /> Guibbon with U <img alt="icon" src="../images/icon32.png" /></h1>
-<p><img alt="Tests" src="https://github.com/ManuGira/Guibbon/actions/workflows/tests.yml/badge.svg" /></p>
-<h3 id="high-level-gui-with-an-api-similar-to-the-highgui-of-opencv">High-level GUI with an API similar to the HighGUI of OpenCV.</h3>
-<p><strong>If you know how to use the GUI of OpenCV, then you already know how to use Guibbon.</strong></p>
-<p>It allows to display an image and add GUI controllers such as:</p>
-<ul>
-<li>Sliders (trackbar)</li>
-<li>Buttons</li>
-<li>Radio buttons</li>
-<li>Check boxes</li>
-<li>Color picker</li>
-<li>Draggable points and polygons on the displayed image</li>
-<li>Any custom widget that you write in Tkinter</li>
-</ul>
-<h3 id="reasons-why-you-want-to-use-guibbon">Reasons why you want to use Guibbon:</h3>
-<ul>
-<li>It's fast to learn and fast to code.</li>
-<li>It's using Tkinter which is natively installed in most python distributions</li>
-<li>Beside Tkinter, it only has 3 dependencies: numpy, opencv-python and pillow</li>
-<li>It's less than 200 KB</li>
-<li>You can create your own custom widget.</li>
-</ul>
 <h2 id="release-notes">Release Notes</h2>
-<h4 id="v016-rolling-version">v0.1.6* (rolling version)</h4>
-<h6 id="features">Features</h6>
+<h4 id="v016-rolling-version"><strong>v0.1.6</strong>* (rolling version)</h4>
+<h6 id="features"><strong>Features</strong></h6>
 <ul>
 <li><strong>Custom Icon</strong>: The window has an icon of a smiling guibbon now</li>
 <li><strong>Set Slider Name</strong>: Allows to change the name of a Slider Widget after its instantiation</li>
 <li><strong>Improve Color Picker UX</strong>: Add an "Edit" button to the Color Picker Widget for better UX</li>
 </ul>
-<h6 id="bug-fixes">Bug fixes</h6>
+<h6 id="bug-fixes"><strong>Bug fixes</strong></h6>
 <ul>
 <li><strong>Float image support</strong>: Before this fix, it was not possible to use <code>guibbon.imshow(...)</code> on an image with dtype=float </li>
 </ul>
-<h4 id="v015">v0.1.5</h4>
-<h6 id="features_1">Features</h6>
+<h4 id="v015"><strong>v0.1.5</strong></h4>
+<h6 id="features_1"><strong>Features</strong></h6>
 <ul>
 <li><strong>Monkey Patching</strong>: Inject Guibbon's function in cv2 package (not permanantly) with <code>guibbon.inject(cv2)</code></li>
 <li><strong>Image Viewer</strong>: shows image with <code>guibbon.imshow(...)</code> similarly to <code>cv2.imshow(...)</code> (can be monkey patched)</li>
