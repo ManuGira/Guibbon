@@ -1,0 +1,5 @@
+site_name: Guibbon with U
+site_url: https://example.com/
+nav:
+  - 'README_user.md'
+  - 'about.md'

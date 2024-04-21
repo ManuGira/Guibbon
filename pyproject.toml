@@ -3,7 +3,7 @@ name = "guibbon"
 version = "0.1.5"
 description = "Very high level GUI with an API similar to the HighGUI of OpenCV"
 authors = ["Manu Gira <manu.gira@outlook.com>"]
-readme = "README_user.md"
+readme = "docs/README_user.md"
 repository = "https://github.com/ManuGira/Guibbon.git"
 keywords = ["GUI", "Tkinter", "OpenCV"]
 
@@ -24,6 +24,8 @@ pytest = "^7.2.2"
 pytest-cov = "^4.0.0"
 ruff = "^0.1.5"
 mypy = "^1.4.1"
+mkdocs = "^1.5.3"
+
 
 [tool.pytest.ini_options]
 addopts = "--cov-report=term --cov-report=html:build/pytest_coverage_html --cov=guibbon"
