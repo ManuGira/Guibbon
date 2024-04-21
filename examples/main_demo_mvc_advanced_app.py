@@ -91,5 +91,5 @@ class DemoMVCAdvApp:
 
 
 if __name__ == "__main__":
-    mc = DemoMVCAdvApp("images/dog.jpg")
+    mc = DemoMVCAdvApp("ressources/dog.jpg")
     mc.show()

@@ -9,7 +9,7 @@ Image_t = npt.NDArray[np.uint8]
 class DemoMVCAppFail:
     """
     This demonstrate a BAD architecture. This is just an example for you to see the difference compared to a correct architecture
-    The difference here is that the on_drag callback is calling update() and show()
+    The difference here is that the on_drag callback is calling update() and show() which is bad
     TODO: try it with a full cv2 widget (mouse event, or trackbar). And make sure the bug also appear. Otherwise a fix must be done
     """
 
@@ -52,5 +52,5 @@ class DemoMVCAppFail:
 
 
 if __name__ == "__main__":
-    mc = DemoMVCAppFail("images/dog.jpg")
+    mc = DemoMVCAppFail("ressources/dog.jpg")
     mc.show()
