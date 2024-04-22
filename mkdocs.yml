@@ -1,5 +1,5 @@
 site_name: Guibbon Doc
-site_url: https://example.com/
+site_url: https://manugira.github.io/Guibbon/
 nav:
   - 'Home': 'index.md'
   - 'getting_started.md'
