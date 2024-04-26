@@ -49,11 +49,11 @@ More info in the [documentation](https://manugira.github.io/Guibbon/)
  * **Magnets for Interactive Overlays**: A point cloud that can be injected to an interactive overlay. The overlay will snap to the magnets when dragged by the user.
 
 ## User Installation
-This package is hosted on [PyPl](https://pypi.org/project/guibbon), you can install the **latest stable release** with pip:
+The [Guibbon package](https://pypi.org/project/guibbon) is hosted on PyPI, you can install the **latest stable release** with pip:
 ```
 pip install guibbon
 ```
-If stability is not for you, install the rolling version from github. You will get early access to new **features**, **bugfixes** and **bugs**:
+If stability is not for you, install the **rolling version** from github. You will get early access to new mkdocs**features**, **bugfixes** and **bugs**:
 ```
 pip install git+https://github.com/ManuGira/Guibbon.git@master
 ```

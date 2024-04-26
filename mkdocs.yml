@@ -1,9 +1,17 @@
 site_name: Guibbon Doc
+
 site_url: https://manugira.github.io/Guibbon/
+
 nav:
-  - 'Home': 'index.md'
-  - 'getting_started.md'
-  - 'Documentation':
-    - 'v0.1.6* (rolling verision)': 'versions/v0.1.6/index.md'
-    - 'v0.1.5 (latest stable release)': 'versions/v0.1.5/index.md'
-  - 'release_notes.md'
+- 'Home': 'index.md'
+- 'getting_started.md'
+- 'API': 'api_reference/index.md'
+- 'release_notes.md'
+
+plugins:
+- mkdocstrings:
+    default_handler: python
+    handlers:
+      python:
+        options:
+          show_source: false
