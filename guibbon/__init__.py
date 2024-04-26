@@ -218,6 +218,7 @@ def createInteractiveRectangle(
         on_release: CallbackRect = None,
         magnet_points: Optional[Point2DList] = None,
 ) -> InteractivePolygon:
+    """Create and returns object of type createInteractiveRectangle windows named windowName."""
     irect: InteractivePolygon
     irect = Guibbon.get_instance(windowName).image_viewer.createInteractiveRectangle(point0_xy, point1_xy, label, on_click, on_drag, on_release, magnet_points)
     return irect
