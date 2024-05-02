@@ -2,14 +2,18 @@ import tkinter as tk
 from typing import Callable, Any, Sequence
 
 CallbackSlider = Callable[[int, Any], None]
+
+
 class SliderWidget:
     def __init__(self, tk_frame: tk.Frame, slider_name: str, values: Sequence[Any], initial_index: int, on_change: CallbackSlider, widget_color):
-        self.name = slider_name
+        self.name = tk.StringVar()
+        self.name.set(slider_name)
+
         self.values = values
         self.on_change = on_change
         self.value_var = tk.StringVar()
 
-        tk.Label(tk_frame, text=self.name, bg=widget_color).pack(padx=2, side=tk.LEFT)
+        tk.Label(tk_frame, textvariable=self.name, bg=widget_color).pack(padx=2, side=tk.LEFT)
         self.value_var.set(self.values[initial_index])
         tk.Label(tk_frame, textvariable=self.value_var, bg=widget_color).pack(padx=2, side=tk.TOP)
         count = len(self.values)
@@ -18,6 +22,12 @@ class SliderWidget:
 
         self.tk_scale["command"] = self.callback
         self.tk_scale.pack(padx=2, fill=tk.X, expand=1)
+
+    def __setattr__(self, key, value):
+        if key == "name" and key in self.__dict__.keys():
+            self.name.set(value)
+        else:
+            return super().__setattr__(key, value)
 
     def callback(self, index):
         val = self.values[int(index)]

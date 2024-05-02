@@ -50,7 +50,7 @@ def on_point_release(event):
 
 
 def demo_cv():
-    img = cv2.imread("images/dog.jpg")
+    img = cv2.imread("ressources/dog.jpg")
 
     k = 0
     winname = "Demo Guibbon"
