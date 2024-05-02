@@ -6,9 +6,9 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         
         
-        <link rel="canonical" href="https://manugira.github.io/Guibbon/api_reference/">
+        <link rel="canonical" href="https://manugira.github.io/Guibbon/release_notes/">
         <link rel="shortcut icon" href="../img/favicon.ico">
-        <title>API - Guibbon Doc</title>
+        <title>Release notes - Guibbon Doc</title>
         <link href="../css/bootstrap.min.css" rel="stylesheet">
         <link href="../css/font-awesome.min.css" rel="stylesheet">
         <link href="../css/base.css" rel="stylesheet">
@@ -24,14 +24,13 @@
             <div class="topnav">
               <span>version</span>
               <select id="version_select" onchange="onVersionChange();">
-                <option value="t0.1.8-dev" selected="selected">t0.1.8-dev</option>
-        <option value="t0.1.7">t0.1.7</option>
-        <option value="t0.1.6">t0.1.6</option>
+                <option value="v0.1.6-dev" selected="selected">v0.1.6-dev</option>
+        <option value="v0.1.5">v0.1.5</option>
               </select>
             </div>
             <script>
             function onVersionChange() {
-              let current_version = "t0.1.8-dev"
+              let current_version = "v0.1.6-dev"
               let target_version = document.getElementById("version_select").value;
               let current_url = window.location.pathname;
               let target_url = current_url.replace(current_version, target_version);
@@ -58,22 +57,22 @@
                             <li class="navitem">
                                 <a href="../getting_started/" class="nav-link">Getting started</a>
                             </li>
-                            <li class="navitem active">
-                                <a href="./" class="nav-link">API</a>
-                            </li>
                             <li class="navitem">
-                                <a href="../release_notes/" class="nav-link">Release notes</a>
+                                <a href="../api_reference/" class="nav-link">API</a>
+                            </li>
+                            <li class="navitem active">
+                                <a href="./" class="nav-link">Release notes</a>
                             </li>
                         </ul>
 
                     <ul class="nav navbar-nav ml-auto">
                             <li class="nav-item">
-                                <a rel="prev" href="../getting_started/" class="nav-link">
+                                <a rel="prev" href="../api_reference/" class="nav-link">
                                     <i class="fa fa-arrow-left"></i> Previous
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a rel="next" href="../release_notes/" class="nav-link">
+                                <a rel="next" class="nav-link disabled">
                                     Next <i class="fa fa-arrow-right"></i>
                                 </a>
                             </li>
@@ -95,7 +94,7 @@
     <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
         <ul class="nav flex-column">
             
-            <li class="nav-item" data-level="1"><a href="#documentation-for-guibbon" class="nav-link">Documentation for Guibbon</a>
+            <li class="nav-item" data-level="2"><a href="#release-notes" class="nav-link">Release Notes</a>
               <ul class="nav flex-column">
               </ul>
             </li>
@@ -104,158 +103,37 @@
 </div></div>
                     <div class="col-md-9" role="main">
 
-<h1 id="documentation-for-guibbon">Documentation for <code>Guibbon</code></h1>
-
-
-<div class="doc doc-object doc-module">
-
-
-
-<a id="guibbon"></a>
-  <div class="doc doc-contents first">
-
-  
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-
-<div class="doc doc-object doc-class">
-
-
-
-<h4 id="guibbon.Guibbon" class="doc doc-heading">
-          <code>Guibbon</code>
-
-
-</h4>
-
-
-  <div class="doc doc-contents ">
-
-  
-      <p>The Guibbon object contains the list of open windows</p>
-
-
-  
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-
-<h5 id="guibbon.Guibbon.getWindowProperty" class="doc doc-heading">
-          <code class="highlight language-python">getWindowProperty(prop_id)</code>
-
-</h5>
-
-
-  <div class="doc doc-contents ">
-  
-
-<details class="todo" open>
-  <summary>not all flags ar handled</summary>
-  <p>cv2.WND_PROP_FULLSCREEN:    fullscreen property (can be WINDOW_NORMAL or WINDOW_FULLSCREEN).
-cv2.WND_PROP_AUTOSIZE:      autosize property (can be WINDOW_NORMAL or WINDOW_AUTOSIZE).
-cv2.WND_PROP_ASPECT_RATIO:  window's aspect ration (can be set to WINDOW_FREERATIO or WINDOW_KEEPRATIO).
-cv2.WND_PROP_OPENGL:        opengl support.
-cv2.WND_PROP_VISIBLE:       checks whether the window exists and is visible
-cv2.WND_PROP_TOPMOST:       property to toggle normal window being topmost or not
-cv2.WND_PROP_VSYNC:         enable or disable VSYNC (in OpenGL mode)</p>
-</details>
-  </div>
-
-</div>
-
-
-
-  </div>
-
-  </div>
-
-
-</div>
-
-
-
-<div class="doc doc-object doc-function">
-
-
-
-<h4 id="guibbon.createInteractivePolygon" class="doc doc-heading">
-          <code class="highlight language-python">createInteractivePolygon(windowName, point_xy_list, label='', on_click=None, on_drag=None, on_release=None, magnet_points=None)</code>
-
-</h4>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Draws a polygon over the displayed image. The corners of the polygon can be dragged by the user, triggering a callback.</p>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-<h4 id="guibbon.createInteractiveRectangle" class="doc doc-heading">
-          <code class="highlight language-python">createInteractiveRectangle(windowName, point0_xy, point1_xy, label='', on_click=None, on_drag=None, on_release=None, magnet_points=None)</code>
-
-</h4>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Create and returns object of type createInteractiveRectangle windows named windowName.</p>
-
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-<h4 id="guibbon.createTrackbar" class="doc doc-heading">
-          <code class="highlight language-python">createTrackbar(trackbarName, windowName, value, count, onChange)</code>
-
-</h4>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Same trackbar as in opencv. However, for a more pythonic signature, you may want to use create_slider(...) instead</p>
-
-  </div>
-
-</div>
-
-
-
-  </div>
-
-  </div>
-
-</div></div>
+<h2 id="release-notes">Release Notes</h2>
+<h4 id="v016-rolling-version"><strong>v0.1.6</strong>* (rolling version)</h4>
+<h6 id="features"><strong>Features</strong></h6>
+<ul>
+<li><strong>Custom Icon</strong>: The window has an icon of a smiling guibbon now</li>
+<li><strong>Set Slider Name</strong>: Allows to change the name of a Slider Widget after its instantiation</li>
+<li><strong>Improve Color Picker UX</strong>: Add an "Edit" button to the Color Picker Widget for better UX</li>
+</ul>
+<h6 id="bug-fixes"><strong>Bug fixes</strong></h6>
+<ul>
+<li><strong>Float image support</strong>: Before this fix, it was not possible to use <code>guibbon.imshow(...)</code> on an image with dtype=float </li>
+</ul>
+<h4 id="v015"><strong>v0.1.5</strong></h4>
+<h6 id="features_1"><strong>Features</strong></h6>
+<ul>
+<li><strong>Monkey Patching</strong>: Inject Guibbon's function in cv2 package (not permanantly) with <code>guibbon.inject(cv2)</code></li>
+<li><strong>Image Viewer</strong>: shows image with <code>guibbon.imshow(...)</code> similarly to <code>cv2.imshow(...)</code> (can be monkey patched)</li>
+<li><strong>WaitKeyEx</strong>: Similar to <code>cv2.WaitKeyEx(...)</code>, it supports most of the keyboard events (can be monkey patched)</li>
+<li><strong>Trackbar</strong>: create and edit trackbar similarly to <code>cv2.createTrackbar</code> (can be monkey patched)</li>
+<li><strong>Slider Widget</strong>: Same as <code>cv2.trackbar</code> but with a more flexible signature</li>
+<li><strong>Button Widget</strong>: A button to trigger a callback</li>
+<li><strong>Check Button Widget</strong>: Single check box to get control over a boolean</li>
+<li><strong>Check Button List Widget</strong>: List of check boxes</li>
+<li><strong>Radio Buttons Widget</strong>: Set of radio buttons (also called option buttons) to get control over an enum value</li>
+<li><strong>Color Picker Widget</strong>: Let the user choose a color from a color palette</li>
+<li><strong>Custom Widget</strong>: Exposing the <code>guibbon.WidgetInterface</code> allowing you to create and add your custom widget to the right panel</li>
+<li><strong>Interactive Point Overlay</strong>: A draggable point on the image. The point act as a 2D slider returning you its position on the image</li>
+<li><strong>Interactive Polygon Overlays</strong>: A set of draggable point on the image</li>
+<li><strong>Interactive Rectangle Overlays</strong>: A couple of interactive points representing top-left and bottom-right corners of a rectangle</li>
+<li><strong>Magnets for Interactive Overlays</strong>: A point cloud that can be injected to an interactive overlay. The overlay will snap to the magnets when dragged by the user.</li>
+</ul></div>
             </div>
         </div>
 
