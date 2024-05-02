@@ -200,6 +200,9 @@ def createInteractivePolygon(
         on_release: CallbackPolygon = None,
         magnet_points: Optional[Point2DList] = None,
 ) -> InteractivePolygon:
+    """
+    Draws a polygon over the displayed image. The corners of the polygon can be dragged by the user, triggering a callback.
+    """
     ipolygon: InteractivePolygon
     ipolygon = Guibbon.get_instance(windowName).image_viewer.createInteractivePolygon(point_xy_list, label, on_click, on_drag, on_release, magnet_points)
     return ipolygon
@@ -215,12 +218,15 @@ def createInteractiveRectangle(
         on_release: CallbackRect = None,
         magnet_points: Optional[Point2DList] = None,
 ) -> InteractivePolygon:
+    """Create and returns object of type createInteractiveRectangle windows named windowName."""
     irect: InteractivePolygon
     irect = Guibbon.get_instance(windowName).image_viewer.createInteractiveRectangle(point0_xy, point1_xy, label, on_click, on_drag, on_release, magnet_points)
     return irect
 
 
 class Guibbon:
+    """The Guibbon object contains the list of open windows"""
+
     root: tk.Tk
     is_alive: bool = False
     instances: Dict[str, "Guibbon"] = {}
