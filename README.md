@@ -109,12 +109,15 @@ $ poetry publish -r pypi -u __token__ -p <paste the secret token here (very long
 ```
 
 ### Publishing Documentation
-The documentation is written with [mkdocs](https://www.mkdocs.org/). Documentation files are placed in folder `./doc/`. You can build and run the website locally:
-* `mkdocs serve` - Start the live-reloading docs server.
-* `mkdocs build` - Build the documentation site.
-
-The documentation can be deployed on github on the page of the Guibbon's project. It can only host a single version of the documentation, so it is important to check out on master before deploying.   
-* `mkdocs gh-deploy`
+The documentation is written with [mkdocs](https://www.mkdocs.org/). Documentation files are placed in folder `./build/docs/site`.  
+Build documentation site for all version tag and current develop:
+```
+$ ./scripts/build_docs.sh
+```
+Once built, the documentation can be deployed on github on the page of the Guibbon's project.  
+```
+$ ./scripts/deploy_docs.sh
+```
 
 ## TODO
 
