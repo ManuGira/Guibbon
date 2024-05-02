@@ -3,6 +3,8 @@
 cd "$(dirname "$0")"
 cd ..
 
+source ./.venv/Scripts/activate
+
 # repo must be have no changes
 if [[ `git status --porcelain` ]]; then
   echo "Please stash or commit any local changes before building the docs"
