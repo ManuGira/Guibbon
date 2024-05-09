@@ -13,13 +13,13 @@ Point2DList = List[Point2D]
 CallbackRadioButtons = Optional[Callable[[int, str], NoReturn]]
 
 # foo(event) -> None
-CallbackPoint = Optional[Callable[[tk.Event], NoReturn]]
+CallbackPoint = Optional[Callable[[tk.EventType], NoReturn]]
 
 # foo(event, point_xy_list) -> None
-CallbackPolygon = Optional[Callable[[tk.Event, Point2DList], NoReturn]]
+CallbackPolygon = Optional[Callable[[tk.EventType, Point2DList], NoReturn]]
 
 # foo(event, point0_xy, point1_xy) -> None
-CallbackRect = Optional[Callable[[tk.Event, Point2D, Point2D], NoReturn]]
+CallbackRect = Optional[Callable[[tk.EventType, Point2D, Point2D], NoReturn]]
 
 # foo(cvevent, x, y, flag, param) -> None
 CallbackMouse = Optional[Callable[[int, int, int, int, None], NoReturn]]

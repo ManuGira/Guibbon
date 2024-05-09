@@ -1,5 +1,4 @@
 import os
-import sys
 
 PAYLOAD = """
         <div style="padding:5px">
@@ -45,15 +44,15 @@ def create_option_tag(target_version, is_default=False):
 
 
 def create_option_group(versions_list, default_version):
-    OPTION_GROUP_HTML = []
+    OPTION_GROUP_HTML_LINES: list[str] = []
     indent = "\n" + 4 * "  "
     for version in versions_list:
         option_html = create_option_tag(
             version,
             is_default=version == default_version,
         )
-        OPTION_GROUP_HTML.append(option_html)
-    OPTION_GROUP_HTML = indent.join(OPTION_GROUP_HTML)
+        OPTION_GROUP_HTML_LINES.append(option_html)
+    OPTION_GROUP_HTML = indent.join(OPTION_GROUP_HTML_LINES)
     return OPTION_GROUP_HTML
 
 

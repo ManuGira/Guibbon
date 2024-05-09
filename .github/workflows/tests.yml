@@ -42,7 +42,7 @@ jobs:
     strategy:
       matrix:
         os: ['windows-latest', 'ubuntu-latest']
-        python-version: ['3.12', '3.10', '3.8']
+        python-version: ['3.11', '3.8']
     runs-on: ${{ matrix.os }}
 
     name: "Tests: ${{ matrix.os }}, py ${{ matrix.python-version }}"

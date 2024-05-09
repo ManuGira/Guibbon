@@ -73,3 +73,4 @@ warn_unused_configs = true
 implicit_reexport = true
 pretty = true
 cache_dir = "build/.mypy_cache"
+exclude = "build/"
