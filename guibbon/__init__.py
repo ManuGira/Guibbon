@@ -1,4 +1,5 @@
 import os
+import re
 import time
 import tkinter as tk
 from typing import Dict, Optional, Type, List, Sequence, Any, Tuple
@@ -19,8 +20,26 @@ from .widgets.slider_widget import SliderWidget, CallbackSlider
 from .widgets.treeview_widget import TreeviewWidget, CallbackTreeview, TreeNode
 from .widgets.widget import WidgetInterface
 
-__version__ = "0.0.0"
-__version_info__ = tuple(int(i) for i in __version__.split(".") if i.isdigit())
+__version__ = "0.1.6-dev"
+
+
+def compute_version_info():
+    mtch = re.match(r"(\d+).(\d+).(\d+)((-dev)?)$", __version__)
+
+    if mtch is None:
+        return [(0, 0, 0), ""]
+
+    major = mtch.group(1)
+    minor = mtch.group(2)
+    build_nb = mtch.group(3)
+
+    count: int = 0 if mtch.lastindex is None else mtch.lastindex
+    mode = "dev" if count >= 4 else ""
+
+    return [(major, minor, build_nb), mode]
+
+
+__version_info__ = compute_version_info()
 
 
 def inject(cv2_package):

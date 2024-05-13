@@ -1,11 +1,36 @@
+import re
+import subprocess
 import sys
 import unittest
-import cv2
-import guibbon as gbn
-import numpy as np
 from typing import Tuple
 
+import cv2
+import numpy as np
+
+import guibbon as gbn
+
 eps = sys.float_info.epsilon
+
+
+class TestPackage(unittest.TestCase):
+    def test_version_match(self):
+        ver0 = gbn.__version__
+        res = subprocess.run(f"{sys.executable} -m pip show guibbon".split(), capture_output=True).stdout.decode()
+        version_line = [line for line in res.split("\n") if "Version" in line][0].strip()
+        ver1 = version_line.split()[-1]
+        ver1 = ver1.replace(".dev0", "-dev")  # I don't know where the ".dev0" comes from but it corresponds to my "-dev"
+        self.assertEqual(ver0, ver1, "Package version (in pyproject.toml) and __version__ (in __init__.py) must match")
+
+    def test_version_format(self):
+        mtch = re.match(r"(\d+).(\d+).(\d+)((-dev)?)$", gbn.__version__)
+        self.assertIsNotNone(mtch, 'Version number must match regex: ' + r"(\d+).(\d+).(\d+)((-dev)?)$")
+
+    def test_version_info_format(self):
+        version_digits, mode = gbn.__version_info__
+        version = ".".join([str(digit) for digit in version_digits])
+        if mode is not None:
+            version += "-" + mode
+        self.assertEqual(version, gbn.__version__)
 
 
 class TestGuibbon(unittest.TestCase):
