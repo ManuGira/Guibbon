@@ -180,6 +180,10 @@ def create_color_picker(winname: str, name: str, on_change: CallbackColorPicker,
     return Guibbon.get_instance(winname).create_color_picker(name, on_change, initial_color_rgb)
 
 
+def create_treeview(winname: str, name: str, tree: TreeNode, on_click: CallbackTreeview) -> TreeviewWidget:
+    return Guibbon.get_instance(winname).create_treeview(name, tree, on_click)
+
+
 def createInteractivePoint(
         windowName,
         point_xy,
@@ -403,12 +407,11 @@ class Guibbon:
         tk_frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
         return cpw
 
-    def create_treeview(self, name: str, tree, on_click: CallbackTreeview) -> TreeviewWidget:
+    def create_treeview(self, name: str, tree: TreeNode, on_click: CallbackTreeview) -> TreeviewWidget:
         tk_frame = tk.Frame(self.ctrl_frame)
         widget = TreeviewWidget(tk_frame, name, tree, on_click)
         tk_frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
         return widget
-
 
     def imshow(self, mat: Image_t, mode: Optional[str] = None, cv2_interpolation: Optional[int] = None):
         self.image_viewer.imshow(mat, mode, cv2_interpolation)
@@ -434,4 +437,3 @@ class Guibbon:
 
     def setMouseCallback(self, onMouse: CallbackMouse, userdata=None):
         self.image_viewer.setMouseCallback(onMouse, userdata)
-
