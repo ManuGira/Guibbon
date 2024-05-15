@@ -20,7 +20,7 @@ from .widgets.slider_widget import SliderWidget, CallbackSlider
 from .widgets.treeview_widget import TreeviewWidget, CallbackTreeview, TreeNode
 from .widgets.widget import WidgetInterface
 
-__version__ = "0.2.0"
+__version__ = "0.2.1"
 
 
 def compute_version_info():
