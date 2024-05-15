@@ -33,8 +33,8 @@ def compute_version_info():
     minor = mtch.group(2)
     build_nb = mtch.group(3)
 
-    count: int = 0 if mtch.lastindex is None else mtch.lastindex
-    mode = "dev" if count >= 4 else ""
+    lastindex: int = 0 if mtch.lastindex is None else mtch.lastindex
+    mode = "dev" if "dev" in mtch.group(lastindex) else None
 
     return [(major, minor, build_nb), mode]
 
