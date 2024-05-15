@@ -21,7 +21,7 @@ Other reasons why you want to use Guibbon:
 More info in the [documentation](https://manugira.github.io/Guibbon/)
 
 ## Release Notes
-#### v0.1.6* (rolling version)
+#### v0.2.0
 ###### Features
 * **Tree View Widget**: Create your tree with `guibbon.TreeNode` and pass it to `guibbon.TreeView(...)`
 * **Custom Icon**: The window has an icon of a smiling guibbon now
@@ -54,7 +54,7 @@ The [Guibbon package](https://pypi.org/project/guibbon) is hosted on PyPI, you c
 ```
 pip install guibbon
 ```
-If stability is not for you, install the **rolling version** from github. You will get early access to new mkdocs**features**, **bugfixes** and **bugs**:
+If stability is not for you, install the **dev version** from github. You will get early access to new **features**, **bugfixes** and **bugs**:
 ```
 pip install git+https://github.com/ManuGira/Guibbon.git@master
 ```
