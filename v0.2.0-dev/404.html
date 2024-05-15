@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="light">
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -10,9 +10,13 @@
         <link rel="shortcut icon" href="/Guibbon/img/favicon.ico">
         <title>Guibbon Doc</title>
         <link href="/Guibbon/css/bootstrap.min.css" rel="stylesheet">
-        <link href="/Guibbon/css/font-awesome.min.css" rel="stylesheet">
+        <link href="/Guibbon/css/fontawesome.min.css" rel="stylesheet">
+        <link href="/Guibbon/css/brands.min.css" rel="stylesheet">
+        <link href="/Guibbon/css/solid.min.css" rel="stylesheet">
+        <link href="/Guibbon/css/v4-font-face.min.css" rel="stylesheet">
         <link href="/Guibbon/css/base.css" rel="stylesheet">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
         <link href="/Guibbon/assets/_mkdocstrings.css" rel="stylesheet">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
         <script>hljs.highlightAll();</script> 
@@ -23,7 +27,7 @@
             <div class="container">
                 <a class="navbar-brand" href="/Guibbon/.">Guibbon Doc</a>
                 <!-- Expander button -->
-                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
@@ -31,21 +35,21 @@
                 <div id="navbar-collapse" class="navbar-collapse collapse">
                         <!-- Main navigation -->
                         <ul class="nav navbar-nav">
-                            <li class="navitem">
+                            <li class="nav-item">
                                 <a href="/Guibbon/." class="nav-link">Home</a>
                             </li>
-                            <li class="navitem">
+                            <li class="nav-item">
                                 <a href="/Guibbon/getting_started/" class="nav-link">Getting started</a>
                             </li>
-                            <li class="navitem">
+                            <li class="nav-item">
                                 <a href="/Guibbon/api_reference/" class="nav-link">API</a>
                             </li>
-                            <li class="navitem">
+                            <li class="nav-item">
                                 <a href="/Guibbon/release_notes/" class="nav-link">Release notes</a>
                             </li>
                         </ul>
 
-                    <ul class="nav navbar-nav ml-auto">
+                    <ul class="nav navbar-nav ms-md-auto">
                     </ul>
                 </div>
             </div>
@@ -69,8 +73,7 @@
             <hr>
             <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
         </footer>
-        <script src="/Guibbon/js/jquery-3.6.0.min.js"></script>
-        <script src="/Guibbon/js/bootstrap.min.js"></script>
+        <script src="/Guibbon/js/bootstrap.bundle.min.js"></script>
         <script>
             var base_url = "/Guibbon/",
                 shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
@@ -82,7 +85,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
-                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
               <table class="table">
