@@ -1,5 +1,5 @@
 ## Release Notes
-#### v0.1.6* (rolling version)
+#### v0.2.1
 ###### Features
 * **Tree View Widget**: Create your tree with `guibbon.TreeNode` and pass it to `guibbon.TreeView(...)`
 * **Custom Icon**: The window has an icon of a smiling guibbon now
