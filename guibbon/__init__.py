@@ -1,4 +1,5 @@
 import os
+import re
 import time
 import tkinter as tk
 from typing import Dict, Optional, Type, List, Sequence, Any, Tuple
@@ -16,10 +17,29 @@ from .widgets.check_button_widget import CheckButtonWidget, CallbackCheckButton
 from .widgets.color_picker_widget import ColorPickerWidget, CallbackColorPicker
 from .widgets.radio_buttons_widget import RadioButtonsWidget, CallbackRadioButtons
 from .widgets.slider_widget import SliderWidget, CallbackSlider
+from .widgets.treeview_widget import TreeviewWidget, CallbackTreeview, TreeNode
 from .widgets.widget import WidgetInterface
 
-__version__ = "0.0.0"
-__version_info__ = tuple(int(i) for i in __version__.split(".") if i.isdigit())
+__version__ = "0.1.6-dev"
+
+
+def compute_version_info():
+    mtch = re.match(r"(\d+).(\d+).(\d+)((-dev)?)$", __version__)
+
+    if mtch is None:
+        return [(0, 0, 0), ""]
+
+    major = mtch.group(1)
+    minor = mtch.group(2)
+    build_nb = mtch.group(3)
+
+    count: int = 0 if mtch.lastindex is None else mtch.lastindex
+    mode = "dev" if count >= 4 else ""
+
+    return [(major, minor, build_nb), mode]
+
+
+__version_info__ = compute_version_info()
 
 
 def inject(cv2_package):
@@ -177,6 +197,10 @@ def create_check_button_list(winname: str, name: str, options: List[str], on_cha
 
 def create_color_picker(winname: str, name: str, on_change: CallbackColorPicker, initial_color_rgb: Optional[Tuple[int, int, int]] = None) -> ColorPickerWidget:
     return Guibbon.get_instance(winname).create_color_picker(name, on_change, initial_color_rgb)
+
+
+def create_treeview(winname: str, name: str, tree: TreeNode, on_click: CallbackTreeview) -> TreeviewWidget:
+    return Guibbon.get_instance(winname).create_treeview(name, tree, on_click)
 
 
 def createInteractivePoint(
@@ -401,6 +425,12 @@ class Guibbon:
         cpw = ColorPickerWidget(tk_frame, name, on_change, initial_color_rgb)
         tk_frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
         return cpw
+
+    def create_treeview(self, name: str, tree: TreeNode, on_click: CallbackTreeview) -> TreeviewWidget:
+        tk_frame = tk.Frame(self.ctrl_frame)
+        widget = TreeviewWidget(tk_frame, name, tree, on_click)
+        tk_frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
+        return widget
 
     def imshow(self, mat: Image_t, mode: Optional[str] = None, cv2_interpolation: Optional[int] = None):
         self.image_viewer.imshow(mat, mode, cv2_interpolation)

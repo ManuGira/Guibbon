@@ -5,7 +5,8 @@ import guibbon as gbn
 from guibbon.typedef import Image_t
 import threading
 
-
+def on_click_treeview(*args):
+    print(args)
 class DemoMVCAdvApp:
     @dataclasses.dataclass
     class Model:
@@ -30,6 +31,13 @@ class DemoMVCAdvApp:
         point0_xy = (200, 200)
         point1_xy = (300, 250)
         gbn.createInteractiveRectangle(self.winname, point0_xy, point1_xy, "rectangle", on_drag=self.on_drag_rect, magnet_points=[(100, 300), (150, 300)])
+
+        tree = gbn.TreeNode(name="root", value="r")
+        tree.set(["branch0"], value="0")
+        tree.set(["branch0", "branch00"], value="00")
+        tree.set(["branch0", "branch01"], value="01")
+        tree.set(["branch1", "branch10"], value="10")
+        gbn.create_treeview(self.winname, "TreeView", tree=tree, on_click=on_click_treeview)
 
         self.model = DemoMVCAdvApp.Model()
         self.result = DemoMVCAdvApp.Result()
