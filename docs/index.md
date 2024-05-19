@@ -1,5 +1,4 @@
-# ![icon](images/icon32.png) Guibbon with U ![icon](images/icon32.png) 
-![Tests](https://github.com/ManuGira/Guibbon/actions/workflows/tests.yml/badge.svg)
+# ![icon](https://raw.githubusercontent.com/ManuGira/Guibbon/static/docs/images/icon32.png) Guibbon with U ![icon](https://raw.githubusercontent.com/ManuGira/Guibbon/static/docs/images/icon32.png) 
 
 ### High-level GUI with an API similar to the HighGUI of OpenCV. 
 **If you know how to use the GUI of OpenCV, then you already know how to use Guibbon.**
