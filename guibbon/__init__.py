@@ -355,7 +355,7 @@ class Guibbon:
         self.buttons_by_names: Dict[str, ButtonWidget] = {}
 
         self.frame.pack()
-        self.image_viewer.pack(side=tk.LEFT)
+        self.image_viewer.frame.pack(side=tk.LEFT)
         # self.ctrl_frame.pack_propagate(False)
         self.ctrl_frame.pack(fill=tk.X)
 

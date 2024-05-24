@@ -12,7 +12,7 @@ from PIL import Image, ImageTk
 from . import interactive_overlays
 from . import transform_matrix as tm
 from .transform_matrix import TransformMatrix
-from .typedef import Image_t, CallbackPoint, CallbackPolygon, CallbackRect, Point2DList, CallbackMouse
+from .typedef import Image_t, CallbackPoint, CallbackPolygon, CallbackRect, Point2D, Point2DList, CallbackMouse
 
 
 class ImageViewer:
@@ -45,16 +45,31 @@ class ImageViewer:
         MOUSE_BUTTON_3: bool = False
 
     def __init__(self, master, height: int, width: int):
-        self.canvas = tk.Canvas(master=master, height=height, width=width, bg="gray10")
+        self.frame = tk.Frame(master=master)
+        self.canvas = tk.Canvas(master=self.frame, height=height, width=width, bg="gray10")
         self.canvas_shape_hw = (height, width)
 
         self.imgtk = None
         self.onMouse: CallbackMouse = None
         self.modifier = ImageViewer.Modifier()
         self.interactive_overlay_instance_list: List[Any] = []
+
+        self.mat: Image_t
+        self.cv2_interpolation: int
+        self.pan_xy: Point2D = (0.0, 0.0)
+        self.zoom_factor: float
         self.img2can_matrix: TransformMatrix
         self.can2img_matrix: TransformMatrix
+
         self.set_img2can_matrix(tm.identity_matrix())
+
+        self.canvas.pack(side=tk.TOP)
+
+        self.toolbar_frame = tk.Frame(master=self.frame)
+        tk.Button(master=self.toolbar_frame, text="fit", command=self.onclick_zoom_fit).pack(side=tk.LEFT)
+        tk.Button(master=self.toolbar_frame, text="fill", command=self.onclick_zoom_fill).pack(side=tk.LEFT)
+        tk.Button(master=self.toolbar_frame, text="100%", command=self.onclick_zoom_100).pack(side=tk.LEFT)
+        self.toolbar_frame.pack(side=tk.TOP, fill=tk.X)
 
     def setMouseCallback(self, onMouse, userdata=None):
         if not isinstance(onMouse, types.FunctionType) and not isinstance(onMouse, types.MethodType):
@@ -214,37 +229,15 @@ class ImageViewer:
         self.interactive_overlay_instance_list.append(irectangle)
         return irectangle
 
-    def pack(self, *args, **kwargs):
-        self.canvas.pack(*args, **kwargs)
-
-    def bind(self, *args, **kwargs):
-        self.canvas.bind(*args, **kwargs)
-
-    def imshow(self, mat: Image_t, mode: Optional[str] = None, cv2_interpolation: Optional[int] = None):
-        mode = "fit" if mode is None else mode
-        cv2_interpolation = cv2.INTER_LINEAR if cv2_interpolation is None else cv2_interpolation
-
+    def draw(self):
         canh, canw = self.canvas_shape_hw
-        imgh, imgw = mat.shape[:2]
+        imgh, imgw = self.mat.shape[:2]
+        img_center_matrix: TransformMatrix = tm.T((imgw / 2, imgh / 2))
+        can_center_matrix: TransformMatrix = tm.T((canw / 2, canh / 2))
+        pan_and_zoom_matrix: TransformMatrix = tm.S((self.zoom_factor, self.zoom_factor)) @ tm.T(self.pan_xy)
 
-        if mat.dtype == float:
-            mat = (np.clip(mat, 0, 1) * 255).astype(np.uint8)
-
-        mat = cv2.cvtColor(mat, cv2.COLOR_BGR2RGB)  # type: ignore
-
-        img_space_matrix: TransformMatrix
-        can_space_matrix: TransformMatrix
-        if mode == "fit":
-            img_space_matrix = tm.T((imgw / 2, imgh / 2)) @ tm.S((max(imgw, imgh), max(imgw, imgh)))
-            can_space_matrix = tm.T((canw / 2, canh / 2)) @ tm.S((max(canw, canh), max(canw, canh)))
-        elif mode == "fill":
-            img_space_matrix = tm.T((imgw / 2, imgh / 2)) @ tm.S((min(imgw, imgh), min(imgw, imgh)))
-            can_space_matrix = tm.T((canw / 2, canh / 2)) @ tm.S((min(canw, canh), min(canw, canh)))
-        else:
-            raise ValueError(f'Don\'t know mode: "{mode}"')
-
-        self.set_img2can_matrix(can_space_matrix @ np.linalg.inv(img_space_matrix))
-        mat = cv2.warpPerspective(mat, self.img2can_matrix, dsize=(canh, canw), flags=cv2_interpolation)  # type: ignore
+        self.set_img2can_matrix(can_center_matrix @ pan_and_zoom_matrix @ np.linalg.inv(img_center_matrix))
+        mat = cv2.warpPerspective(self.mat, self.img2can_matrix, dsize=(canh, canw), flags=self.cv2_interpolation)  # type: ignore
 
         self.imgtk = ImageTk.PhotoImage(image=Image.fromarray(mat))
         self.canvas.create_image(canw // 2, canh // 2, anchor=tk.CENTER, image=self.imgtk)
@@ -252,3 +245,43 @@ class ImageViewer:
         for overlay in self.interactive_overlay_instance_list:
             overlay.set_img2can_matrix(self.img2can_matrix)
             overlay.update()
+
+    def set_zoom_fit(self):
+        canh, canw = self.canvas_shape_hw
+        imgh, imgw = self.mat.shape[:2]
+        self.zoom_factor = min(canh / imgh, canw / imgw)
+
+    def set_zoom_fill(self):
+        canh, canw = self.canvas_shape_hw
+        imgh, imgw = self.mat.shape[:2]
+        self.zoom_factor = max(canh / imgh, canw / imgw)
+
+    def onclick_zoom_fit(self):
+        self.set_zoom_fit()
+        self.draw()
+
+    def onclick_zoom_fill(self):
+        self.set_zoom_fill()
+        self.draw()
+
+    def onclick_zoom_100(self):
+        self.zoom_factor = 1
+        self.draw()
+
+    def imshow(self, mat: Image_t, mode: Optional[str] = None, cv2_interpolation: Optional[int] = None):
+        self.cv2_interpolation = cv2.INTER_LINEAR if cv2_interpolation is None else cv2_interpolation
+
+        if mat.dtype == float:
+            mat = (np.clip(mat, 0, 1) * 255).astype(np.uint8)
+
+        self.mat = cv2.cvtColor(mat, cv2.COLOR_BGR2RGB)  # type: ignore
+
+        mode = "fit" if mode is None else mode
+        if mode == "fit":
+            self.set_zoom_fit()
+        elif mode == "fill":
+            self.set_zoom_fill()
+        else:
+            raise ValueError(f'Don\'t know mode: "{mode}"')
+
+        self.draw()
