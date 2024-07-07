@@ -72,8 +72,8 @@ def not_implemented_error():
     raise NotImplementedError("Function not implemented in current version of Guibbon")
 
 
-def imshow(winname: str, mat: Image_t, mode: Optional[str] = None, cv2_interpolation: Optional[int] = None):
-    Guibbon.get_instance(winname).imshow(mat, mode, cv2_interpolation)
+def imshow(winname: str, mat: Image_t, cv2_interpolation: Optional[int] = None):
+    Guibbon.get_instance(winname).imshow(mat, cv2_interpolation)
 
 
 def getWindowProperty(winname: str, prop_id: int) -> float:
@@ -342,8 +342,8 @@ class Guibbon:
         self.image_viewer = ImageViewer(self.frame, height=720, width=int(720 * self.img_ratio))
 
         # add dummy image to image_viewer
-        img = np.zeros(shape=(100, 100, 3), dtype=np.uint8)
-        self.imshow(img)
+        # img = np.zeros(shape=(100, 100, 3), dtype=np.uint8)
+        # self.imshow(img)
 
         self.ctrl_frame = tk.Frame(master=self.frame, bg=COLORS.ctrl_panel)
         dummy_canvas = tk.Canvas(master=self.ctrl_frame, height=0, width=300)
@@ -432,8 +432,8 @@ class Guibbon:
         tk_frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
         return widget
 
-    def imshow(self, mat: Image_t, mode: Optional[str] = None, cv2_interpolation: Optional[int] = None):
-        self.image_viewer.imshow(mat, mode, cv2_interpolation)
+    def imshow(self, mat: Image_t, cv2_interpolation: Optional[int] = None):
+        self.image_viewer.imshow(mat, cv2_interpolation)
 
     def getWindowProperty(self, prop_id: int) -> float:
         """

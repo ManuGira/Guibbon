@@ -66,9 +66,20 @@ class ImageViewer:
         self.canvas.pack(side=tk.TOP)
 
         self.toolbar_frame = tk.Frame(master=self.frame)
-        tk.Button(master=self.toolbar_frame, text="fit", command=self.onclick_zoom_fit).pack(side=tk.LEFT)
-        tk.Button(master=self.toolbar_frame, text="fill", command=self.onclick_zoom_fill).pack(side=tk.LEFT)
-        tk.Button(master=self.toolbar_frame, text="100%", command=self.onclick_zoom_100).pack(side=tk.LEFT)
+        toolbar_cfg = {"side": tk.LEFT, "padx": 1, "pady": 2}
+        tk.Button(master=self.toolbar_frame, text="fit", command=self.onclick_zoom_fit).pack(toolbar_cfg)
+        tk.Button(master=self.toolbar_frame, text="fill", command=self.onclick_zoom_fill).pack(toolbar_cfg)
+        tk.Button(master=self.toolbar_frame, text="100%", command=self.onclick_zoom_100).pack(toolbar_cfg)
+
+        # Tcl doc about validatecommand: https://tcl-lang.org/man/tcl8.6/TkCmd/ttk_entry.htm#M34
+        # self.zoom_text = tk.StringVar()
+        vcmd = (self.toolbar_frame.register(self.onchange_zoom_entry))
+        self.entry = tk.Entry(master=self.toolbar_frame, validate="all", validatecommand=(vcmd, "%P"))
+        self.entry.pack(toolbar_cfg)
+        self.entry.bind('<Return>', self.onreturn_zoom_entry)
+
+        # self.zoom_var = tk.DoubleVar()
+        # tk.Spinbox(master=self.toolbar_frame, width=10, repeatdelay=500, repeatinterval=100, command=self.onchange_spinbox_zoom, textvariable=self.zoom_var).pack(button_cfg)
         self.toolbar_frame.pack(side=tk.TOP, fill=tk.X)
 
     def setMouseCallback(self, onMouse, userdata=None):
@@ -230,6 +241,12 @@ class ImageViewer:
         return irectangle
 
     def draw(self):
+        # if zoom_factor is not defined yet, define it
+        try:
+            self.zoom_factor
+        except AttributeError:
+            self.set_zoom_fit()
+
         canh, canw = self.canvas_shape_hw
         imgh, imgw = self.mat.shape[:2]
         img_center_matrix: TransformMatrix = tm.T((imgw / 2, imgh / 2))
@@ -256,6 +273,24 @@ class ImageViewer:
         imgh, imgw = self.mat.shape[:2]
         self.zoom_factor = max(canh / imgh, canw / imgw)
 
+
+    def onreturn_zoom_entry(self, event: tk.Event):
+        # focus out by giving focus to the next item
+        self.entry.tk_focusNext().focus()
+
+
+    # Callable[[], object] | str | list[str] | tuple[str, ...]
+    def onchange_zoom_entry(self, P):
+        try:
+            zoom = float(P)
+        except ValueError as e:
+            print(e)
+            return False
+        self.zoom_factor = zoom/100
+        self.draw()
+        print("ZOOM ON CHANGE", self.zoom_factor)
+        return True
+
     def onclick_zoom_fit(self):
         self.set_zoom_fit()
         self.draw()
@@ -268,20 +303,12 @@ class ImageViewer:
         self.zoom_factor = 1
         self.draw()
 
-    def imshow(self, mat: Image_t, mode: Optional[str] = None, cv2_interpolation: Optional[int] = None):
+    def imshow(self, mat: Image_t, cv2_interpolation: Optional[int] = None):
         self.cv2_interpolation = cv2.INTER_LINEAR if cv2_interpolation is None else cv2_interpolation
 
         if mat.dtype == float:
             mat = (np.clip(mat, 0, 1) * 255).astype(np.uint8)
 
         self.mat = cv2.cvtColor(mat, cv2.COLOR_BGR2RGB)  # type: ignore
-
-        mode = "fit" if mode is None else mode
-        if mode == "fit":
-            self.set_zoom_fit()
-        elif mode == "fill":
-            self.set_zoom_fill()
-        else:
-            raise ValueError(f'Don\'t know mode: "{mode}"')
 
         self.draw()
