@@ -13,6 +13,7 @@ from . import interactive_overlays
 from . import transform_matrix as tm
 from .transform_matrix import TransformMatrix
 from .typedef import Image_t, CallbackPoint, CallbackPolygon, CallbackRect, Point2D, Point2DList, CallbackMouse
+from . import wrapped_tk_widgets as wtk
 
 
 class ImageViewer:
@@ -70,16 +71,8 @@ class ImageViewer:
         tk.Button(master=self.toolbar_frame, text="fit", command=self.onclick_zoom_fit).pack(toolbar_cfg)
         tk.Button(master=self.toolbar_frame, text="fill", command=self.onclick_zoom_fill).pack(toolbar_cfg)
         tk.Button(master=self.toolbar_frame, text="100%", command=self.onclick_zoom_100).pack(toolbar_cfg)
-
-        # Tcl doc about validatecommand: https://tcl-lang.org/man/tcl8.6/TkCmd/ttk_entry.htm#M34
-        # self.zoom_text = tk.StringVar()
-        vcmd = (self.toolbar_frame.register(self.onchange_zoom_entry))
-        self.entry = tk.Entry(master=self.toolbar_frame, validate="all", validatecommand=(vcmd, "%P"))
-        self.entry.pack(toolbar_cfg)
-        self.entry.bind('<Return>', self.onreturn_zoom_entry)
-
-        # self.zoom_var = tk.DoubleVar()
-        # tk.Spinbox(master=self.toolbar_frame, width=10, repeatdelay=500, repeatinterval=100, command=self.onchange_spinbox_zoom, textvariable=self.zoom_var).pack(button_cfg)
+        wtk.Entry(master=self.toolbar_frame, on_return_callback=self.onchange_zoom).pack(toolbar_cfg)
+        tk.Label(master=self.toolbar_frame, text="%").pack(toolbar_cfg)
         self.toolbar_frame.pack(side=tk.TOP, fill=tk.X)
 
     def setMouseCallback(self, onMouse, userdata=None):
@@ -252,7 +245,6 @@ class ImageViewer:
         img_center_matrix: TransformMatrix = tm.T((imgw / 2, imgh / 2))
         can_center_matrix: TransformMatrix = tm.T((canw / 2, canh / 2))
         pan_and_zoom_matrix: TransformMatrix = tm.S((self.zoom_factor, self.zoom_factor)) @ tm.T(self.pan_xy)
-
         self.set_img2can_matrix(can_center_matrix @ pan_and_zoom_matrix @ np.linalg.inv(img_center_matrix))
         mat = cv2.warpPerspective(self.mat, self.img2can_matrix, dsize=(canh, canw), flags=self.cv2_interpolation)  # type: ignore
 
@@ -273,23 +265,13 @@ class ImageViewer:
         imgh, imgw = self.mat.shape[:2]
         self.zoom_factor = max(canh / imgh, canw / imgw)
 
-
-    def onreturn_zoom_entry(self, event: tk.Event):
-        # focus out by giving focus to the next item
-        self.entry.tk_focusNext().focus()
-
-
-    # Callable[[], object] | str | list[str] | tuple[str, ...]
-    def onchange_zoom_entry(self, P):
+    def onchange_zoom(self, text: str):
         try:
-            zoom = float(P)
+            zoom = float(text)
         except ValueError as e:
-            print(e)
-            return False
-        self.zoom_factor = zoom/100
+            return
+        self.zoom_factor = zoom / 100
         self.draw()
-        print("ZOOM ON CHANGE", self.zoom_factor)
-        return True
 
     def onclick_zoom_fit(self):
         self.set_zoom_fit()
