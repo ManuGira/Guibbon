@@ -71,7 +71,8 @@ class ImageViewer:
         tk.Button(master=self.toolbar_frame, text="fit", command=self.onclick_zoom_fit).pack(toolbar_cfg)
         tk.Button(master=self.toolbar_frame, text="fill", command=self.onclick_zoom_fill).pack(toolbar_cfg)
         tk.Button(master=self.toolbar_frame, text="100%", command=self.onclick_zoom_100).pack(toolbar_cfg)
-        wtk.Entry(master=self.toolbar_frame, on_return_callback=self.onchange_zoom).pack(toolbar_cfg)
+        self.zoom_entry = wtk.Entry(master=self.toolbar_frame, on_change=self.on_change_zoom)
+        self.zoom_entry.pack(toolbar_cfg)
         tk.Label(master=self.toolbar_frame, text="%").pack(toolbar_cfg)
         self.toolbar_frame.pack(side=tk.TOP, fill=tk.X)
 
@@ -239,6 +240,10 @@ class ImageViewer:
             self.zoom_factor
         except AttributeError:
             self.set_zoom_fit()
+            self.zoom_entry.is_focus = False
+
+        if not self.zoom_entry.is_focus:
+            self.zoom_entry.set(f"{int(self.zoom_factor*100**2)/100}")
 
         canh, canw = self.canvas_shape_hw
         imgh, imgw = self.mat.shape[:2]
@@ -265,7 +270,7 @@ class ImageViewer:
         imgh, imgw = self.mat.shape[:2]
         self.zoom_factor = max(canh / imgh, canw / imgw)
 
-    def onchange_zoom(self, text: str):
+    def on_change_zoom(self, text: str):
         try:
             zoom = float(text)
         except ValueError as e:
@@ -275,14 +280,17 @@ class ImageViewer:
 
     def onclick_zoom_fit(self):
         self.set_zoom_fit()
+        self.zoom_entry.is_focus = False
         self.draw()
 
     def onclick_zoom_fill(self):
         self.set_zoom_fill()
+        self.zoom_entry.is_focus = False
         self.draw()
 
     def onclick_zoom_100(self):
         self.zoom_factor = 1
+        self.zoom_entry.is_focus = False
         self.draw()
 
     def imshow(self, mat: Image_t, cv2_interpolation: Optional[int] = None):
