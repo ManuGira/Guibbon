@@ -10,10 +10,11 @@ import numpy as np
 from PIL import Image, ImageTk
 
 from . import interactive_overlays
+from . import mouse_pan
 from . import transform_matrix as tm
+from . import wrapped_tk_widgets as wtk
 from .transform_matrix import TransformMatrix
 from .typedef import Image_t, CallbackPoint, CallbackPolygon, CallbackRect, Point2D, Point2DList, CallbackMouse
-from . import wrapped_tk_widgets as wtk
 
 
 class ImageViewer:
@@ -55,9 +56,12 @@ class ImageViewer:
         self.modifier = ImageViewer.Modifier()
         self.interactive_overlay_instance_list: List[Any] = []
 
+        self.mouse_pan_calculator = mouse_pan.MousePan(on_drag=self.on_mouse_pan_drag, on_release=self.on_mouse_pan_release)
+
         self.mat: Image_t
         self.cv2_interpolation: int
         self.pan_xy: Point2D = (0.0, 0.0)
+        self.cumulative_pan_xy: Point2D = (0.0, 0.0)
         self.zoom_factor: float
         self.img2can_matrix: TransformMatrix
         self.can2img_matrix: TransformMatrix
@@ -74,21 +78,29 @@ class ImageViewer:
         self.zoom_entry = wtk.Entry(master=self.toolbar_frame, on_change=self.on_change_zoom)
         self.zoom_entry.pack(toolbar_cfg)
         tk.Label(master=self.toolbar_frame, text="%").pack(toolbar_cfg)
+
+        self.is_mouse_panzoom_enabled = tk.BooleanVar()
+        chk1 = tk.Checkbutton(master=self.toolbar_frame, text="mouse pan/zoom", variable=self.is_mouse_panzoom_enabled, onvalue=True, offvalue=False)
+        chk1.pack(toolbar_cfg)
+        chk1.select()
+
+        # self.mouse_panzoom_checkbutton.configure(state='selected')
+        # self.mouse_panzoom_checkbutton.state(["selected"])
+
         self.toolbar_frame.pack(side=tk.TOP, fill=tk.X)
+
+        # <MODIFIER-MODIFIER-TYPE-DETAIL>
+        # see https://dafarry.github.io/tkinterbook/tkinter-events-and-bindings.htm
+        self.canvas.bind("<Motion>", self.on_event)
+        self.canvas.bind("<ButtonPress>", self.on_event)
+        self.canvas.bind("<ButtonRelease>", self.on_event)
+        self.canvas.bind("<MouseWheel>", self.on_event)
 
     def setMouseCallback(self, onMouse, userdata=None):
         if not isinstance(onMouse, types.FunctionType) and not isinstance(onMouse, types.MethodType):
             raise TypeError(f"onMouse must be a function, got {type(onMouse)} instead")
         if userdata is not None:
             raise NotImplementedError("userdata argument of function setMouseCallback is not handled in current version of guibbon")
-
-        if self.onMouse is None:
-            # <MODIFIER-MODIFIER-TYPE-DETAIL>
-            # see https://dafarry.github.io/tkinterbook/tkinter-events-and-bindings.htm
-            self.canvas.bind("<Motion>", self.on_event)
-            self.canvas.bind("<ButtonPress>", self.on_event)
-            self.canvas.bind("<ButtonRelease>", self.on_event)
-            self.canvas.bind("<MouseWheel>", self.on_event)
 
         self.onMouse = onMouse
 
@@ -177,7 +189,32 @@ class ImageViewer:
         x, y = tm.apply(self.can2img_matrix, (event.x, event.y))
         param = None
 
-        self.onMouse(cvevent, x, y, flag, param)  # type: ignore
+        if self.is_mouse_panzoom_enabled.get():
+            if is_mousewheel:
+                print("booost", 2 ** (event.delta / 100))
+                self.zoom_factor *= 2 ** (event.delta / 100)
+            else:
+                can2img_scale_matrix = tm.identity_matrix()
+                # remove translation component to avoid cumulating it
+                can2img_scale_matrix[:2, :2] = self.can2img_matrix[:2, :2]
+                self.mouse_pan_calculator.on_tk_event(event, can2img_scale_matrix)
+
+        if self.onMouse is not None:
+            self.onMouse(cvevent, x, y, flag, param)  # type: ignore
+
+    def on_mouse_pan_drag(self, p0_xy, p1_xy):
+        print("ON MOUSE PAN", self.pan_xy)
+        self.pan_xy = (
+            self.cumulative_pan_xy[0] + p1_xy[0] - p0_xy[0],
+            self.cumulative_pan_xy[1] + p1_xy[1] - p0_xy[1],
+        )
+        self.draw()
+
+    def on_mouse_pan_release(self, p0_xy, p1_xy):
+        self.cumulative_pan_xy = self.pan_xy
+
+    def on_mouse_zoom(self):
+        pass
 
     def set_img2can_matrix(self, img2can_matrix: TransformMatrix):
         self.img2can_matrix = img2can_matrix.copy()
@@ -243,12 +280,13 @@ class ImageViewer:
             self.zoom_entry.is_focus = False
 
         if not self.zoom_entry.is_focus:
-            self.zoom_entry.set(f"{int(self.zoom_factor*100**2)/100}")
+            self.zoom_entry.set(f"{int(self.zoom_factor * 100 ** 2) / 100}")
 
         canh, canw = self.canvas_shape_hw
         imgh, imgw = self.mat.shape[:2]
         img_center_matrix: TransformMatrix = tm.T((imgw / 2, imgh / 2))
         can_center_matrix: TransformMatrix = tm.T((canw / 2, canh / 2))
+        print("MY PAN VECTOR", self.pan_xy)
         pan_and_zoom_matrix: TransformMatrix = tm.S((self.zoom_factor, self.zoom_factor)) @ tm.T(self.pan_xy)
         self.set_img2can_matrix(can_center_matrix @ pan_and_zoom_matrix @ np.linalg.inv(img_center_matrix))
         mat = cv2.warpPerspective(self.mat, self.img2can_matrix, dsize=(canh, canw), flags=self.cv2_interpolation)  # type: ignore
