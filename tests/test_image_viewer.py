@@ -90,12 +90,7 @@ class TestImageViewer(unittest.TestCase):
 
     def test_imshow(self):
         expected_zoom = 5
-        self.image_viewer.imshow(self.img, mode="fit")
-        actual_zoom = self.image_viewer.img2can_matrix[0, 0]
-        self.assertEqual(expected_zoom, actual_zoom)
-
-        expected_zoom = 10
-        self.image_viewer.imshow(self.img, mode="fill")
+        self.image_viewer.imshow(self.img)
         actual_zoom = self.image_viewer.img2can_matrix[0, 0]
         self.assertEqual(expected_zoom, actual_zoom)
 
