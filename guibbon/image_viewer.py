@@ -72,6 +72,7 @@ class ImageViewer:
 
         self.toolbar_frame = tk.Frame(master=self.frame)
         toolbar_cfg = {"side": tk.LEFT, "padx": 1, "pady": 2}
+        tk.Button(master=self.toolbar_frame, text="home", command=self.onclick_zoom_home).pack(toolbar_cfg)
         tk.Button(master=self.toolbar_frame, text="fit", command=self.onclick_zoom_fit).pack(toolbar_cfg)
         tk.Button(master=self.toolbar_frame, text="fill", command=self.onclick_zoom_fill).pack(toolbar_cfg)
         tk.Button(master=self.toolbar_frame, text="100%", command=self.onclick_zoom_100).pack(toolbar_cfg)
@@ -330,6 +331,14 @@ class ImageViewer:
 
     def onclick_zoom_100(self):
         self.zoom_factor = 1
+        self.zoom_entry.is_focus = False
+        self.draw()
+
+    def onclick_zoom_home(self):
+        self.set_zoom_fit()
+        self.pan_xy = (0.0, 0.0)
+        self.cumulative_pan_xy = (0.0, 0.0)
+
         self.zoom_entry.is_focus = False
         self.draw()
 
