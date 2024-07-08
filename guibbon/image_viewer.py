@@ -194,7 +194,15 @@ class ImageViewer:
             if is_mousewheel:
                 step = 0.2
                 boost = 4 if self.modifier.CONTROL else 1
-                self.zoom_factor *= 2 ** math.copysign(step * boost, event.delta)
+                zoom_gain = 2 ** math.copysign(step * boost, event.delta)
+
+                dim_xy = np.array([self.mat.shape[1], self.mat.shape[0]], dtype=float)
+                canvas_center_xy = dim_xy / 2 - self.pan_xy
+                center2mouse_xy = canvas_center_xy - (x, y)
+
+                self.pan_xy = tuple(self.pan_xy - center2mouse_xy * (1 - zoom_gain))
+                self.cumulative_pan_xy = self.pan_xy
+                self.zoom_factor *= zoom_gain
                 self.draw()
             else:
                 can2img_scale_matrix = tm.identity_matrix()
@@ -206,7 +214,6 @@ class ImageViewer:
             self.onMouse(cvevent, x, y, flag, param)  # type: ignore
 
     def on_mouse_pan_drag(self, p0_xy, p1_xy):
-        print("ON MOUSE PAN", self.pan_xy)
         self.pan_xy = (
             self.cumulative_pan_xy[0] + p1_xy[0] - p0_xy[0],
             self.cumulative_pan_xy[1] + p1_xy[1] - p0_xy[1],
@@ -279,8 +286,7 @@ class ImageViewer:
         try:
             self.zoom_factor
         except AttributeError:
-            self.set_zoom_fit()
-            self.zoom_entry.is_focus = False
+            self.set_panzoom_home()
 
         if not self.zoom_entry.is_focus:
             self.zoom_entry.set(f"{int(self.zoom_factor * 100 ** 2) / 100}")
@@ -289,7 +295,6 @@ class ImageViewer:
         imgh, imgw = self.mat.shape[:2]
         img_center_matrix: TransformMatrix = tm.T((imgw / 2, imgh / 2))
         can_center_matrix: TransformMatrix = tm.T((canw / 2, canh / 2))
-        print("MY PAN VECTOR", self.pan_xy)
         pan_and_zoom_matrix: TransformMatrix = tm.S((self.zoom_factor, self.zoom_factor)) @ tm.T(self.pan_xy)
         self.set_img2can_matrix(can_center_matrix @ pan_and_zoom_matrix @ np.linalg.inv(img_center_matrix))
         mat = cv2.warpPerspective(self.mat, self.img2can_matrix, dsize=(canh, canw), flags=self.cv2_interpolation)  # type: ignore
@@ -310,6 +315,11 @@ class ImageViewer:
         canh, canw = self.canvas_shape_hw
         imgh, imgw = self.mat.shape[:2]
         self.zoom_factor = max(canh / imgh, canw / imgw)
+
+    def set_panzoom_home(self):
+        self.set_zoom_fit()
+        self.pan_xy = (0.0, 0.0)
+        self.cumulative_pan_xy = (0.0, 0.0)
 
     def on_change_zoom(self, text: str):
         try:
@@ -335,11 +345,7 @@ class ImageViewer:
         self.draw()
 
     def onclick_zoom_home(self):
-        self.set_zoom_fit()
-        self.pan_xy = (0.0, 0.0)
-        self.cumulative_pan_xy = (0.0, 0.0)
-
-        self.zoom_entry.is_focus = False
+        self.set_panzoom_home()
         self.draw()
 
     def imshow(self, mat: Image_t, cv2_interpolation: Optional[int] = None):
