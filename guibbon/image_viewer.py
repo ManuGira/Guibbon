@@ -191,8 +191,10 @@ class ImageViewer:
 
         if self.is_mouse_panzoom_enabled.get():
             if is_mousewheel:
-                print("booost", 2 ** (event.delta / 100))
-                self.zoom_factor *= 2 ** (event.delta / 100)
+                step = 0.2
+                boost = 4 if self.modifier.CONTROL else 1
+                self.zoom_factor *= 2 ** math.copysign(step * boost, event.delta)
+                self.draw()
             else:
                 can2img_scale_matrix = tm.identity_matrix()
                 # remove translation component to avoid cumulating it
