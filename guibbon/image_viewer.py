@@ -339,7 +339,7 @@ class ImageViewer:
     def on_change_zoom(self, text: str):
         try:
             zoom = float(text)
-        except ValueError as e:
+        except ValueError:
             return
         self.zoom_factor = zoom / 100
         self.draw()

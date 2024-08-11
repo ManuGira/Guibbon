@@ -1,4 +1,4 @@
-from .typedef import Point2D, CallbackPoint
+from .typedef import Point2D
 from . import transform_matrix as tmat
 import tkinter as tk
 

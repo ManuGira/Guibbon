@@ -21,7 +21,7 @@ class Entry:
                 "validatecommand": (vcmd, "%P"),
             })
 
-        self.entry = tk.Entry(master=master, cnf=cnf)
+        self.entry: tk.Entry = tk.Entry(master=master, cnf=cnf)
         self.entry.bind('<Return>', self._on_return)
         self.entry.bind("<FocusOut>", self._on_focus_out)
 
@@ -38,16 +38,20 @@ class Entry:
     def get(self):
         return self.text_var.get()
 
-    def _on_change(self, text):
+    def _on_change(self, text: str) -> bool:
         self.on_change(text)
         self.is_focus = True
         return True
 
-    def _on_return(self, event: tk.Event):
+    def _on_return(self, event):
         # focus out by giving focus to the next item
-        self.entry.tk_focusNext().focus()
+
+        try:
+            self.entry.tk_focusNext().focus()  # type: ignore
+        except AttributeError:
+            pass
         self.on_return(self.text_var.get())
 
-    def _on_focus_out(self, event: tk.Event):
+    def _on_focus_out(self, event):
         # focus out by giving focus to the next item
         self.is_focus = False

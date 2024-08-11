@@ -1,6 +1,5 @@
 import unittest
 
-import numpy as np
 
 from guibbon import mouse_pan
 from guibbon import transform_matrix as tmat
@@ -39,7 +38,7 @@ class TestMousePan(unittest.TestCase):
 
     def test_MousePan_callback_triggering(self):
         self.assertFalse(self.mp.is_down, "MousePan.is_down must be initialized to False")
-        event = tk.Event()
+        event: tk.Event = tk.Event()  # type: ignore
         event.x = 1
         event.y = 1
 
@@ -87,7 +86,7 @@ class TestMousePan(unittest.TestCase):
         def tuple_is_same(tup1, tup2, eps=EPS):
             return tuple(abs(v1 - v2) < eps for v1, v2 in zip(tup1, tup2))
 
-        event = tk.Event()
+        event: tk.Event = tk.Event()  # type: ignore
         x0, y0 = 11, 22
         x1, y1 = 111, 222
         event.x, event.y = x0, y0

@@ -5,7 +5,6 @@ import tkinter as tk
 from typing import Dict, Optional, Type, List, Sequence, Any, Tuple
 
 import cv2
-import numpy as np
 
 from .colors import COLORS
 from .image_viewer import ImageViewer, MODE
