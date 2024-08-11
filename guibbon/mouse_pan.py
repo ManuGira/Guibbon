@@ -13,7 +13,7 @@ class MousePan:
         self.p1_xy: Point2D = (0, 0)
         self.p0_xy: Point2D = (0, 0)
 
-    def on_tk_event(self, event: tk.Event, can2img_matrix: tmat.TransformMatrix):
+    def on_tk_event(self, event, can2img_matrix: tmat.TransformMatrix):
         can_xy = event.x, event.y
         img_xy = tmat.apply(can2img_matrix, can_xy)
 

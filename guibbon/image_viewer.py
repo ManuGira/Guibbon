@@ -17,6 +17,12 @@ from .transform_matrix import TransformMatrix
 from .typedef import Image_t, CallbackPoint, CallbackPolygon, CallbackRect, Point2D, Point2DList, CallbackMouse
 
 
+class MODE(enum.IntEnum):
+    FIT = enum.auto()
+    FILL = enum.auto()
+    P100 = enum.auto()
+
+
 class ImageViewer:
     class BUTTONNUM(enum.IntEnum):
         LEFT = 1
@@ -55,6 +61,7 @@ class ImageViewer:
         self.onMouse: CallbackMouse = None
         self.modifier = ImageViewer.Modifier()
         self.interactive_overlay_instance_list: List[Any] = []
+        self.mode: Optional[MODE] = None
 
         self.mouse_pan_calculator = mouse_pan.MousePan(on_drag=self.on_mouse_pan_drag, on_release=self.on_mouse_pan_release)
 
@@ -62,7 +69,7 @@ class ImageViewer:
         self.cv2_interpolation: int
         self.pan_xy: Point2D = (0.0, 0.0)
         self.cumulative_pan_xy: Point2D = (0.0, 0.0)
-        self.zoom_factor: float
+        self.zoom_factor: float = 1.0
         self.img2can_matrix: TransformMatrix
         self.can2img_matrix: TransformMatrix
 
@@ -317,7 +324,15 @@ class ImageViewer:
         self.zoom_factor = max(canh / imgh, canw / imgw)
 
     def set_panzoom_home(self):
-        self.set_zoom_fit()
+        if self.mode == MODE.FIT:
+            self.set_zoom_fit()
+        elif self.mode == MODE.FILL:
+            self.set_zoom_fill()
+        elif self.mode == MODE.P100:
+            self.zoom_factor = 1.0
+        else:
+            raise ValueError(f"unknown mode. Expected on of {MODE}, got")
+
         self.pan_xy = (0.0, 0.0)
         self.cumulative_pan_xy = (0.0, 0.0)
 
@@ -348,7 +363,10 @@ class ImageViewer:
         self.set_panzoom_home()
         self.draw()
 
-    def imshow(self, mat: Image_t, cv2_interpolation: Optional[int] = None):
+    def imshow(self, mat: Image_t, mode: MODE = MODE.FIT, cv2_interpolation: Optional[int] = None):
+        if self.mode is None:
+            self.mode = mode
+
         self.cv2_interpolation = cv2.INTER_LINEAR if cv2_interpolation is None else cv2_interpolation
 
         if mat.dtype == float:

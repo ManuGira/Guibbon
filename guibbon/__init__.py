@@ -8,7 +8,7 @@ import cv2
 import numpy as np
 
 from .colors import COLORS
-from .image_viewer import ImageViewer
+from .image_viewer import ImageViewer, MODE
 from .keyboard_event_handler import KeyboardEventHandler
 from .typedef import Image_t, CallbackPoint, CallbackPolygon, CallbackRect, Point2DList, InteractivePolygon, CallbackMouse
 from .widgets.button_widget import ButtonWidget, CallbackButton
@@ -72,8 +72,8 @@ def not_implemented_error():
     raise NotImplementedError("Function not implemented in current version of Guibbon")
 
 
-def imshow(winname: str, mat: Image_t, cv2_interpolation: Optional[int] = None):
-    Guibbon.get_instance(winname).imshow(mat, cv2_interpolation)
+def imshow(winname: str, mat: Image_t, mode: MODE = MODE.FIT, cv2_interpolation: Optional[int] = None):
+    Guibbon.get_instance(winname).imshow(mat, mode, cv2_interpolation)
 
 
 def getWindowProperty(winname: str, prop_id: int) -> float:
@@ -432,8 +432,8 @@ class Guibbon:
         tk_frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
         return widget
 
-    def imshow(self, mat: Image_t, cv2_interpolation: Optional[int] = None):
-        self.image_viewer.imshow(mat, cv2_interpolation)
+    def imshow(self, mat: Image_t, mode: MODE = MODE.FIT, cv2_interpolation: Optional[int] = None):
+        self.image_viewer.imshow(mat, mode, cv2_interpolation)
 
     def getWindowProperty(self, prop_id: int) -> float:
         """

@@ -69,7 +69,7 @@ class DemoMVCAdvApp:
         while True:
             if self.is_update_needed:
                 self.update()
-                gbn.imshow(self.winname, self.result.img, mode="fit")
+                gbn.imshow(self.winname, self.result.img, mode=gbn.MODE.FIT)
                 self.is_update_needed = False
             gbn.waitKeyEx(10)
 
