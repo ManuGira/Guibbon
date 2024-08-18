@@ -1,6 +1,5 @@
 import unittest
 
-
 from guibbon import mouse_pan
 from guibbon import transform_matrix as tmat
 import tkinter as tk
@@ -34,13 +33,15 @@ class TestMousePan(unittest.TestCase):
         self.on_release_count = 0
         self.p0_xy = (-1, -1)
         self.p1_xy = (-1, -1)
-        self.mp = mouse_pan.MousePan(on_click=self.on_click, on_drag=self.on_drag, on_release=self.on_release)
+        self.right_button_num = 3
+        self.mp = mouse_pan.MousePan(button_num=self.right_button_num, on_click=self.on_click, on_drag=self.on_drag, on_release=self.on_release)
 
     def test_MousePan_callback_triggering(self):
         self.assertFalse(self.mp.is_down, "MousePan.is_down must be initialized to False")
         event: tk.Event = tk.Event()  # type: ignore
         event.x = 1
         event.y = 1
+        event.num = self.right_button_num
 
         self.reset_counters()
         event.type = tk.EventType.Motion
@@ -90,6 +91,7 @@ class TestMousePan(unittest.TestCase):
         x0, y0 = 11, 22
         x1, y1 = 111, 222
         event.x, event.y = x0, y0
+        event.num = self.right_button_num
 
         sx, sy = (3, 4)
         scale_mat = tmat.scale_matrix((sx, sy))

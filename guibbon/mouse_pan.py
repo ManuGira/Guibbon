@@ -4,7 +4,8 @@ import tkinter as tk
 
 
 class MousePan:
-    def __init__(self, on_click=None, on_drag=None, on_release=None):
+    def __init__(self, button_num, on_click=None, on_drag=None, on_release=None):
+        self.button_num = button_num
         self.on_click = on_click
         self.on_drag = on_drag
         self.on_release = on_release
@@ -17,7 +18,7 @@ class MousePan:
         can_xy = event.x, event.y
         img_xy = tmat.apply(can2img_matrix, can_xy)
 
-        if event.type == tk.EventType.ButtonPress:
+        if event.type == tk.EventType.ButtonPress and event.num == self.button_num:
             self.is_down = True
             self.p0_xy = img_xy
             self.p1_xy = img_xy
@@ -29,7 +30,7 @@ class MousePan:
             if self.on_drag is not None:
                 self.on_drag(self.p0_xy, self.p1_xy)
 
-        if event.type == tk.EventType.ButtonRelease and self.is_down:
+        if event.type == tk.EventType.ButtonRelease and self.is_down and event.num == self.button_num:
             if self.on_release is not None:
                 self.on_release(self.p0_xy, self.p1_xy)
             self.is_down = False

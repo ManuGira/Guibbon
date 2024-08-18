@@ -63,13 +63,13 @@ class ImageViewer:
         self.interactive_overlay_instance_list: List[Any] = []
         self.mode: Optional[MODE] = None
 
-        self.mouse_pan_calculator = mouse_pan.MousePan(on_drag=self.on_mouse_pan_drag, on_release=self.on_mouse_pan_release)
+        self.mouse_pan_calculator = mouse_pan.MousePan(ImageViewer.BUTTONNUM.RIGHT, on_drag=self.on_mouse_pan_drag, on_release=self.on_mouse_pan_release)
 
         self.mat: Image_t
         self.cv2_interpolation: int
         self.pan_xy: Point2D = (0.0, 0.0)
         self.cumulative_pan_xy: Point2D = (0.0, 0.0)
-        self.zoom_factor: float = 1.0
+        self.zoom_factor: float
         self.img2can_matrix: TransformMatrix
         self.can2img_matrix: TransformMatrix
 
@@ -199,6 +199,7 @@ class ImageViewer:
 
         if self.is_mouse_panzoom_enabled.get():
             if is_mousewheel:
+                # mouse wheel zoom
                 step = 0.2
                 boost = 4 if self.modifier.CONTROL else 1
                 zoom_gain = 2 ** math.copysign(step * boost, event.delta)
@@ -210,8 +211,10 @@ class ImageViewer:
                 self.pan_xy = tuple(self.pan_xy - center2mouse_xy * (1 - zoom_gain))
                 self.cumulative_pan_xy = self.pan_xy
                 self.zoom_factor *= zoom_gain
+                self.zoom_entry.is_focus = False  # focus out to allow auto update
                 self.draw()
             else:
+                # mouse panning
                 can2img_scale_matrix = tm.identity_matrix()
                 # remove translation component to avoid cumulating it
                 can2img_scale_matrix[:2, :2] = self.can2img_matrix[:2, :2]
@@ -346,21 +349,22 @@ class ImageViewer:
 
     def onclick_zoom_fit(self):
         self.set_zoom_fit()
-        self.zoom_entry.is_focus = False
+        self.zoom_entry.is_focus = False  # focus out to allow auto update
         self.draw()
 
     def onclick_zoom_fill(self):
         self.set_zoom_fill()
-        self.zoom_entry.is_focus = False
+        self.zoom_entry.is_focus = False  # focus out to allow auto update
         self.draw()
 
     def onclick_zoom_100(self):
         self.zoom_factor = 1
-        self.zoom_entry.is_focus = False
+        self.zoom_entry.is_focus = False  # focus out to allow auto update
         self.draw()
 
     def onclick_zoom_home(self):
         self.set_panzoom_home()
+        self.zoom_entry.is_focus = False
         self.draw()
 
     def imshow(self, mat: Image_t, mode: MODE = MODE.FIT, cv2_interpolation: Optional[int] = None):
