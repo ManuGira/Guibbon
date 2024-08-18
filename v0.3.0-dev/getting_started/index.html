@@ -28,14 +28,14 @@
             <div class="topnav">
               <span>version</span>
               <select id="version_select" onchange="onVersionChange();">
-                <option value="v0.3.0-dev">v0.3.0-dev</option>
-        <option value="v0.2.1" selected="selected">v0.2.1</option>
+                <option value="v0.3.0-dev" selected="selected">v0.3.0-dev</option>
+        <option value="v0.2.1">v0.2.1</option>
         <option value="v0.1.5">v0.1.5</option>
               </select>
             </div>
             <script>
             function onVersionChange() {
-              let current_version = "v0.2.1"
+              let current_version = "v0.3.0-dev"
               let target_version = document.getElementById("version_select").value;
               let current_url = window.location.pathname;
               let target_url = current_url.replace(current_version, target_version);

@@ -6,9 +6,9 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         
         
-        <link rel="canonical" href="https://manugira.github.io/Guibbon/getting_started/">
+        <link rel="canonical" href="https://manugira.github.io/Guibbon/release_notes/">
         <link rel="shortcut icon" href="../img/favicon.ico">
-        <title>Getting started - Guibbon Doc</title>
+        <title>Release notes - Guibbon Doc</title>
         <link href="../css/bootstrap.min.css" rel="stylesheet">
         <link href="../css/fontawesome.min.css" rel="stylesheet">
         <link href="../css/brands.min.css" rel="stylesheet">
@@ -28,14 +28,14 @@
             <div class="topnav">
               <span>version</span>
               <select id="version_select" onchange="onVersionChange();">
-                <option value="v0.3.0-dev">v0.3.0-dev</option>
-        <option value="v0.2.1" selected="selected">v0.2.1</option>
+                <option value="v0.3.0-dev" selected="selected">v0.3.0-dev</option>
+        <option value="v0.2.1">v0.2.1</option>
         <option value="v0.1.5">v0.1.5</option>
               </select>
             </div>
             <script>
             function onVersionChange() {
-              let current_version = "v0.2.1"
+              let current_version = "v0.3.0-dev"
               let target_version = document.getElementById("version_select").value;
               let current_url = window.location.pathname;
               let target_url = current_url.replace(current_version, target_version);
@@ -60,24 +60,24 @@
                                 <a href=".." class="nav-link">Home</a>
                             </li>
                             <li class="nav-item">
-                                <a href="./" class="nav-link active" aria-current="page">Getting started</a>
+                                <a href="../getting_started/" class="nav-link">Getting started</a>
                             </li>
                             <li class="nav-item">
                                 <a href="../api_reference/" class="nav-link">API</a>
                             </li>
                             <li class="nav-item">
-                                <a href="../release_notes/" class="nav-link">Release notes</a>
+                                <a href="./" class="nav-link active" aria-current="page">Release notes</a>
                             </li>
                         </ul>
 
                     <ul class="nav navbar-nav ms-md-auto">
                             <li class="nav-item">
-                                <a rel="prev" href=".." class="nav-link">
+                                <a rel="prev" href="../api_reference/" class="nav-link">
                                     <i class="fa fa-arrow-left"></i> Previous
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a rel="next" href="../api_reference/" class="nav-link">
+                                <a rel="next" class="nav-link disabled">
                                     Next <i class="fa fa-arrow-right"></i>
                                 </a>
                             </li>
@@ -99,12 +99,8 @@
     <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
         <ul class="nav flex-column">
             
-            <li class="nav-item" data-bs-level="1"><a href="#getting-started" class="nav-link">Getting started</a>
+            <li class="nav-item" data-bs-level="2"><a href="#release-notes" class="nav-link">Release Notes</a>
               <ul class="nav flex-column">
-            <li class="nav-item" data-bs-level="2"><a href="#installation" class="nav-link">Installation</a>
-              <ul class="nav flex-column">
-              </ul>
-            </li>
               </ul>
             </li>
         </ul>
@@ -112,14 +108,44 @@
 </div></div>
                     <div class="col-md-9" role="main">
 
-<h1 id="getting-started">Getting started</h1>
-<h2 id="installation">Installation</h2>
-<p>This package is hosted on <a href="https://pypi.org/project/guibbon">PyPl</a>, you can install the <strong>latest stable release</strong> with pip:</p>
-<pre><code>pip install guibbon
-</code></pre>
-<p>If stability is not for you, install the rolling version from github. You will get early access to new <strong>features</strong>, <strong>bugfixes</strong> and <strong>bugs</strong>:</p>
-<pre><code>pip install git+https://github.com/ManuGira/Guibbon.git@master
-</code></pre></div>
+<h2 id="release-notes">Release Notes</h2>
+<h4 id="v030">v0.3.0</h4>
+<h6 id="features">Features</h6>
+<ul>
+<li><strong>Pan &amp; Zoom</strong>: The image can be panned and zoomed with the mouse (mouse wheel and right click)</li>
+<li><strong>Zoom toolbar</strong>: A toolbar is now available on bottom of the displayed image. It can be used to set the zoom.  </li>
+</ul>
+<h4 id="v021">v0.2.1</h4>
+<h6 id="features_1">Features</h6>
+<ul>
+<li><strong>Tree View Widget</strong>: Create your tree with <code>guibbon.TreeNode</code> and pass it to <code>guibbon.TreeView(...)</code></li>
+<li><strong>Custom Icon</strong>: The window has an icon of a smiling guibbon now</li>
+<li><strong>Set Slider Name</strong>: Allows to change the name of a Slider Widget after its instantiation</li>
+<li><strong>Improve Color Picker UX</strong>: Add an "Edit" button to the Color Picker Widget for better UX</li>
+</ul>
+<h6 id="bug-fixes">Bug fixes</h6>
+<ul>
+<li><strong>Float image support</strong>: Before this fix, it was not possible to use <code>guibbon.imshow(...)</code> on an image with dtype=float </li>
+</ul>
+<h4 id="v015">v0.1.5</h4>
+<h6 id="features_2">Features</h6>
+<ul>
+<li><strong>Monkey Patching</strong>: Inject Guibbon's function in cv2 package (not permanantly) with <code>guibbon.inject(cv2)</code></li>
+<li><strong>Image Viewer</strong>: shows image with <code>guibbon.imshow(...)</code> similarly to <code>cv2.imshow(...)</code> (can be monkey patched)</li>
+<li><strong>WaitKeyEx</strong>: Similar to <code>cv2.WaitKeyEx(...)</code>, it supports most of the keyboard events (can be monkey patched)</li>
+<li><strong>Trackbar</strong>: create and edit trackbar similarly to <code>cv2.createTrackbar</code> (can be monkey patched)</li>
+<li><strong>Slider Widget</strong>: Same as <code>cv2.trackbar</code> but with a more flexible signature</li>
+<li><strong>Button Widget</strong>: A button to trigger a callback</li>
+<li><strong>Check Button Widget</strong>: Single check box to get control over a boolean</li>
+<li><strong>Check Button List Widget</strong>: List of check boxes</li>
+<li><strong>Radio Buttons Widget</strong>: Set of radio buttons (also called option buttons) to get control over an enum value</li>
+<li><strong>Color Picker Widget</strong>: Let the user choose a color from a color palette</li>
+<li><strong>Custom Widget</strong>: Exposing the <code>guibbon.WidgetInterface</code> allowing you to create and add your custom widget to the right panel</li>
+<li><strong>Interactive Point Overlay</strong>: A draggable point on the image. The point act as a 2D slider returning you its position on the image</li>
+<li><strong>Interactive Polygon Overlays</strong>: A set of draggable point on the image</li>
+<li><strong>Interactive Rectangle Overlays</strong>: A couple of interactive points representing top-left and bottom-right corners of a rectangle</li>
+<li><strong>Magnets for Interactive Overlays</strong>: A point cloud that can be injected to an interactive overlay. The overlay will snap to the magnets when dragged by the user.</li>
+</ul></div>
             </div>
         </div>
 

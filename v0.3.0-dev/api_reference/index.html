@@ -6,9 +6,9 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         
         
-        <link rel="canonical" href="https://manugira.github.io/Guibbon/getting_started/">
+        <link rel="canonical" href="https://manugira.github.io/Guibbon/api_reference/">
         <link rel="shortcut icon" href="../img/favicon.ico">
-        <title>Getting started - Guibbon Doc</title>
+        <title>API - Guibbon Doc</title>
         <link href="../css/bootstrap.min.css" rel="stylesheet">
         <link href="../css/fontawesome.min.css" rel="stylesheet">
         <link href="../css/brands.min.css" rel="stylesheet">
@@ -28,14 +28,14 @@
             <div class="topnav">
               <span>version</span>
               <select id="version_select" onchange="onVersionChange();">
-                <option value="v0.3.0-dev">v0.3.0-dev</option>
-        <option value="v0.2.1" selected="selected">v0.2.1</option>
+                <option value="v0.3.0-dev" selected="selected">v0.3.0-dev</option>
+        <option value="v0.2.1">v0.2.1</option>
         <option value="v0.1.5">v0.1.5</option>
               </select>
             </div>
             <script>
             function onVersionChange() {
-              let current_version = "v0.2.1"
+              let current_version = "v0.3.0-dev"
               let target_version = document.getElementById("version_select").value;
               let current_url = window.location.pathname;
               let target_url = current_url.replace(current_version, target_version);
@@ -60,10 +60,10 @@
                                 <a href=".." class="nav-link">Home</a>
                             </li>
                             <li class="nav-item">
-                                <a href="./" class="nav-link active" aria-current="page">Getting started</a>
+                                <a href="../getting_started/" class="nav-link">Getting started</a>
                             </li>
                             <li class="nav-item">
-                                <a href="../api_reference/" class="nav-link">API</a>
+                                <a href="./" class="nav-link active" aria-current="page">API</a>
                             </li>
                             <li class="nav-item">
                                 <a href="../release_notes/" class="nav-link">Release notes</a>
@@ -72,12 +72,12 @@
 
                     <ul class="nav navbar-nav ms-md-auto">
                             <li class="nav-item">
-                                <a rel="prev" href=".." class="nav-link">
+                                <a rel="prev" href="../getting_started/" class="nav-link">
                                     <i class="fa fa-arrow-left"></i> Previous
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a rel="next" href="../api_reference/" class="nav-link">
+                                <a rel="next" href="../release_notes/" class="nav-link">
                                     Next <i class="fa fa-arrow-right"></i>
                                 </a>
                             </li>
@@ -99,12 +99,8 @@
     <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
         <ul class="nav flex-column">
             
-            <li class="nav-item" data-bs-level="1"><a href="#getting-started" class="nav-link">Getting started</a>
+            <li class="nav-item" data-bs-level="1"><a href="#documentation-for-guibbon" class="nav-link">Documentation for Guibbon</a>
               <ul class="nav flex-column">
-            <li class="nav-item" data-bs-level="2"><a href="#installation" class="nav-link">Installation</a>
-              <ul class="nav flex-column">
-              </ul>
-            </li>
               </ul>
             </li>
         </ul>
@@ -112,14 +108,158 @@
 </div></div>
                     <div class="col-md-9" role="main">
 
-<h1 id="getting-started">Getting started</h1>
-<h2 id="installation">Installation</h2>
-<p>This package is hosted on <a href="https://pypi.org/project/guibbon">PyPl</a>, you can install the <strong>latest stable release</strong> with pip:</p>
-<pre><code>pip install guibbon
-</code></pre>
-<p>If stability is not for you, install the rolling version from github. You will get early access to new <strong>features</strong>, <strong>bugfixes</strong> and <strong>bugs</strong>:</p>
-<pre><code>pip install git+https://github.com/ManuGira/Guibbon.git@master
-</code></pre></div>
+<h1 id="documentation-for-guibbon">Documentation for <code>Guibbon</code></h1>
+
+
+<div class="doc doc-object doc-module">
+
+
+
+<a id="guibbon"></a>
+  <div class="doc doc-contents first">
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h4 id="guibbon.Guibbon" class="doc doc-heading">
+          <code>Guibbon</code>
+
+
+</h4>
+
+
+  <div class="doc doc-contents ">
+
+  
+      <p>The Guibbon object contains the list of open windows</p>
+
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h5 id="guibbon.Guibbon.getWindowProperty" class="doc doc-heading">
+          <code class="highlight language-python">getWindowProperty(prop_id)</code>
+
+</h5>
+
+
+  <div class="doc doc-contents ">
+  
+
+<details class="todo" open>
+  <summary>not all flags ar handled</summary>
+  <p>cv2.WND_PROP_FULLSCREEN:    fullscreen property (can be WINDOW_NORMAL or WINDOW_FULLSCREEN).
+cv2.WND_PROP_AUTOSIZE:      autosize property (can be WINDOW_NORMAL or WINDOW_AUTOSIZE).
+cv2.WND_PROP_ASPECT_RATIO:  window's aspect ration (can be set to WINDOW_FREERATIO or WINDOW_KEEPRATIO).
+cv2.WND_PROP_OPENGL:        opengl support.
+cv2.WND_PROP_VISIBLE:       checks whether the window exists and is visible
+cv2.WND_PROP_TOPMOST:       property to toggle normal window being topmost or not
+cv2.WND_PROP_VSYNC:         enable or disable VSYNC (in OpenGL mode)</p>
+</details>
+  </div>
+
+</div>
+
+
+
+  </div>
+
+  </div>
+
+
+</div>
+
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h4 id="guibbon.createInteractivePolygon" class="doc doc-heading">
+          <code class="highlight language-python">createInteractivePolygon(windowName, point_xy_list, label='', on_click=None, on_drag=None, on_release=None, magnet_points=None)</code>
+
+</h4>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Draws a polygon over the displayed image. The corners of the polygon can be dragged by the user, triggering a callback.</p>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h4 id="guibbon.createInteractiveRectangle" class="doc doc-heading">
+          <code class="highlight language-python">createInteractiveRectangle(windowName, point0_xy, point1_xy, label='', on_click=None, on_drag=None, on_release=None, magnet_points=None)</code>
+
+</h4>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Create and returns object of type createInteractiveRectangle windows named windowName.</p>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h4 id="guibbon.createTrackbar" class="doc doc-heading">
+          <code class="highlight language-python">createTrackbar(trackbarName, windowName, value, count, onChange)</code>
+
+</h4>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Same trackbar as in opencv. However, for a more pythonic signature, you may want to use create_slider(...) instead</p>
+
+  </div>
+
+</div>
+
+
+
+  </div>
+
+  </div>
+
+</div></div>
             </div>
         </div>
 
