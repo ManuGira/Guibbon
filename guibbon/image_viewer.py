@@ -10,9 +10,17 @@ import numpy as np
 from PIL import Image, ImageTk
 
 from . import interactive_overlays
+from . import mouse_pan
 from . import transform_matrix as tm
+from . import wrapped_tk_widgets as wtk
 from .transform_matrix import TransformMatrix
-from .typedef import Image_t, CallbackPoint, CallbackPolygon, CallbackRect, Point2DList, CallbackMouse
+from .typedef import Image_t, CallbackPoint, CallbackPolygon, CallbackRect, Point2D, Point2DList, CallbackMouse
+
+
+class MODE(enum.IntEnum):
+    FIT = enum.auto()
+    FILL = enum.auto()
+    P100 = enum.auto()
 
 
 class ImageViewer:
@@ -45,30 +53,62 @@ class ImageViewer:
         MOUSE_BUTTON_3: bool = False
 
     def __init__(self, master, height: int, width: int):
-        self.canvas = tk.Canvas(master=master, height=height, width=width, bg="gray10")
+        self.frame = tk.Frame(master=master)
+        self.canvas = tk.Canvas(master=self.frame, height=height, width=width, bg="gray10")
         self.canvas_shape_hw = (height, width)
 
         self.imgtk = None
         self.onMouse: CallbackMouse = None
         self.modifier = ImageViewer.Modifier()
         self.interactive_overlay_instance_list: List[Any] = []
+        self.mode: Optional[MODE] = None
+
+        self.mouse_pan_calculator = mouse_pan.MousePan(ImageViewer.BUTTONNUM.RIGHT, on_drag=self.on_mouse_pan_drag, on_release=self.on_mouse_pan_release)
+
+        self.mat: Image_t
+        self.cv2_interpolation: int
+        self.pan_xy: Point2D = (0.0, 0.0)
+        self.cumulative_pan_xy: Point2D = (0.0, 0.0)
+        self.zoom_factor: float
         self.img2can_matrix: TransformMatrix
         self.can2img_matrix: TransformMatrix
+
         self.set_img2can_matrix(tm.identity_matrix())
+
+        self.canvas.pack(side=tk.TOP)
+
+        self.toolbar_frame = tk.Frame(master=self.frame)
+        toolbar_cfg = {"side": tk.LEFT, "padx": 1, "pady": 2}
+        tk.Button(master=self.toolbar_frame, text="home", command=self.onclick_zoom_home).pack(toolbar_cfg)
+        tk.Button(master=self.toolbar_frame, text="fit", command=self.onclick_zoom_fit).pack(toolbar_cfg)
+        tk.Button(master=self.toolbar_frame, text="fill", command=self.onclick_zoom_fill).pack(toolbar_cfg)
+        tk.Button(master=self.toolbar_frame, text="100%", command=self.onclick_zoom_100).pack(toolbar_cfg)
+        self.zoom_entry = wtk.Entry(master=self.toolbar_frame, on_change=self.on_change_zoom)
+        self.zoom_entry.pack(toolbar_cfg)
+        tk.Label(master=self.toolbar_frame, text="%").pack(toolbar_cfg)
+
+        self.is_mouse_panzoom_enabled = tk.BooleanVar()
+        chk1 = tk.Checkbutton(master=self.toolbar_frame, text="mouse pan/zoom", variable=self.is_mouse_panzoom_enabled, onvalue=True, offvalue=False)
+        chk1.pack(toolbar_cfg)
+        chk1.select()
+
+        # self.mouse_panzoom_checkbutton.configure(state='selected')
+        # self.mouse_panzoom_checkbutton.state(["selected"])
+
+        self.toolbar_frame.pack(side=tk.TOP, fill=tk.X)
+
+        # <MODIFIER-MODIFIER-TYPE-DETAIL>
+        # see https://dafarry.github.io/tkinterbook/tkinter-events-and-bindings.htm
+        self.canvas.bind("<Motion>", self.on_event)
+        self.canvas.bind("<ButtonPress>", self.on_event)
+        self.canvas.bind("<ButtonRelease>", self.on_event)
+        self.canvas.bind("<MouseWheel>", self.on_event)
 
     def setMouseCallback(self, onMouse, userdata=None):
         if not isinstance(onMouse, types.FunctionType) and not isinstance(onMouse, types.MethodType):
             raise TypeError(f"onMouse must be a function, got {type(onMouse)} instead")
         if userdata is not None:
             raise NotImplementedError("userdata argument of function setMouseCallback is not handled in current version of guibbon")
-
-        if self.onMouse is None:
-            # <MODIFIER-MODIFIER-TYPE-DETAIL>
-            # see https://dafarry.github.io/tkinterbook/tkinter-events-and-bindings.htm
-            self.canvas.bind("<Motion>", self.on_event)
-            self.canvas.bind("<ButtonPress>", self.on_event)
-            self.canvas.bind("<ButtonRelease>", self.on_event)
-            self.canvas.bind("<MouseWheel>", self.on_event)
 
         self.onMouse = onMouse
 
@@ -157,7 +197,44 @@ class ImageViewer:
         x, y = tm.apply(self.can2img_matrix, (event.x, event.y))
         param = None
 
-        self.onMouse(cvevent, x, y, flag, param)  # type: ignore
+        if self.is_mouse_panzoom_enabled.get():
+            if is_mousewheel:
+                # mouse wheel zoom
+                step = 0.2
+                boost = 4 if self.modifier.CONTROL else 1
+                zoom_gain = 2 ** math.copysign(step * boost, event.delta)
+
+                dim_xy = np.array([self.mat.shape[1], self.mat.shape[0]], dtype=float)
+                canvas_center_xy = dim_xy / 2 - self.pan_xy
+                center2mouse_xy = canvas_center_xy - (x, y)
+
+                self.pan_xy = tuple(self.pan_xy - center2mouse_xy * (1 - zoom_gain))
+                self.cumulative_pan_xy = self.pan_xy
+                self.zoom_factor *= zoom_gain
+                self.zoom_entry.is_focus = False  # focus out to allow auto update
+                self.draw()
+            else:
+                # mouse panning
+                can2img_scale_matrix = tm.identity_matrix()
+                # remove translation component to avoid cumulating it
+                can2img_scale_matrix[:2, :2] = self.can2img_matrix[:2, :2]
+                self.mouse_pan_calculator.on_tk_event(event, can2img_scale_matrix)
+
+        if self.onMouse is not None:
+            self.onMouse(cvevent, x, y, flag, param)  # type: ignore
+
+    def on_mouse_pan_drag(self, p0_xy, p1_xy):
+        self.pan_xy = (
+            self.cumulative_pan_xy[0] + p1_xy[0] - p0_xy[0],
+            self.cumulative_pan_xy[1] + p1_xy[1] - p0_xy[1],
+        )
+        self.draw()
+
+    def on_mouse_pan_release(self, p0_xy, p1_xy):
+        self.cumulative_pan_xy = self.pan_xy
+
+    def on_mouse_zoom(self):
+        pass
 
     def set_img2can_matrix(self, img2can_matrix: TransformMatrix):
         self.img2can_matrix = img2can_matrix.copy()
@@ -214,37 +291,23 @@ class ImageViewer:
         self.interactive_overlay_instance_list.append(irectangle)
         return irectangle
 
-    def pack(self, *args, **kwargs):
-        self.canvas.pack(*args, **kwargs)
+    def draw(self):
+        # if zoom_factor is not defined yet, define it
+        try:
+            self.zoom_factor
+        except AttributeError:
+            self.set_panzoom_home()
 
-    def bind(self, *args, **kwargs):
-        self.canvas.bind(*args, **kwargs)
-
-    def imshow(self, mat: Image_t, mode: Optional[str] = None, cv2_interpolation: Optional[int] = None):
-        mode = "fit" if mode is None else mode
-        cv2_interpolation = cv2.INTER_LINEAR if cv2_interpolation is None else cv2_interpolation
+        if not self.zoom_entry.is_focus:
+            self.zoom_entry.set(f"{int(self.zoom_factor * 100 ** 2) / 100}")
 
         canh, canw = self.canvas_shape_hw
-        imgh, imgw = mat.shape[:2]
-
-        if mat.dtype == float:
-            mat = (np.clip(mat, 0, 1) * 255).astype(np.uint8)
-
-        mat = cv2.cvtColor(mat, cv2.COLOR_BGR2RGB)  # type: ignore
-
-        img_space_matrix: TransformMatrix
-        can_space_matrix: TransformMatrix
-        if mode == "fit":
-            img_space_matrix = tm.T((imgw / 2, imgh / 2)) @ tm.S((max(imgw, imgh), max(imgw, imgh)))
-            can_space_matrix = tm.T((canw / 2, canh / 2)) @ tm.S((max(canw, canh), max(canw, canh)))
-        elif mode == "fill":
-            img_space_matrix = tm.T((imgw / 2, imgh / 2)) @ tm.S((min(imgw, imgh), min(imgw, imgh)))
-            can_space_matrix = tm.T((canw / 2, canh / 2)) @ tm.S((min(canw, canh), min(canw, canh)))
-        else:
-            raise ValueError(f'Don\'t know mode: "{mode}"')
-
-        self.set_img2can_matrix(can_space_matrix @ np.linalg.inv(img_space_matrix))
-        mat = cv2.warpPerspective(mat, self.img2can_matrix, dsize=(canh, canw), flags=cv2_interpolation)  # type: ignore
+        imgh, imgw = self.mat.shape[:2]
+        img_center_matrix: TransformMatrix = tm.T((imgw / 2, imgh / 2))
+        can_center_matrix: TransformMatrix = tm.T((canw / 2, canh / 2))
+        pan_and_zoom_matrix: TransformMatrix = tm.S((self.zoom_factor, self.zoom_factor)) @ tm.T(self.pan_xy)
+        self.set_img2can_matrix(can_center_matrix @ pan_and_zoom_matrix @ np.linalg.inv(img_center_matrix))
+        mat = cv2.warpPerspective(self.mat, self.img2can_matrix, dsize=(canh, canw), flags=self.cv2_interpolation)  # type: ignore
 
         self.imgtk = ImageTk.PhotoImage(image=Image.fromarray(mat))
         self.canvas.create_image(canw // 2, canh // 2, anchor=tk.CENTER, image=self.imgtk)
@@ -252,3 +315,67 @@ class ImageViewer:
         for overlay in self.interactive_overlay_instance_list:
             overlay.set_img2can_matrix(self.img2can_matrix)
             overlay.update()
+
+    def set_zoom_fit(self):
+        canh, canw = self.canvas_shape_hw
+        imgh, imgw = self.mat.shape[:2]
+        self.zoom_factor = min(canh / imgh, canw / imgw)
+
+    def set_zoom_fill(self):
+        canh, canw = self.canvas_shape_hw
+        imgh, imgw = self.mat.shape[:2]
+        self.zoom_factor = max(canh / imgh, canw / imgw)
+
+    def set_panzoom_home(self):
+        if self.mode == MODE.FIT:
+            self.set_zoom_fit()
+        elif self.mode == MODE.FILL:
+            self.set_zoom_fill()
+        elif self.mode == MODE.P100:
+            self.zoom_factor = 1.0
+        else:
+            raise ValueError(f"unknown mode. Expected on of {MODE}, got")
+
+        self.pan_xy = (0.0, 0.0)
+        self.cumulative_pan_xy = (0.0, 0.0)
+
+    def on_change_zoom(self, text: str):
+        try:
+            zoom = float(text)
+        except ValueError:
+            return
+        self.zoom_factor = zoom / 100
+        self.draw()
+
+    def onclick_zoom_fit(self):
+        self.set_zoom_fit()
+        self.zoom_entry.is_focus = False  # focus out to allow auto update
+        self.draw()
+
+    def onclick_zoom_fill(self):
+        self.set_zoom_fill()
+        self.zoom_entry.is_focus = False  # focus out to allow auto update
+        self.draw()
+
+    def onclick_zoom_100(self):
+        self.zoom_factor = 1
+        self.zoom_entry.is_focus = False  # focus out to allow auto update
+        self.draw()
+
+    def onclick_zoom_home(self):
+        self.set_panzoom_home()
+        self.zoom_entry.is_focus = False
+        self.draw()
+
+    def imshow(self, mat: Image_t, mode: MODE = MODE.FIT, cv2_interpolation: Optional[int] = None):
+        if self.mode is None:
+            self.mode = mode
+
+        self.cv2_interpolation = cv2.INTER_LINEAR if cv2_interpolation is None else cv2_interpolation
+
+        if mat.dtype == float:
+            mat = (np.clip(mat, 0, 1) * 255).astype(np.uint8)
+
+        self.mat = cv2.cvtColor(mat, cv2.COLOR_BGR2RGB)  # type: ignore
+
+        self.draw()

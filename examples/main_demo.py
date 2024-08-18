@@ -1,7 +1,6 @@
 # type: ignore
 
 import sys
-import numpy as np
 import cv2
 import guibbon as gbn
 
@@ -78,7 +77,7 @@ def demo_cv():
 
     while gbn.Guibbon.is_instance(winname):  # cv2.getWindowProperty(title, cv2.WND_PROP_VISIBLE) > 0.5:
         k += 1
-        cv2.imshow(winname, img * np.uint8(k))
+        cv2.imshow(winname, img, mode=gbn.MODE.P100)
         # gbn.imshow("ok", img * np.uint8(k))
         print(cv2.waitKeyEx(0), end=", ")
 

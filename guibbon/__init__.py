@@ -5,10 +5,9 @@ import tkinter as tk
 from typing import Dict, Optional, Type, List, Sequence, Any, Tuple
 
 import cv2
-import numpy as np
 
 from .colors import COLORS
-from .image_viewer import ImageViewer
+from .image_viewer import ImageViewer, MODE
 from .keyboard_event_handler import KeyboardEventHandler
 from .typedef import Image_t, CallbackPoint, CallbackPolygon, CallbackRect, Point2DList, InteractivePolygon, CallbackMouse
 from .widgets.button_widget import ButtonWidget, CallbackButton
@@ -72,7 +71,7 @@ def not_implemented_error():
     raise NotImplementedError("Function not implemented in current version of Guibbon")
 
 
-def imshow(winname: str, mat: Image_t, mode: Optional[str] = None, cv2_interpolation: Optional[int] = None):
+def imshow(winname: str, mat: Image_t, mode: MODE = MODE.FIT, cv2_interpolation: Optional[int] = None):
     Guibbon.get_instance(winname).imshow(mat, mode, cv2_interpolation)
 
 
@@ -342,8 +341,8 @@ class Guibbon:
         self.image_viewer = ImageViewer(self.frame, height=720, width=int(720 * self.img_ratio))
 
         # add dummy image to image_viewer
-        img = np.zeros(shape=(100, 100, 3), dtype=np.uint8)
-        self.imshow(img)
+        # img = np.zeros(shape=(100, 100, 3), dtype=np.uint8)
+        # self.imshow(img)
 
         self.ctrl_frame = tk.Frame(master=self.frame, bg=COLORS.ctrl_panel)
         dummy_canvas = tk.Canvas(master=self.ctrl_frame, height=0, width=300)
@@ -355,7 +354,7 @@ class Guibbon:
         self.buttons_by_names: Dict[str, ButtonWidget] = {}
 
         self.frame.pack()
-        self.image_viewer.pack(side=tk.LEFT)
+        self.image_viewer.frame.pack(side=tk.LEFT)
         # self.ctrl_frame.pack_propagate(False)
         self.ctrl_frame.pack(fill=tk.X)
 
@@ -432,7 +431,7 @@ class Guibbon:
         tk_frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
         return widget
 
-    def imshow(self, mat: Image_t, mode: Optional[str] = None, cv2_interpolation: Optional[int] = None):
+    def imshow(self, mat: Image_t, mode: MODE = MODE.FIT, cv2_interpolation: Optional[int] = None):
         self.image_viewer.imshow(mat, mode, cv2_interpolation)
 
     def getWindowProperty(self, prop_id: int) -> float:

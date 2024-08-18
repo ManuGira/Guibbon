@@ -21,6 +21,11 @@ Other reasons why you want to use Guibbon:
 More info in the [documentation](https://manugira.github.io/Guibbon/)
 
 ## Release Notes
+#### v0.3.0
+###### Features
+* **Pan & Zoom**: The image can be panned and zoomed with the mouse
+* **Zoom toolbar**: A toolbar is now available on bottom of the displayed image. It can be used to set the zoom.  
+
 #### v0.2.1
 ###### Features
 * **Tree View Widget**: Create your tree with `guibbon.TreeNode` and pass it to `guibbon.TreeView(...)`
