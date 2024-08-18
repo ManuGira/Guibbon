@@ -1,4 +1,9 @@
 ## Release Notes
+#### v0.3.0
+###### Features
+* **Pan & Zoom**: The image can be panned and zoomed with the mouse (mouse wheel and right click)
+* **Zoom toolbar**: A toolbar is now available on bottom of the displayed image. It can be used to set the zoom.  
+
 #### v0.2.1
 ###### Features
 * **Tree View Widget**: Create your tree with `guibbon.TreeNode` and pass it to `guibbon.TreeView(...)`
@@ -6,11 +11,11 @@
 * **Set Slider Name**: Allows to change the name of a Slider Widget after its instantiation
 * **Improve Color Picker UX**: Add an "Edit" button to the Color Picker Widget for better UX
 
-###### **Bug fixes**
+###### Bug fixes
 * **Float image support**: Before this fix, it was not possible to use `guibbon.imshow(...)` on an image with dtype=float 
 
-#### **v0.1.5**
-###### **Features**
+#### v0.1.5
+###### Features
  * **Monkey Patching**: Inject Guibbon's function in cv2 package (not permanantly) with `guibbon.inject(cv2)`
  * **Image Viewer**: shows image with `guibbon.imshow(...)` similarly to `cv2.imshow(...)` (can be monkey patched)
  * **WaitKeyEx**: Similar to `cv2.WaitKeyEx(...)`, it supports most of the keyboard events (can be monkey patched)
