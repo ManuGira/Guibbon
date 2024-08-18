@@ -6,7 +6,7 @@ cd ..
 source ./.venv/Scripts/activate
 
 # repo must be have no changes
-if [[ `git status --porcelain` ]]; then
+if [[ $(git status --porcelain) ]]; then
   echo "Please stash or commit any local changes before building the docs"
   exit 1
 fi
@@ -54,6 +54,6 @@ cat $BUILD_DIR/dev_versions.txt | while read -r VERSION ; do
   echo ""
 done
 
-# Add a version selector on top of for each html page
+# Add a version selector on top of each html page
 python $BUILD_DIR/build_docs_index.py $BUILD_DIR/tag_versions.txt $BUILD_DIR/dev_versions.txt $BUILD_SITE_DIR/index.html
 
