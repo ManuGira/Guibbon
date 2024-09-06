@@ -48,6 +48,10 @@ def on_point_release(event):
     print("on_point_release", event)
 
 
+def on_change_multislider(event):
+    print("onchange_multislider", event)
+
+
 def demo_cv():
     img = cv2.imread("ressources/dog.jpg")
 
@@ -72,6 +76,8 @@ def demo_cv():
         gbn.create_check_button(winname, "check single", on_check_button, initial_value=True)
         gbn.create_color_picker(winname, "Color picker", on_color_pick, (255, 0, 0))
         gbn.createInteractivePoint(winname, (100, 100), "point", on_click=on_point_click, on_drag=on_point_drag, on_release=on_point_release)
+
+        gbn.create_multislider(winname, "multi slider", range(30), initial_indexes=[0, 15], on_change=on_change_multislider)
 
     cv2.namedWindow("ok")
 
