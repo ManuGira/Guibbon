@@ -6,11 +6,14 @@ import abc
 
 Image_t = npt.NDArray[np.uint8]
 
-Point2D = tuple[float, float]
+Point2Di = Tuple[int, int]
+Point2D = Tuple[float, float]
 
 Point2DList = list[Point2D]
 
 CallbackRadioButtons = Optional[Callable[[int, str], None]]
+
+tkEvent = Any
 
 # foo(event) -> None
 CallbackPoint = Optional[Callable[[tk.Event], None]]

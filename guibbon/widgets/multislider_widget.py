@@ -1,17 +1,20 @@
 import tkinter as tk
 from typing import Callable, Any, Sequence, List, Tuple
-from guibbon.image_viewer import ImageViewer, MODE
 from guibbon.interactive_overlays import Point
-from guibbon.typedef import Point2D
+from guibbon.typedef import Point2D, Point2Di, tkEvent
 
 CallbackMultiSlider = Callable[[List[Tuple[int, Any]]], None]
 
-
 class MultiSliderWidget:
+    colors = {
+        "grey": "#%02x%02x%02x" % (191, 191, 191),
+    }
+
     def __init__(self, tk_frame: tk.Frame, multislider_name: str, values: Sequence[Any], initial_indexes: Sequence[int], on_change: CallbackMultiSlider, widget_color):
         self.name = tk.StringVar()
         self.name.set(multislider_name)
-        self.initial_indexes = initial_indexes + []
+        self.initial_indexes = initial_indexes  # should copy this
+        N = len(self.initial_indexes)
 
         self.values = values
         self.on_change = on_change
@@ -24,31 +27,42 @@ class MultiSliderWidget:
         tk.Label(top_frame, textvariable=self.name, bg=widget_color).pack(padx=2, side=tk.LEFT)
         tk.Label(top_frame, textvariable=self.value_var, bg=widget_color).pack(padx=2, side=tk.LEFT)
 
-        self.canvas = tk.Canvas(master=tk_frame, height=21, bg="gray10", borderwidth=0)
+        self.canvas = tk.Canvas(master=tk_frame, height=21, borderwidth=0)
         self.canvas.pack(side=tk.TOP, fill=tk.X)
 
-        # forces to compute rendered position and size of the canvas
-        tk_frame.pack()
-        self.canvas.update_idletasks()  # forces to compute rendered position and size of the canvas
+        self.line_id = self.canvas.create_line(-1, -1, -1, -1, fill=MultiSliderWidget.colors["grey"], width=3)
 
         self.cursors_positions: List[Tuple[int, Any]] = [(ind, values[ind]) for ind in initial_indexes]
         self.cursors: List[Point] = []
-        N = len(self.initial_indexes)
 
         # k_=k to fix value of k
         on_change_lambdas = [lambda event, k_=k: self.callback(k_, event) for k in range(N)]
-
         for cursor_id in range(N):
-            x_slider = self.cursors_positions[cursor_id][0]
-            point_xy_can = self.slider2canvas((x_slider, 0))
-            cursor = Point(
-                canvas=self.canvas,
-                point_xy=point_xy_can,
-                on_drag=on_change_lambdas[cursor_id],
+            self.cursors.append(
+                Point(
+                    canvas=self.canvas,
+                    point_xy=(-1, -1),
+                    on_drag=on_change_lambdas[cursor_id],
+                )
             )
-            cursor.update()
-            self.cursors.append(cursor)
 
+        self.update_canvas()
+
+    def update_canvas(self):
+        self.canvas.update_idletasks()  # forces to compute rendered position and size of the canvas
+
+        N = len(self.values)
+        line_x0, line_y0 = self.slider2canvas((0, 0))
+        line_x1, line_y1 = self.slider2canvas((N - 1, 0))
+        self.canvas.coords(self.line_id, line_x0, line_y0, line_x1, line_y1)
+        self.canvas.itemconfig(self.line_id, state="normal")
+        self.canvas.tag_raise(self.line_id)
+
+        for cursor_pos, cursor in zip(self.cursors_positions, self.cursors):
+            x_slider = cursor_pos[0]
+            point_xy_can = self.slider2canvas((x_slider, 0))
+            cursor.set_can_point_xy(point_xy_can)
+            cursor.update()
 
     def __setattr__(self, key, value):
         if key == "name" and key in self.__dict__.keys():
@@ -56,7 +70,7 @@ class MultiSliderWidget:
         else:
             return super().__setattr__(key, value)
 
-    def slider2canvas(self, point_xy: Point2D) -> Point2D:
+    def slider2canvas(self, point_xy: Point2Di) -> Point2Di:
         w_can = self.canvas.winfo_width()
         h_can = self.canvas.winfo_height()
         margin = h_can // 2
@@ -67,11 +81,11 @@ class MultiSliderWidget:
 
         x_slider, y_slider = point_xy
 
-        x_can = x_slider / scale + margin
+        x_can = int(round(x_slider / scale + margin))
         y_can = margin + 1
         return x_can, y_can
 
-    def canvas2slider(self, point_xy: Point2D) -> Point2D:
+    def canvas2slider(self, point_xy: Point2Di) -> Point2Di:
         w_can = self.canvas.winfo_width()
         h_can = self.canvas.winfo_height()
         margin = h_can // 2
@@ -89,7 +103,7 @@ class MultiSliderWidget:
         y_slider = 0
         return x_slider, y_slider
 
-    def callback(self, cursor_id, event: tk.Event):
+    def callback(self, cursor_id, event: tkEvent):
         x_slider, y_slider = self.canvas2slider((event.x, event.y))
         x_can, y_can = self.slider2canvas((x_slider, y_slider))
         self.cursors[cursor_id].set_can_point_xy((x_can, y_can))
@@ -102,14 +116,6 @@ class MultiSliderWidget:
 
         self.cursors_positions[cursor_id] = (x_slider, self.values[x_slider])
         self.on_change(self.cursors_positions)
-
-        # return self.on_change(x_slider, val)
-
-    def update(self):
-        """
-        Refreshes cursor position according to canvas size
-        """
-
 
     # def set_index(self, index, trigger_callback=True):
     #     self.tk_scale.set(index)

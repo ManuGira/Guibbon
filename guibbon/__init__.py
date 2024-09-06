@@ -395,14 +395,16 @@ class Guibbon:
         tk_frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
         return slider
 
+    def get_slider_instance(self, slider_name: str):
+        return self.sliders_by_names[slider_name]
+
     def create_multislider(self, multislider_name: str, values: Sequence[Any], initial_indexes: Sequence[int], on_change: CallbackMultiSlider) -> MultiSliderWidget:
         tk_frame = tk.Frame(self.ctrl_frame, bg=COLORS.widget)
         multislider = MultiSliderWidget(tk_frame, multislider_name, values, initial_indexes, on_change, COLORS.widget)
-        # self.sliders_by_names[multislider_name] = multislider
         tk_frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
+        multislider.update_canvas()
         return multislider
-    def get_slider_instance(self, slider_name: str):
-        return self.sliders_by_names[slider_name]
+
 
     def create_custom_widget(self, CustomWidgetClass: Type[WidgetInterface], *params) -> WidgetInterface:
         tk_frame = tk.Frame(self.ctrl_frame, bg=COLORS.widget)
