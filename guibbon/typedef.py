@@ -1,7 +1,6 @@
 from typing import Optional, Callable
 import numpy as np
 import numpy.typing as npt
-import tkinter as tk
 import abc
 
 Image_t = npt.NDArray[np.uint8]

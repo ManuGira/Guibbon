@@ -1,7 +1,7 @@
 import tkinter as tk
 from typing import Callable, Any, Sequence, List, Tuple
 from guibbon.interactive_overlays import Point
-from guibbon.typedef import Point2D, Point2Di, tkEvent
+from guibbon.typedef import Point2Di, tkEvent
 
 CallbackMultiSlider = Callable[[List[Tuple[int, Any]]], None]
 
@@ -30,7 +30,10 @@ class MultiSliderWidget:
         self.canvas = tk.Canvas(master=tk_frame, height=21, borderwidth=0)
         self.canvas.pack(side=tk.TOP, fill=tk.X)
 
-        self.line_id = self.canvas.create_line(-1, -1, -1, -1, fill=MultiSliderWidget.colors["grey"], width=3)
+        self.line_ids = []
+        self.line_ids.append(self.canvas.create_line(-1, -1, -1, -1, fill=MultiSliderWidget.colors["grey"], width=3))
+        for i in range(len(values)):
+            self.line_ids.append(self.canvas.create_line(-1, -1, -1, -1, fill=MultiSliderWidget.colors["grey"], width=3))
 
         self.cursors_positions: List[Tuple[int, Any]] = [(ind, values[ind]) for ind in initial_indexes]
         self.cursors: List[Point] = []
@@ -52,11 +55,19 @@ class MultiSliderWidget:
         self.canvas.update_idletasks()  # forces to compute rendered position and size of the canvas
 
         N = len(self.values)
+
+        for i, line_id in enumerate(self.line_ids[:-1]):
+            line_x, line_y = self.slider2canvas((i, 0))
+            self.canvas.coords(line_id, line_x, line_y-2, line_x, line_y+3)
+            self.canvas.itemconfig(line_id, state="normal")
+            self.canvas.tag_raise(line_id)
+
+        # horizontal_lines
         line_x0, line_y0 = self.slider2canvas((0, 0))
         line_x1, line_y1 = self.slider2canvas((N - 1, 0))
-        self.canvas.coords(self.line_id, line_x0, line_y0, line_x1, line_y1)
-        self.canvas.itemconfig(self.line_id, state="normal")
-        self.canvas.tag_raise(self.line_id)
+        self.canvas.coords(self.line_ids[-1], line_x0, line_y0, line_x1, line_y1)
+        self.canvas.itemconfig(self.line_ids[-1], state="normal")
+        self.canvas.tag_raise(self.line_ids[-1])
 
         for cursor_pos, cursor in zip(self.cursors_positions, self.cursors):
             x_slider = cursor_pos[0]
