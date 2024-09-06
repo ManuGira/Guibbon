@@ -19,13 +19,18 @@ class MultiSliderWidget:
         self.values = values
         self.on_change = on_change
 
-        self.value_var = tk.StringVar()
-        self.value_var.set(self.values[0])
+        self.cursors_positions: List[Tuple[int, Any]] = [(ind, values[ind]) for ind in initial_indexes]
 
-        top_frame = tk.Frame(tk_frame)
-        top_frame.pack(side=tk.TOP)
-        tk.Label(top_frame, textvariable=self.name, bg=widget_color).pack(padx=2, side=tk.LEFT)
-        tk.Label(top_frame, textvariable=self.value_var, bg=widget_color).pack(padx=2, side=tk.LEFT)
+        tk.Label(tk_frame, textvariable=self.name, bg=widget_color).pack(padx=2, side=tk.TOP, anchor=tk.W)
+
+        # create 1 label (with a string var) for each cursor
+        self.cursors_strvar = []
+        for i in range(N):
+            var = tk.StringVar()
+            var.set(self.cursors_positions[i][1])
+
+            self.cursors_strvar.append(var)
+            tk.Label(tk_frame, textvariable=var, bg=widget_color).pack(padx=2, side=tk.TOP, anchor=tk.W)
 
         self.canvas = tk.Canvas(master=tk_frame, height=21, borderwidth=0)
         self.canvas.pack(side=tk.TOP, fill=tk.X)
@@ -35,9 +40,9 @@ class MultiSliderWidget:
         for i in range(len(values)):
             self.line_ids.append(self.canvas.create_line(-1, -1, -1, -1, fill=MultiSliderWidget.colors["grey"], width=3))
 
-        self.cursors_positions: List[Tuple[int, Any]] = [(ind, values[ind]) for ind in initial_indexes]
         self.cursors: List[Point] = []
 
+        # create interactive points and their custom callbacks
         # k_=k to fix value of k
         on_change_lambdas = [lambda event, k_=k: self.callback(k_, event) for k in range(N)]
         for cursor_id in range(N):
@@ -126,6 +131,10 @@ class MultiSliderWidget:
             return
 
         self.cursors_positions[cursor_id] = (x_slider, self.values[x_slider])
+
+        for var, curs_pos in zip(self.cursors_strvar, self.cursors_positions):
+            var.set(curs_pos[1])
+
         self.on_change(self.cursors_positions)
 
     # def set_index(self, index, trigger_callback=True):
