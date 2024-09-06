@@ -21,6 +21,8 @@ Other reasons why you want to use Guibbon:
 More info in the [documentation](https://manugira.github.io/Guibbon/)
 
 ## Release Notes
+#### v0.4.0-dev
+
 #### v0.3.0
 ###### Features
 * **Pan & Zoom**: The image can be panned and zoomed with the mouse

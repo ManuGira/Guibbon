@@ -1,4 +1,6 @@
 ## Release Notes
+#### v0.4.0-dev
+
 #### v0.3.0
 ###### Features
 * **Pan & Zoom**: The image can be panned and zoomed with the mouse (mouse wheel and right click)
