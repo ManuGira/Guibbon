@@ -152,10 +152,10 @@ class MultiSliderWidget:
     # def get_values(self):
     #     return self.values
     #
-    # def set_values(self, values, new_index=None):
+    # def set_values(self, values, new_position=None):
     #     count = len(values)
     #     self.tk_scale["to"] = count - 1
     #     self.values = values
-    #     if new_index is not None:
-    #         self.set_index(new_index, trigger_callback=False)
-    #         self.value_var.set(values[new_index])
+    #     if new_position is not None:
+    #         self.set_index(new_position, trigger_callback=False)
+    #         self.value_var.set(values[new_position])

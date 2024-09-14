@@ -22,16 +22,16 @@ class Test_SliderWidget(unittest.TestCase):
         slider = gbn.get_slider_instance(self.winname, name)
         self.assertIsInstance(slider, gbn.SliderWidget, msg="function gbn.get_slider_instance must return an instance of a SliderWidget")
 
-        index = slider.get_index()
+        index = slider.get_position()
         self.assertEqual(index, 2, msg="function get_values of SliderWidget instance must return correct value")
 
         self.triggered = False
-        slider.set_index(0)
+        slider.set_position(0)
         self.assertTrue(self.triggered, "function set_index of SliderWidget instance must trigger callback by default")
-        slider.set_index(1, trigger_callback=False)
+        slider.set_position(1, trigger_callback=False)
         self.assertTrue(self.triggered, "function set_index of SliderWidget instance should not trigger callback when trigger_callback=False")
-        index = slider.get_index()
-        self.assertEqual(index, 1, msg="function get_index of SliderWidget instance must return correct index")
+        index = slider.get_position()
+        self.assertEqual(index, 1, msg="function get_index of SliderWidget instance must return correct position")
         values_res = slider.get_values()
         for expected, actual in zip(values, values_res):
             self.assertEqual(expected, actual, msg="function get_values of SliderWidget instance must return correct values")

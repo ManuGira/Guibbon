@@ -145,12 +145,12 @@ def createTrackbar(trackbarName, windowName, value, count, onChange):
 
 def setTrackbarPos(trackbarname, winname, pos):
     trackbar_instance = get_slider_instance(winname, trackbarname)
-    trackbar_instance.set_index(pos)
+    trackbar_instance.set_position(pos)
 
 
 def getTrackbarPos(trackbarname, winname):
     trackbar_instance = get_slider_instance(winname, trackbarname)
-    return trackbar_instance.get_index()
+    return trackbar_instance.get_position()
 
 
 def setTrackbarMin(trackbarname, winname, minval):
@@ -158,7 +158,7 @@ def setTrackbarMin(trackbarname, winname, minval):
     current_minval = trackbar_instance.get_values()[0]
     maxval = trackbar_instance.get_values()[-1]
     values = list(range(minval, maxval + 1))
-    new_index = max(trackbar_instance.get_index() + current_minval - minval, 0)
+    new_index = max(trackbar_instance.get_position() + current_minval - minval, 0)
     trackbar_instance.set_values(values, new_index)
 
 

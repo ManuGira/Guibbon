@@ -239,7 +239,7 @@ class Polygon(InteractivePolygon):
         self.ipoints = []
         for k, point_xy in enumerate(point_xy_list):
             # subscribe to on_click only if needed.
-            # subscribe to on_drag in any cases (to update points coordinates). Use lambda to pass point index.
+            # subscribe to on_drag in any cases (to update points coordinates). Use lambda to pass point position.
             # subscribe to on_release only if needed.
             ipoint = Point(
                 canvas,
