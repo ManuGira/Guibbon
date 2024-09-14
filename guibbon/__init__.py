@@ -16,9 +16,9 @@ from .widgets.button_widget import ButtonWidget, CallbackButton
 from .widgets.check_button_list_widget import CheckButtonListWidget, CallbackCheckButtonList
 from .widgets.check_button_widget import CheckButtonWidget, CallbackCheckButton
 from .widgets.color_picker_widget import ColorPickerWidget, CallbackColorPicker
+from .widgets.multislider_widget import MultiSliderWidget, CallbackMultiSlider
 from .widgets.radio_buttons_widget import RadioButtonsWidget, CallbackRadioButtons
 from .widgets.slider_widget import SliderWidget, CallbackSlider
-from .widgets.multislider_widget import MultiSliderWidget, CallbackMultiSlider
 from .widgets.treeview_widget import TreeviewWidget, CallbackTreeview, TreeNode
 from .widgets.widget import WidgetInterface
 
@@ -118,9 +118,12 @@ def create_slider(winname: str, slider_name: str, values: Sequence[Any], on_chan
     slider_instance: SliderWidget = Guibbon.get_instance(winname).create_slider(slider_name, values, on_change, initial_index)
     return slider_instance
 
-def create_multislider(winname: str, multislider_name: str, values: Sequence[Any], initial_indexes: Sequence[int], on_change: CallbackMultiSlider) -> MultiSliderWidget:
-    multislider_instance: MultiSliderWidget = Guibbon.get_instance(winname).create_multislider(multislider_name, values, initial_indexes, on_change)
+
+def create_multislider(winname: str, multislider_name: str, values: Sequence[Any], initial_indexes: Sequence[int], on_drag: Optional[CallbackMultiSlider] = None,
+                       on_release: Optional[CallbackMultiSlider] = None) -> MultiSliderWidget:
+    multislider_instance: MultiSliderWidget = Guibbon.get_instance(winname).create_multislider(multislider_name, values, initial_indexes, on_drag, on_release)
     return multislider_instance
+
 
 def get_slider_instance(winname: str, slider_name: str) -> SliderWidget:
     slider_instance: SliderWidget = Guibbon.get_instance(winname).get_slider_instance(slider_name)
@@ -398,13 +401,13 @@ class Guibbon:
     def get_slider_instance(self, slider_name: str):
         return self.sliders_by_names[slider_name]
 
-    def create_multislider(self, multislider_name: str, values: Sequence[Any], initial_indexes: Sequence[int], on_change: CallbackMultiSlider) -> MultiSliderWidget:
+    def create_multislider(self, multislider_name: str, values: Sequence[Any], initial_indexes: Sequence[int], on_drag: Optional[CallbackMultiSlider] = None,
+                           on_release: Optional[CallbackMultiSlider] = None) -> MultiSliderWidget:
         tk_frame = tk.Frame(self.ctrl_frame, bg=COLORS.widget)
-        multislider = MultiSliderWidget(tk_frame, multislider_name, values, initial_indexes, on_change, COLORS.widget)
+        multislider = MultiSliderWidget(tk_frame, multislider_name, values, initial_indexes, on_drag, on_release, COLORS.widget)
         tk_frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
         multislider.update_canvas()
         return multislider
-
 
     def create_custom_widget(self, CustomWidgetClass: Type[WidgetInterface], *params) -> WidgetInterface:
         tk_frame = tk.Frame(self.ctrl_frame, bg=COLORS.widget)

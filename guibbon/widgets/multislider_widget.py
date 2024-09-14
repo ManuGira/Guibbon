@@ -1,5 +1,5 @@
 import tkinter as tk
-from typing import Callable, Any, Sequence, List, Tuple
+from typing import Callable, Any, Sequence, List, Tuple, Optional
 from guibbon.interactive_overlays import Point
 from guibbon.typedef import Point2Di, tkEvent
 
@@ -11,14 +11,16 @@ class MultiSliderWidget:
         "grey": "#%02x%02x%02x" % (191, 191, 191),
     }
 
-    def __init__(self, tk_frame: tk.Frame, multislider_name: str, values: Sequence[Any], initial_indexes: Sequence[int], on_change: CallbackMultiSlider, widget_color):
+    def __init__(self, tk_frame: tk.Frame, multislider_name: str, values: Sequence[Any], initial_indexes: Sequence[int], on_drag: Optional[CallbackMultiSlider] = None,
+                 on_release: Optional[CallbackMultiSlider] = None, widget_color=None):
         self.name = tk.StringVar()
         self.name.set(multislider_name)
         self.initial_indexes = initial_indexes  # should copy this
         N = len(self.initial_indexes)
 
         self.values = values
-        self.on_change = on_change
+        self.on_drag = on_drag
+        self.on_release = on_release
 
         self.cursors_positions: List[Tuple[int, Any]] = [(ind, values[ind]) for ind in initial_indexes]
 
@@ -39,13 +41,14 @@ class MultiSliderWidget:
 
         # create interactive points and their custom callbacks
         # k_=k to fix value of k
-        on_change_lambdas = [lambda event, k_=k: self.callback(k_, event) for k in range(N)]
+        on_drag_lambdas = [lambda event, k_=k: self.on_drag_callback(k_, event) for k in range(N)]
         for cursor_id in range(N):
             self.cursors.append(
                 Point(
                     canvas=self.canvas,
                     point_xy=(-1, -1),
-                    on_drag=on_change_lambdas[cursor_id],
+                    on_drag=on_drag_lambdas[cursor_id],
+                    on_release=None if self.on_release is None else self.on_release_callback,
                 )
             )
 
@@ -114,7 +117,7 @@ class MultiSliderWidget:
         y_slider = 0
         return x_slider, y_slider
 
-    def callback(self, cursor_id, event: tkEvent):
+    def on_drag_callback(self, cursor_id, event: tkEvent):
         x_slider, y_slider = self.canvas2slider((event.x, event.y))
         x_can, y_can = self.slider2canvas((x_slider, y_slider))
         self.cursors[cursor_id].set_can_point_xy((x_can, y_can))
@@ -128,7 +131,13 @@ class MultiSliderWidget:
         self.cursors_positions[cursor_id] = (x_slider, self.values[x_slider])
 
         self.label_txt.set("[" + ", ".join([str(curs_pos[1]) for curs_pos in self.cursors_positions]) + "]")
-        self.on_change(self.cursors_positions)
+
+        if self.on_drag is not None:
+            self.on_drag(self.cursors_positions)
+
+    def on_release_callback(self, event: tkEvent):
+        if self.on_release is not None:
+            self.on_release(self.cursors_positions)
 
     # def set_index(self, index, trigger_callback=True):
     #     self.tk_scale.set(index)

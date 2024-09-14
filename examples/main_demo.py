@@ -48,8 +48,14 @@ def on_point_release(event):
     print("on_point_release", event)
 
 
-def on_change_multislider(event):
-    print("onchange_multislider", event)
+def on_drag_multislider(event):
+    print("on_drag_multislider", event)
+
+
+def on_release_multislider(event):
+    print("on_release_multislider", event)
+
+
 
 
 def demo_cv():
@@ -77,7 +83,7 @@ def demo_cv():
         gbn.create_color_picker(winname, "Color picker", on_color_pick, (255, 0, 0))
         gbn.createInteractivePoint(winname, (100, 100), "point", on_click=on_point_click, on_drag=on_point_drag, on_release=on_point_release)
 
-        gbn.create_multislider(winname, "multi slider", range(30), initial_indexes=[0, 15], on_change=on_change_multislider)
+        gbn.create_multislider(winname, "multi slider", range(30), initial_indexes=[0, 15], on_drag=on_drag_multislider, on_release=on_release_multislider)
 
     cv2.namedWindow("ok")
 
