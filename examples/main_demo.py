@@ -83,7 +83,8 @@ def demo_cv():
         gbn.create_color_picker(winname, "Color picker", on_color_pick, (255, 0, 0))
         gbn.createInteractivePoint(winname, (100, 100), "point", on_click=on_point_click, on_drag=on_point_drag, on_release=on_point_release)
 
-        gbn.create_multislider(winname, "multi slider", range(30), initial_indexes=[0, 15], on_drag=on_drag_multislider, on_release=on_release_multislider)
+        multislider = gbn.create_multislider(winname, "multi slider", range(30), initial_indexes=[0, 15], on_drag=on_drag_multislider, on_release=on_release_multislider)
+        gbn.create_button(winname, "reset multi slider", lambda: multislider.set_positions([0, 15]))
 
     cv2.namedWindow("ok")
 
