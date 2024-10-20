@@ -48,7 +48,7 @@ class ColorPickerWidget:
         self.frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
 
     def callback(self):
-        colors = askcolor(title="Color Chooser")
+        colors = askcolor(title="Color Chooser", color=self.get_current_value())
         if colors[0] is not None:
             r, g, b = colors[0]
             self.color_rgb = (r, g, b)
