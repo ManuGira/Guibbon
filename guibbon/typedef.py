@@ -2,17 +2,16 @@ from typing import Optional, Callable
 import numpy as np
 import numpy.typing as npt
 import abc
+import tkinter as tk
 
 Image_t = npt.NDArray[np.uint8]
 
-Point2Di = Tuple[int, int]
-Point2D = Tuple[float, float]
+Point2Di = tuple[int, int]
+Point2D = tuple[float, float]
 
 Point2DList = list[Point2D]
 
 CallbackRadioButtons = Optional[Callable[[int, str], None]]
-
-tkEvent = Any
 
 # foo(event) -> None
 CallbackPoint = Optional[Callable[[tk.Event], None]]
@@ -39,6 +38,10 @@ class InteractivePoint(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def set_visible(self, value: bool):
         pass
+
+    @abc.abstractmethod
+    def delete(self):
+        raise NotImplementedError()
 
 
 class InteractivePolygon(metaclass=abc.ABCMeta):

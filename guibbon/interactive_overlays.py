@@ -112,6 +112,9 @@ class Point(InteractivePoint):
         self.canvas.tag_bind(self.circle_id, "<Enter>", self._on_enter)
         self.canvas.tag_bind(self.circle_id, "<Leave>", self._on_leave)
 
+    def delete(self):
+        self.canvas.delete(self.circle_id)
+
     def update(self):
         self.update_magnets()
         radius = Point.radius[self.state]
