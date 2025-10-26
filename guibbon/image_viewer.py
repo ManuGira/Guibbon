@@ -3,7 +3,7 @@ import enum
 import math
 import tkinter as tk
 import types
-from typing import List, Any, Optional
+from typing import Any, Optional
 
 import cv2
 import numpy as np
@@ -60,7 +60,7 @@ class ImageViewer:
         self.imgtk = None
         self.onMouse: CallbackMouse = None
         self.modifier = ImageViewer.Modifier()
-        self.interactive_overlay_instance_list: List[Any] = []
+        self.interactive_overlay_instance_list: list[Any] = []
         self.mode: Optional[MODE] = None
 
         self.mouse_pan_calculator = mouse_pan.MousePan(ImageViewer.BUTTONNUM.RIGHT, on_drag=self.on_mouse_pan_drag, on_release=self.on_mouse_pan_release)

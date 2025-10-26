@@ -1,11 +1,11 @@
 import tkinter as tk
-from typing import Callable, List, Optional
+from typing import Callable, Optional
 
-CallbackCheckButtonList = Callable[[List[bool]], None]
+CallbackCheckButtonList = Callable[[list[bool]], None]
 
 
 class CheckButtonListWidget:
-    def __init__(self, tk_frame, name: str, options: List[str], on_change: CallbackCheckButtonList, initial_values: Optional[List[bool]] = None):
+    def __init__(self, tk_frame, name: str, options: list[str], on_change: CallbackCheckButtonList, initial_values: Optional[list[bool]] = None):
         self.name = name
         self.on_change: CallbackCheckButtonList = on_change
         if initial_values is None:
@@ -33,5 +33,5 @@ class CheckButtonListWidget:
         res = [var.get() for var in self.vars]
         self.on_change(res)
 
-    def get_current_value(self) -> List[bool]:
+    def get_current_value(self) -> list[bool]:
         return [var.get() for var in self.vars]

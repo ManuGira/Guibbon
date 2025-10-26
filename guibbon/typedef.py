@@ -1,4 +1,4 @@
-from typing import Optional, Callable, NoReturn, List, Tuple
+from typing import Optional, Callable, NoReturn
 import numpy as np
 import numpy.typing as npt
 import tkinter as tk
@@ -6,9 +6,9 @@ import abc
 
 Image_t = npt.NDArray[np.uint8]
 
-Point2D = Tuple[float, float]
+Point2D = tuple[float, float]
 
-Point2DList = List[Point2D]
+Point2DList = list[Point2D]
 
 CallbackRadioButtons = Optional[Callable[[int, str], NoReturn]]
 

@@ -2,7 +2,7 @@ import os
 import re
 import time
 import tkinter as tk
-from typing import Dict, Optional, Type, List, Sequence, Any, Tuple
+from typing import Optional, Type, Sequence, Any
 
 import cv2
 
@@ -178,7 +178,7 @@ def create_window(winname: str) -> "Guibbon":
     return Guibbon.get_instance(winname)
 
 
-def create_radio_buttons(winname: str, name: str, options: List[str], on_change: CallbackRadioButtons) -> RadioButtonsWidget:
+def create_radio_buttons(winname: str, name: str, options: list[str], on_change: CallbackRadioButtons) -> RadioButtonsWidget:
     return Guibbon.get_instance(winname).create_radio_buttons(name, options, on_change)
 
 
@@ -190,11 +190,11 @@ def create_check_button(winname: str, name: str, on_change: CallbackCheckButton,
     return Guibbon.get_instance(winname).create_check_button(name, on_change, initial_value)
 
 
-def create_check_button_list(winname: str, name: str, options: List[str], on_change: CallbackCheckButtonList, initial_values: Optional[List[bool]] = None) -> CheckButtonListWidget:
+def create_check_button_list(winname: str, name: str, options: list[str], on_change: CallbackCheckButtonList, initial_values: Optional[list[bool]] = None) -> CheckButtonListWidget:
     return Guibbon.get_instance(winname).create_check_button_list(name, options, on_change, initial_values)
 
 
-def create_color_picker(winname: str, name: str, on_change: CallbackColorPicker, initial_color_rgb: Optional[Tuple[int, int, int]] = None) -> ColorPickerWidget:
+def create_color_picker(winname: str, name: str, on_change: CallbackColorPicker, initial_color_rgb: Optional[tuple[int, int, int]] = None) -> ColorPickerWidget:
     return Guibbon.get_instance(winname).create_color_picker(name, on_change, initial_color_rgb)
 
 
@@ -252,7 +252,7 @@ class Guibbon:
 
     root: tk.Tk
     is_alive: bool = False
-    instances: Dict[str, "Guibbon"] = {}
+    instances: dict[str, "Guibbon"] = {}
     active_instance_name: Optional[str]
     is_timeout: bool
     keyboard: KeyboardEventHandler
@@ -348,10 +348,10 @@ class Guibbon:
         dummy_canvas = tk.Canvas(master=self.ctrl_frame, height=0, width=300)
         dummy_canvas.pack()
 
-        self.sliders_by_names: Dict[str, SliderWidget] = {}
-        self.custom_widtgets_by_names: Dict[str, WidgetInterface] = {}
-        self.radio_buttons_by_names: Dict[str, RadioButtonsWidget] = {}
-        self.buttons_by_names: Dict[str, ButtonWidget] = {}
+        self.sliders_by_names: dict[str, SliderWidget] = {}
+        self.custom_widtgets_by_names: dict[str, WidgetInterface] = {}
+        self.radio_buttons_by_names: dict[str, RadioButtonsWidget] = {}
+        self.buttons_by_names: dict[str, ButtonWidget] = {}
 
         self.frame.pack()
         self.image_viewer.frame.pack(side=tk.LEFT)
@@ -397,7 +397,7 @@ class Guibbon:
         tk_frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
         return widget_instance
 
-    def create_radio_buttons(self, name: str, options: List[str], on_change: CallbackRadioButtons) -> RadioButtonsWidget:
+    def create_radio_buttons(self, name: str, options: list[str], on_change: CallbackRadioButtons) -> RadioButtonsWidget:
         tk_frame = tk.Frame(self.ctrl_frame, bg=COLORS.widget)
         radio_buttons = RadioButtonsWidget(tk_frame, name, options, on_change)
         self.radio_buttons_by_names[name] = radio_buttons
@@ -413,13 +413,13 @@ class Guibbon:
         tk_frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
         return cb
 
-    def create_check_button_list(self, name: str, options: List[str], on_change: CallbackCheckButtonList, initial_values: Optional[List[bool]] = None) -> CheckButtonListWidget:
+    def create_check_button_list(self, name: str, options: list[str], on_change: CallbackCheckButtonList, initial_values: Optional[list[bool]] = None) -> CheckButtonListWidget:
         tk_frame = tk.Frame(self.ctrl_frame)
         cb = CheckButtonListWidget(tk_frame, name, options, on_change, initial_values)
         tk_frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
         return cb
 
-    def create_color_picker(self, name: str, on_change: CallbackColorPicker, initial_color_rgb: Optional[Tuple[int, int, int]] = None) -> ColorPickerWidget:
+    def create_color_picker(self, name: str, on_change: CallbackColorPicker, initial_color_rgb: Optional[tuple[int, int, int]] = None) -> ColorPickerWidget:
         tk_frame = tk.Frame(self.ctrl_frame)
         cpw = ColorPickerWidget(tk_frame, name, on_change, initial_color_rgb)
         tk_frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
