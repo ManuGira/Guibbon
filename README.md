@@ -1,4 +1,3 @@
-
 # ![icon](https://raw.githubusercontent.com/ManuGira/Guibbon/static/docs/images/icon32.png) Guibbon with U ![icon](https://raw.githubusercontent.com/ManuGira/Guibbon/static/docs/images/icon32.png) 
 ![Tests](https://github.com/ManuGira/Guibbon/actions/workflows/tests.yml/badge.svg)
 
@@ -18,113 +17,57 @@ Other reasons why you want to use Guibbon:
  - Beside Tkinter, it only has 3 dependencies: numpy, opencv-python and pillow
  - It's less than 200 KB
 
-More info in the [documentation](https://manugira.github.io/Guibbon/)
+More info: 
+  - [documentation](./docs/index.md)
+  - [Release Notes](./docs/release_notes.md)
+  - [Getting Started (user installation)](./docs/getting_started.md)
 
-## Release Notes
-#### v0.4.0-dev
-
-#### v0.3.0
-###### Features
-* **Pan & Zoom**: The image can be panned and zoomed with the mouse
-* **Zoom toolbar**: A toolbar is now available on bottom of the displayed image. It can be used to set the zoom.  
-
-#### v0.2.1
-###### Features
-* **Tree View Widget**: Create your tree with `guibbon.TreeNode` and pass it to `guibbon.TreeView(...)`
-* **Custom Icon**: The window has an icon of a smiling guibbon now
-* **Set Slider Name**: Allows to change the name of a Slider Widget after its instantiation
-* **Improve Color Picker UX**: Add an "Edit" button to the Color Picker Widget for better UX
-
-###### Bug fixes
-* **Float image support**: Before this fix, it was not possible to use `guibbon.imshow(...)` on an image with dtype=float 
-
-#### v0.1.5
-###### Features
- * **Monkey Patching**: Inject Guibbon's function in cv2 package (not permanantly) with `guibbon.inject(cv2)`
- * **Image Viewer**: shows image with `guibbon.imshow(...)` similarly to `cv2.imshow(...)` (can be monkey patched)
- * **WaitKeyEx**: Similar to `cv2.WaitKeyEx(...)`, it supports most of the keyboard events (can be monkey patched)
- * **Trackbar**: create and edit trackbar similarly to `cv2.createTrackbar` (can be monkey patched)
- * **Slider Widget**: Same as `cv2.trackbar` but with a more flexible signature
- * **Button Widget**: A button to trigger a callback
- * **Check Button Widget**: Single check box to get control over a boolean
- * **Check Button List Widget**: List of check boxes
- * **Radio Buttons Widget**: Set of radio buttons (also called option buttons) to get control over an enum value
- * **Color Picker Widget**: Let the user choose a color from a color palette
- * **Custom Widget**: Exposing the `guibbon.WidgetInterface` allowing you to create and add your custom widget to the right panel
- * **Interactive Point Overlay**: A draggable point on the image. The point act as a 2D slider returning you its position on the image
- * **Interactive Polygon Overlays**: A set of draggable point on the image
- * **Interactive Rectangle Overlays**: A couple of interactive points representing top-left and bottom-right corners of a rectangle
- * **Magnets for Interactive Overlays**: A point cloud that can be injected to an interactive overlay. The overlay will snap to the magnets when dragged by the user.
-
-## User Installation
-The [Guibbon package](https://pypi.org/project/guibbon) is hosted on PyPI, you can install the **latest stable release** with pip:
-```
-pip install guibbon
-```
-If stability is not for you, install the **dev version** from github. You will get early access to new **features**, **bugfixes** and **bugs**:
-```
-pip install git+https://github.com/ManuGira/Guibbon.git@master
-```
 ## Development 
 
 The project is configured in `pyproject.toml`. It contains dependecies, and configs for continuous integration.
 
 ### Dev Installation
-Install development requirements with poetry:
-```
-$ poetry install
-```
-This will create a new venv for this project and install dependencies according to poetry.lock. If you prefer to manage your venv yourself, you can install with pip:
-```
-$ pip install -r requirements_dev.txt
-$ pip install -e .  # Install this package in editable mode
-``` 
-All requirements files and poetry.lock have been generated with the `prepare_python.sh` script.
-```
-./prepare_python.sh
-```
+All development actions must be performed using uv. uv handles the project environment and there is no need to activate virtual environments manually — run tools and scripts with `uv run <command>`. The project includes uv.lock and pyproject.toml to define dependencies and the development environment. 
+Use `uv run` for all development tasks described below.
+
+#### Install uv
+Follow the official installation instructions:
+https://docs.astral.sh/uv/getting-started/installation/
+
+Once installed, use `uv run <command>` for all project commands.
 
 ### Continuous Integration
-#### Testing with pytest 
-Run tests and generate coverage report:
+All CI and local developer commands are executed through uv.
+#### Testing with pytest
+Run tests and generate the coverage report via uv:
 ```
-$ pytest 
+$ uv run pytest
 ```
 #### Type checking with mypy
-Run it with:
+Run type checks:
 ```
-$ mypy .
+$ uv run mypy .
 ```
 #### Lintering with ruff
 Linter check:
 ```
-$ ruff check .
+$ uv run ruff check .
 ```
 Linter fix:
 ```
-$ ruff check --fix .
+$ uv run ruff check --fix .
 ```
 
-### Publishing to PyPI with poetry
-First, update the version number in the `pyproject.toml`  
-Then build tarball and wheel:
-```
-$ poetry build
-```
-Publish to PyPI:
-```
-$ poetry publish -r pypi -u __token__ -p <paste the secret token here (very long string starting with "pypi-")>
-```
+### Publishing to PyPI
+Update the version number in `pyproject.toml` and then build and publish using uv to ensure the project environment is used.
 
-### Publishing Documentation
-The documentation is written with [mkdocs](https://www.mkdocs.org/). Documentation files are placed in folder `./build/docs/site`.  
-Build documentation site for all version tag and current develop:
+Build source and wheel distributions:
 ```
-$ ./scripts/build_docs.sh
+$ uv run python -m build
 ```
-Once built, the documentation can be deployed on github on the page of the Guibbon's project.  
+Publish to PyPI with twine through uv:
 ```
-$ ./scripts/deploy_docs.sh
+$ uv run python -m twine upload -r pypi dist/* -u __token__ -p <paste the secret token here (very long string starting with "pypi-")>
 ```
 
 ## TODO

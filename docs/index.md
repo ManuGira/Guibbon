@@ -25,4 +25,3 @@ It allows to display an image and add GUI controllers such as:
 
 * Source code hosted on [GitHub](https://github.com/ManuGira/Guibbon)
 * Package hosted on [PyPl](https://pypi.org/project/guibbon)
-* Documentation hosted on [Github Pages](https://manugira.github.io/Guibbon/)
