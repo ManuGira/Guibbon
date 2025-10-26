@@ -40,28 +40,37 @@ jobs:
     strategy:
       matrix:
         os: ['windows-latest', 'ubuntu-latest']
-        python-version: ['3.12', '3.13']
+        python-version: ['3.10', '3.11', '3.12','3.13']
     runs-on: ${{ matrix.os }}
 
     name: "Tests: ${{ matrix.os }}, py ${{ matrix.python-version }}"
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install tkinter (Ubuntu only)
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        run: |
+          sudo apt-get update && sudo apt-get install -y python3-tk
+
       - name: Install uv from astral.sh
         run: |
           curl -LsSf https://astral.sh/uv/install.sh | sh
-          export PATH="$HOME/.cargo/bin:$PATH"
 
       - name: Set up Python version ${{ matrix.python-version }}
         run: |
           uv python pin ${{ matrix.python-version }}
 
-      - name: Tests with pytest
+      - name: Run tests (Ubuntu)
+        if: matrix.os == 'ubuntu-latest'
         run: |
-          if ${{ matrix.os == 'ubuntu-latest' }}
-          then
-            echo "Create virtual display to avoid tk/tcl errors on ubuntu"
-            export DISPLAY=:99 
-            Xvfb :99 &  
-          fi
+          echo "Create virtual display to avoid tk/tcl errors on ubuntu"
+          export DISPLAY=:99 
+          Xvfb :99 &  
+          echo "Running tests"
+          uv run pytest
+
+      - name: Run tests (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          echo "Running tests"
           uv run pytest

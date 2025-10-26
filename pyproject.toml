@@ -6,7 +6,7 @@ authors = ["Manu Gira <manu.gira@outlook.com>"]
 readme = "docs/index.md"
 repository = "https://github.com/ManuGira/Guibbon.git"
 keywords = ["GUI", "Tkinter", "OpenCV"]
-requires-python = ">=3.12"
+requires-python = ">=3.10"
 dependencies = [
     "opencv-python>=4.12.0.88",
     "pillow>=12.0.0",
@@ -20,6 +20,8 @@ dev = [
     "pytest>=8.4.2",
     "pytest-cov>=7.0.0",
     "ruff>=0.14.2",
+    "toml>=0.10.2",
+    "types-toml>=0.10.8.20240310",
 ]
 
 [tool.pytest.ini_options]

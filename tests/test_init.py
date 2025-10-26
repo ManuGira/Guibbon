@@ -1,11 +1,11 @@
 import re
-import subprocess
 import sys
 import unittest
 from typing import Tuple
 
 import cv2
 import numpy as np
+import toml
 
 import guibbon as gbn
 
@@ -15,7 +15,8 @@ eps = sys.float_info.epsilon
 class TestPackage(unittest.TestCase):
     def test_version_match(self):
         ver0 = gbn.__version__
-        version_line = subprocess.run("uv version".split(), capture_output=True).stdout.decode()
+        toml_data = toml.load("pyproject.toml")
+        version_line = toml_data["project"]["version"]
         ver1 = version_line.split()[-1]
         ver1 = ver1.replace(".dev0", "-dev")  # I don't know where the ".dev0" comes from but it corresponds to my "-dev"
         self.assertEqual(ver0, ver1, "Package version (in pyproject.toml) and __version__ (in __init__.py) must match")
