@@ -1,8 +1,8 @@
 import tkinter as tk
 from tkinter import ttk
-from typing import Callable, List, Any
+from typing import Callable, Any
 
-CallbackTreeview = Callable[[List[str], Any], None]
+CallbackTreeview = Callable[[list[str], Any], None]
 
 
 class TreeNode:
@@ -74,7 +74,7 @@ class TreeviewWidget:
     def callback(self, event):
         try:
             item = self.tk_treeview.identify('item', event.x, event.y)
-            names: List[str] = []
+            names: list[str] = []
             while item != "":
                 names = [self.tk_treeview.item(item, "text")] + names
                 item = self.tk_treeview.parent(item)

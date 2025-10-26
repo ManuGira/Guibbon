@@ -1,5 +1,7 @@
 ## Release Notes
 #### v0.4.0-dev
+###### Features
+* **Python version support**: Guibbon now supports Python 3.10 to 3.13 and drops support for Python <3.10
 
 #### v0.3.0
 ###### Features

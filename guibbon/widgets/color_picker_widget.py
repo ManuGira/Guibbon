@@ -1,11 +1,11 @@
 import tkinter as tk
 from tkinter.colorchooser import askcolor
-from typing import Callable, Tuple, Optional
+from typing import Callable, Optional
 
-CallbackColorPicker = Callable[[Tuple[int, int, int]], None]
+CallbackColorPicker = Callable[[tuple[int, int, int]], None]
 
 
-def convert_color_tuple3i_to_hexastr(color_rgb: Tuple[int, int, int]) -> str:
+def convert_color_tuple3i_to_hexastr(color_rgb: tuple[int, int, int]) -> str:
     """
     >>> convert_color_tuple3i_to_hexastr((0, 0, 0))
     '#000000'
@@ -23,7 +23,7 @@ def convert_color_tuple3i_to_hexastr(color_rgb: Tuple[int, int, int]) -> str:
 
 
 class ColorPickerWidget:
-    def __init__(self, tk_frame, name: str, on_change: CallbackColorPicker, initial_color_rgb: Optional[Tuple[int, int, int]] = None):
+    def __init__(self, tk_frame, name: str, on_change: CallbackColorPicker, initial_color_rgb: Optional[tuple[int, int, int]] = None):
         self.frame = tk.Frame(tk_frame)
         label = tk.Label(self.frame, text=name)
         label.pack(padx=2, side=tk.LEFT, anchor=tk.W)
@@ -37,7 +37,7 @@ class ColorPickerWidget:
             assert isinstance(c, int)
         assert min(initial_color_rgb) >= 0
         assert max(initial_color_rgb) <= 255
-        self.color_rgb: Tuple[int, int, int] = initial_color_rgb
+        self.color_rgb: tuple[int, int, int] = initial_color_rgb
 
         color_hex = convert_color_tuple3i_to_hexastr(self.color_rgb)
         self.canvas = tk.Canvas(self.frame, bg=color_hex, bd=3, height=10)
@@ -55,5 +55,5 @@ class ColorPickerWidget:
         self.canvas["bg"] = convert_color_tuple3i_to_hexastr(self.color_rgb)
         self.on_change(self.color_rgb)
 
-    def get_current_value(self) -> Tuple[int, int, int]:
+    def get_current_value(self) -> tuple[int, int, int]:
         return self.color_rgb

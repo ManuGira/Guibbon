@@ -1,4 +1,4 @@
-from typing import Optional, Callable, NoReturn, List, Tuple
+from typing import Optional, Callable
 import numpy as np
 import numpy.typing as npt
 import tkinter as tk
@@ -6,23 +6,23 @@ import abc
 
 Image_t = npt.NDArray[np.uint8]
 
-Point2D = Tuple[float, float]
+Point2D = tuple[float, float]
 
-Point2DList = List[Point2D]
+Point2DList = list[Point2D]
 
-CallbackRadioButtons = Optional[Callable[[int, str], NoReturn]]
+CallbackRadioButtons = Optional[Callable[[int, str], None]]
 
 # foo(event) -> None
-CallbackPoint = Optional[Callable[[tk.EventType], NoReturn]]
+CallbackPoint = Optional[Callable[[tk.Event], None]]
 
 # foo(event, point_xy_list) -> None
-CallbackPolygon = Optional[Callable[[tk.EventType, Point2DList], NoReturn]]
+CallbackPolygon = Optional[Callable[[tk.Event, Point2DList], None]]
 
 # foo(event, point0_xy, point1_xy) -> None
-CallbackRect = Optional[Callable[[tk.EventType, Point2D, Point2D], NoReturn]]
+CallbackRect = Optional[Callable[[tk.Event, Point2D, Point2D], None]]
 
 # foo(cvevent, x, y, flag, param) -> None
-CallbackMouse = Optional[Callable[[int, int, int, int, None], NoReturn]]
+CallbackMouse = Optional[Callable[[int, int, int, int, None], None]]
 
 
 class InteractivePoint(metaclass=abc.ABCMeta):

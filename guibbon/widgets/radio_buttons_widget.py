@@ -1,5 +1,5 @@
 import tkinter as tk
-from typing import Callable, NoReturn, List, Tuple
+from typing import Callable
 
 from guibbon.colors import COLORS
 
@@ -15,14 +15,14 @@ class RadioButtonsWidget:
         tk.Label(self.frame, text=self.name).pack(padx=2, side=tk.TOP, anchor=tk.W)
 
         self.int_var = tk.IntVar()
-        self.buttons_list: List[tk.Radiobutton] = []
+        self.buttons_list: list[tk.Radiobutton] = []
 
         self.radioframeborder, self.buttons_list = RadioButtonsWidget._create_rb_list(self.frame, self.int_var, self.options, self.callback)
 
         self.frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
 
     @staticmethod
-    def _create_rb_list(frame: tk.Frame, int_var: tk.IntVar, options: List[str], callback: Callable[[], NoReturn]) -> Tuple[tk.Frame, List[tk.Radiobutton]]:
+    def _create_rb_list(frame: tk.Frame, int_var: tk.IntVar, options: list[str], callback: Callable[[], None]) -> tuple[tk.Frame, list[tk.Radiobutton]]:
         buttons_list = []
         radioframeborder = tk.Frame(frame, bg=COLORS.border)
         radioframe = tk.Frame(radioframeborder)
@@ -54,7 +54,7 @@ class RadioButtonsWidget:
     def get_options_list(self):
         return self.options + []
 
-    def set_options_list(self, new_options: List[str]):
+    def set_options_list(self, new_options: list[str]):
         if len(new_options) == len(self.options):
             for rb, opt in zip(self.buttons_list, new_options):
                 rb.config(text=opt)
