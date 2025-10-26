@@ -127,7 +127,7 @@ class Point(InteractivePoint):
 
     def set_img2can_matrix(self, img2can_matrix: TransformMatrix):
         self.img2can_matrix = img2can_matrix.copy()
-        self.can2img_matrix = np.linalg.inv(self.img2can_matrix)
+        self.can2img_matrix = np.linalg.inv(self.img2can_matrix).astype(float)
 
     def get_img_point_xy(self) -> Point2D:
         return self.point_xy
@@ -230,8 +230,11 @@ class Polygon(InteractivePolygon):
         self.on_release = on_release
         N = len(point_xy_list)
 
-        # k_=k to fix value of k
-        on_drag_lambdas: Sequence[CallbackPoint] = [lambda event, k_=k: self._on_drag(k_, event) for k in range(N)]
+        # create on_drag lambdas to pass point index and fix value of k
+        def make_on_drag(self, k: int):
+            return lambda event: self._on_drag(k, event)
+
+        on_drag_lambdas: Sequence[CallbackPoint] = [make_on_drag(self, k) for k in range(N)]
 
         self.ipoints = []
         for k, point_xy in enumerate(point_xy_list):

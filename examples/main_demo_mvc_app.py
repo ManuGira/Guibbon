@@ -19,7 +19,10 @@ class MyCustomWidget(gbn.WidgetInterface):
 
 class DemoMVCApp:
     def __init__(self, filename):
-        self.img: Image_t = cv2.imread(filename).astype(np.uint8)
+        img = cv2.imread(filename)
+        if img is None:
+            raise FileNotFoundError(f"Image file not found: {filename}")
+        self.img: Image_t = img.astype(np.uint8)
         self.winname = "demo app"
         gbn.namedWindow(self.winname)
         gbn.createInteractivePoint(self.winname, (100, 100), "point", on_drag=self.on_drag)

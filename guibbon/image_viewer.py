@@ -57,7 +57,7 @@ class ImageViewer:
         self.canvas = tk.Canvas(master=self.frame, height=height, width=width, bg="gray10")
         self.canvas_shape_hw = (height, width)
 
-        self.imgtk = None
+        self.imgtk: ImageTk.PhotoImage
         self.onMouse: CallbackMouse = None
         self.modifier = ImageViewer.Modifier()
         self.interactive_overlay_instance_list: list[Any] = []
@@ -238,7 +238,7 @@ class ImageViewer:
 
     def set_img2can_matrix(self, img2can_matrix: TransformMatrix):
         self.img2can_matrix = img2can_matrix.copy()
-        self.can2img_matrix = np.linalg.inv(self.img2can_matrix)
+        self.can2img_matrix = np.linalg.inv(self.img2can_matrix).astype(float)
 
     def createInteractivePoint(
             self,

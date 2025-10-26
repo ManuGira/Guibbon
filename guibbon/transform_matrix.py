@@ -2,7 +2,7 @@ import numpy as np
 import numpy.typing as npt
 from .typedef import Point2D
 
-# 3x3 matrix
+# 3x3 matrix of float64
 TransformMatrix = npt.NDArray[np.float64]
 
 

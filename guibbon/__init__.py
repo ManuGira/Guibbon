@@ -10,6 +10,7 @@ from .colors import COLORS
 from .image_viewer import ImageViewer, MODE
 from .keyboard_event_handler import KeyboardEventHandler
 from .typedef import Image_t, CallbackPoint, CallbackPolygon, CallbackRect, Point2DList, InteractivePolygon, CallbackMouse
+from .typedef import Point2D as Point2D
 from .widgets.button_widget import ButtonWidget, CallbackButton
 from .widgets.check_button_list_widget import CheckButtonListWidget, CallbackCheckButtonList
 from .widgets.check_button_widget import CheckButtonWidget, CallbackCheckButton

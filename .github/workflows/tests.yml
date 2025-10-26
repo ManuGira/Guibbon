@@ -15,15 +15,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python 3.12
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.12'
-
-      - name: Install dependencies
+      - name: Install uv from astral.sh
         run: |
           curl -LsSf https://astral.sh/uv/install.sh | sh
           export PATH="$HOME/.cargo/bin:$PATH"
+
+      - name: Set up Python version 3.12
+        run: |
+          uv python pin 3.12
 
       - name: Type check with mypy
         run: |
@@ -48,15 +47,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: Install dependencies
+      - name: Install uv from astral.sh
         run: |
           curl -LsSf https://astral.sh/uv/install.sh | sh
           export PATH="$HOME/.cargo/bin:$PATH"
+
+      - name: Set up Python version ${{ matrix.python-version }}
+        run: |
+          uv python pin ${{ matrix.python-version }}
 
       - name: Tests with pytest
         run: |
