@@ -1,6 +1,6 @@
 [project]
 name = "guibbon"
-version = "1.0.0-dev"
+version = "0.4.0-dev"
 description = "Very high level GUI with an API similar to the HighGUI of OpenCV"
 authors = ["Manu Gira <manu.gira@outlook.com>"]
 readme = "docs/index.md"
