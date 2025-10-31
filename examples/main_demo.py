@@ -82,9 +82,10 @@ def demo_cv():
         gbn.create_color_picker(winname, "Color picker", on_color_pick, (255, 0, 0))
         gbn.createInteractivePoint(winname, (100, 100), "point", on_click=on_point_click, on_drag=on_point_drag, on_release=on_point_release)
 
-        multislider = gbn.create_multislider(winname, "multi slider", range(30), initial_indexes=[0, 15], on_drag=on_drag_multislider, on_release=on_release_multislider)
-        gbn.create_button(winname, "reset multi slider", lambda: multislider.set_positions(np.linspace(0, 29, num=len(multislider.cursors), dtype=int).tolist()))
-        gbn.create_button(winname, "add cursor", lambda: multislider.add_cursor(len(multislider.cursors)))
+        multislider_values = "abcdefghijklmnopqrstuvwxyz"
+        multislider = gbn.create_multislider(winname, "multi slider", multislider_values, initial_indexes=[0, 15], on_drag=on_drag_multislider, on_release=on_release_multislider)
+        gbn.create_button(winname, "reset multi slider", lambda: multislider.set_positions(np.linspace(0, len(multislider_values)-1, num=len(multislider.get_positions()), dtype=int).tolist()))
+        gbn.create_button(winname, "add cursor", lambda: multislider.add_cursor(len(multislider.get_positions())))
         gbn.create_button(winname, "remove cursor", lambda: multislider.remove_cursor())
 
     cv2.namedWindow("ok")

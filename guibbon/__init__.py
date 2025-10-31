@@ -404,10 +404,10 @@ class Guibbon:
     def create_multislider(self, multislider_name: str, values: Sequence[Any], initial_indexes: Sequence[int], on_drag: Optional[CallbackMultiSlider] = None,
                            on_release: Optional[CallbackMultiSlider] = None) -> MultiSliderWidget:
         tk_frame = tk.Frame(self.ctrl_frame, bg=COLORS.widget)
-        multislider = MultiSliderWidget(tk_frame, multislider_name, values, initial_indexes, on_drag, on_release, COLORS.widget)
         tk_frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
-        multislider.update_canvas()
-        return multislider
+        multi_slider_widget = MultiSliderWidget(tk_frame, multislider_name, values, initial_indexes, on_drag, on_release, COLORS.widget)
+        # multi_slider_widget.multi_slider.update_canvas()
+        return multi_slider_widget
 
     def create_custom_widget(self, CustomWidgetClass: Type[WidgetInterface], *params) -> WidgetInterface:
         tk_frame = tk.Frame(self.ctrl_frame, bg=COLORS.widget)

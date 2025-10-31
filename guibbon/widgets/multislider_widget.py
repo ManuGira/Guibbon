@@ -1,10 +1,13 @@
 import tkinter as tk
 from typing import Callable, Any, Sequence, Optional
+
+from mypy.literals import literal
+
 from guibbon.interactive_overlays import Point
 from guibbon.typedef import Point2Di
 
-
-CallbackMultiSlider = Callable[[list[tuple[int, Any]]], None]
+MultiSliderState = list[tuple[int, Any]]
+CallbackMultiSlider = Callable[[MultiSliderState], None]
 
 
 class MultiSliderWidget:
@@ -12,34 +15,117 @@ class MultiSliderWidget:
         "grey": "#%02x%02x%02x" % (191, 191, 191),
     }
 
-    def __init__(self, tk_frame: tk.Frame, multislider_name: str, values: Sequence[Any], initial_positions: Sequence[int], on_drag: Optional[CallbackMultiSlider] = None,
-                 on_release: Optional[CallbackMultiSlider] = None, widget_color=None):
-        self.name = tk.StringVar(value=multislider_name)
-        self.values = values
+    def __init__(self,
+                 tk_frame: tk.Frame,
+                 multi_slider_name: str,
+                 values: Sequence[Any],
+                 initial_positions: Sequence[int],
+                 on_drag: Optional[CallbackMultiSlider] = None,
+                 on_release: Optional[CallbackMultiSlider] = None,
+                 widget_color=None):
+
+        frame_top = tk.Frame(tk_frame, bg=widget_color)
+        self.name = tk.StringVar(value=multi_slider_name)
+        tk.Label(master=frame_top, textvariable=self.name, bg=widget_color).pack(padx=2, side=tk.LEFT)
+        self.label_txt = tk.StringVar()
+        tk.Label(master=frame_top, textvariable=self.label_txt, bg=widget_color).pack(padx=2, side=tk.TOP)
+
+        frame_top.pack(side=tk.TOP, fill=tk.X, expand=1)
+
+        canvas = tk.Canvas(master=tk_frame, height=21, borderwidth=0, bg=widget_color)
+        canvas.pack(side=tk.TOP, fill=tk.X)
+
+        self.multi_slider_overlay = MultiSliderOverlay(
+            canvas,
+            values,
+            initial_positions,
+            on_drag=self.on_drag_callback,
+            on_release=self.on_release_callback,
+        )
 
         self.on_drag = on_drag
         self.on_release = on_release
 
-        tk.Label(tk_frame, textvariable=self.name, bg=widget_color).pack(padx=2, side=tk.LEFT)
-        self.label_txt = tk.StringVar()
-        tk.Label(tk_frame, textvariable=self.label_txt, bg=widget_color).pack(padx=2, side=tk.TOP)
+        self.update_label()
 
-        self.canvas = tk.Canvas(master=tk_frame, height=21, borderwidth=0, bg=widget_color)
-        self.canvas.pack(side=tk.TOP, fill=tk.X)
+
+    def update_label(self) -> None:
+        values = self.multi_slider_overlay.get_values()
+        positions = self.multi_slider_overlay.get_positions()
+        pvalues = [values[pos] for pos in positions]
+        self.label_txt.set("[" + ", ".join(pvalues) + "]")
+
+
+    def on_drag_callback(self, positions_values: MultiSliderState) -> None:
+        """
+        Wrapper for on_drag callback
+        This wrapper is called by the MultiSlider instance
+        This wrapper calls the user-defined on_drag callback
+        """
+        self.update_label()
+        if self.on_drag is not None:
+            self.on_drag(positions_values)
+
+    def on_release_callback(self, positions_values: MultiSliderState) -> None:
+        """
+        Wrapper for on_release callback
+        This wrapper is called by the MultiSlider instance
+        This wrapper calls the user-defined on_release callback
+        """
+        self.update_label()
+        if self.on_release is not None:
+            self.on_release(positions_values)
+
+    def add_cursor(self, position: int = 0) -> None:
+        self.multi_slider_overlay.add_cursor(position)
+        self.update_label()
+
+    def remove_cursor(self) -> None:
+        self.multi_slider_overlay.remove_cursor()
+        self.update_label()
+
+    def get_positions(self):
+        return self.multi_slider_overlay.get_positions()
+
+    def set_positions(self, positions: Sequence[int], trigger_callback=True):
+        self.multi_slider_overlay.set_positions(positions, trigger_callback)
+        self.update_label()
+
+    def get_values(self):
+        return self.multi_slider_overlay.get_values()
+
+    def set_values(self, values: Sequence[Any], new_position=None, trigger_callback=True):
+        self.multi_slider_overlay.set_values(values, new_position, trigger_callback)
+        self.update_label()
+
+
+class MultiSliderOverlay:
+    def __init__(self,
+                 canvas: tk.Canvas,
+                 values: Sequence[Any],
+                 initial_positions: Sequence[int],
+                 on_drag: Optional[CallbackMultiSlider] = None,
+                 on_release: Optional[CallbackMultiSlider] = None):
+        self.canvas = canvas
+        self.values: list[Any] = [v for v in values]
+
+
+        self.on_drag = on_drag
+        self.on_release = on_release
 
         self.line_ids = []
         self.line_ids.append(self.canvas.create_line(-1, -1, -1, -1, fill=MultiSliderWidget.colors["grey"], width=3))
         for i in range(len(values)):
             self.line_ids.append(self.canvas.create_line(-1, -1, -1, -1, fill=MultiSliderWidget.colors["grey"], width=3))
 
-        self.positions_values: list[tuple[int, Any]] = []
+        #self.positions_values: MultiSliderState = []
         self.cursors: list[Point] = []
 
+        self.cursor_positions: list[int] = []
         for k in range(len(initial_positions)):
             self.add_cursor(position=initial_positions[k])
 
         self.update_canvas()
-        self.update_label()
 
 
     def add_cursor(self, position: int = 0):
@@ -52,9 +138,8 @@ class MultiSliderWidget:
             on_release=None if self.on_release is None else self.on_release_callback,
         )
         self.cursors.append(cursor)
-        self.positions_values.append((position, self.values[position]))
+        self.cursor_positions.append(position)
         self.update_canvas()
-        self.update_label()
 
     def remove_cursor(self):
         if len(self.cursors) <= 1:
@@ -62,12 +147,8 @@ class MultiSliderWidget:
         cursor = self.cursors.pop()
         cursor.set_visible(False)
         cursor.delete()
-        self.positions_values.pop()
+        self.cursor_positions.pop()
         self.update_canvas()
-        self.update_label()
-
-    def update_label(self):
-        self.label_txt.set("[" + ", ".join([str(curs_pos[1]) for curs_pos in self.positions_values]) + "]")
 
     def update_canvas(self):
         self.canvas.update_idletasks()  # forces to compute rendered positions_values and size of the canvas
@@ -89,17 +170,12 @@ class MultiSliderWidget:
         self.canvas.tag_raise(self.line_ids[-1])
 
         # draw cursors
-        for cursor_pos, cursor in zip(self.positions_values, self.cursors):
-            x_slider = cursor_pos[0]
+        for cursor_pos, cursor in zip(self.cursor_positions, self.cursors):
+            x_slider = cursor_pos
             point_xy_can = self.slider2canvas((x_slider, 0))
             cursor.set_can_point_xy(point_xy_can)
             cursor.update()
 
-    def __setattr__(self, key, value):
-        if key == "name" and key in self.__dict__.keys():
-            self.name.set(value)
-        else:
-            return super().__setattr__(key, value)
 
     def slider2canvas(self, point_xy: Point2Di) -> Point2Di:
         w_can = self.canvas.winfo_width()
@@ -134,59 +210,60 @@ class MultiSliderWidget:
         y_slider = 0
         return x_slider, y_slider
 
-
     def on_drag_callback(self, cursor_id, event: tk.Event):
         x_slider, y_slider = self.canvas2slider((event.x, event.y))
         x_can, y_can = self.slider2canvas((x_slider, y_slider))
         self.cursors[cursor_id].set_can_point_xy((x_can, y_can))
         self.cursors[cursor_id].update()
 
-        old_ind = self.positions_values[cursor_id][0]
+        old_ind = self.cursor_positions[cursor_id]
         new_ind = x_slider
         if old_ind == new_ind:
             return
 
-        self.positions_values[cursor_id] = (x_slider, self.values[x_slider])
-
-        self.update_label()
+        self.cursor_positions[cursor_id] = x_slider
 
         if self.on_drag is not None:
-            self.on_drag(self.positions_values)
+            positions_values = [(pos, self.values[pos]) for pos in self.cursor_positions]
+            self.on_drag(positions_values)
 
     def on_release_callback(self, event: tk.Event):
         if self.on_release is not None:
-            self.on_release(self.positions_values)
+            positions_values = [(pos, self.values[pos]) for pos in self.cursor_positions]
+            self.on_release(positions_values)
+
+    def get_positions(self) -> list[int]:
+        return self.cursor_positions + []
 
     def set_positions(self, positions: Sequence[int], trigger_callback=True):
-        self.positions_values = [(pos, self.values[pos]) for pos in positions]
+        delta = len(positions) - len(self.cursor_positions)
+        if delta > 0:
+            for _ in range(delta):
+                self.add_cursor(position=0)
+        elif delta < 0:
+            for _ in range(-delta):
+                self.remove_cursor()
+
+        self.cursor_positions = [pos for pos in positions]
         self.update_canvas()
-        self.update_label()
         if trigger_callback:
+            positions_values = [(pos, self.values[pos]) for pos in self.cursor_positions]
             if self.on_drag is not None:
-                self.on_drag(self.positions_values)
+                self.on_drag(positions_values)
             if self.on_release is not None:
-                self.on_release(self.positions_values)
+                self.on_release(positions_values)
 
-    def get_positions(self):
-        return list(zip(*self.positions_values)[0])
+    def get_values(self) -> list[Any]:
+        return self.values + []
 
-    def get_values(self):
-        return self.values
-
-    def set_values(self, values, new_position=None):
-        self.values = values
-        self.positions_values = [(pos, self.values[pos]) for pos in self.get_positions()]
+    def set_values(self, values: Sequence[Any], trigger_callback=True):
+        self.values = [v for v in values]
+        self.cursor_positions = [min(pos, len(self.values) - 1) for pos in self.cursor_positions]
         self.update_canvas()
-        self.update_label()
         if trigger_callback:
+            positions_values = [(pos, self.values[pos]) for pos in self.cursor_positions]
             if self.on_drag is not None:
-                self.on_drag(self.positions_values)
+                self.on_drag(positions_values)
             if self.on_release is not None:
-                self.on_release(self.positions_values)
+                self.on_release(positions_values)
 
-        count = len(values)
-        self.tk_scale["to"] = count - 1
-        self.values = values
-        if new_position is not None:
-            self.set_index(new_position, trigger_callback=False)
-            self.value_var.set(values[new_position])

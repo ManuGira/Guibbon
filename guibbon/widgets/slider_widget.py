@@ -13,9 +13,12 @@ class SliderWidget:
         self.on_change = on_change
         self.value_var = tk.StringVar()
 
-        tk.Label(tk_frame, textvariable=self.name, bg=widget_color).pack(padx=2, side=tk.LEFT)
+        frame_top = tk.Frame(tk_frame, bg=widget_color)
+        tk.Label(master=frame_top, textvariable=self.name, bg=widget_color).pack(padx=2, side=tk.LEFT)
         self.value_var.set(self.values[initial_position])
-        tk.Label(tk_frame, textvariable=self.value_var, bg=widget_color).pack(padx=2, side=tk.TOP)
+        tk.Label(master=frame_top, textvariable=self.value_var, bg=widget_color).pack(padx=2, side=tk.TOP)
+        frame_top.pack(side=tk.TOP, fill=tk.X, expand=1)
+
         count = len(self.values)
         self.tk_scale = tk.Scale(tk_frame, from_=0, to=count - 1, orient=tk.HORIZONTAL, bg=widget_color, borderwidth=0, showvalue=False)
         self.tk_scale.set(initial_position)
