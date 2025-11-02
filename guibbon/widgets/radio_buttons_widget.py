@@ -46,10 +46,14 @@ class RadioButtonsWidget:
         return i, opt
 
     def select(self, index, trigger_callback=False):
+        # Always update the variable to the new index
+        self.int_var.set(index)
+        # Visually select the radio button
+        self.buttons_list[index].select()
+        
         if trigger_callback:
-            self.buttons_list[index].invoke()
-        else:
-            self.buttons_list[index].select()
+            # Manually call the callback after the value has been set
+            self.callback()
 
     def get_options_list(self):
         return self.options + []

@@ -308,8 +308,11 @@ class ImageViewer:
         pan_and_zoom_matrix: TransformMatrix = tm.S((self.zoom_factor, self.zoom_factor)) @ tm.T(self.pan_xy)
         self.set_img2can_matrix(can_center_matrix @ pan_and_zoom_matrix @ np.linalg.inv(img_center_matrix))
         mat = cv2.warpPerspective(self.mat, self.img2can_matrix, dsize=(canh, canw), flags=self.cv2_interpolation)  # type: ignore
-
-        self.imgtk = ImageTk.PhotoImage(image=Image.fromarray(mat))
+        
+        # Convert to PIL Image and then to PhotoImage
+        # Important: Pass master parameter to ensure PhotoImage is associated with the correct Tk instance
+        pil_image = Image.fromarray(mat)
+        self.imgtk = ImageTk.PhotoImage(image=pil_image, master=self.canvas)        
         self.canvas.create_image(canw // 2, canh // 2, anchor=tk.CENTER, image=self.imgtk)
 
         for overlay in self.interactive_overlay_instance_list:

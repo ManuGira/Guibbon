@@ -36,6 +36,7 @@ class TestImageViewer(unittest.TestCase):
 
         # create an instance of the image viewer
         self.root = tk.Tk()
+        self.root.withdraw()  # Hide the window to prevent flashing during tests
         self.frame = tk.Frame(self.root)
         self.image_viewer = ImageViewer(self.frame, height=1000, width=1000)
 
@@ -73,7 +74,16 @@ class TestImageViewer(unittest.TestCase):
         self.image_viewer.imshow(self.img)
 
     def tearDown(self) -> None:
-        self.root.destroy()
+        # Proper cleanup to avoid tkinter image reference issues
+        try:
+            self.image_viewer.canvas.delete("all")  # Clear all canvas items
+            if hasattr(self.image_viewer, 'imgtk'):
+                del self.image_viewer.imgtk
+            self.root.update_idletasks()
+        except Exception:
+            pass
+        finally:
+            self.root.destroy()
 
     def iteractive_point_event(self, event):
         self.iteractive_point_event_count += 1

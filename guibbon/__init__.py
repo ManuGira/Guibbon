@@ -344,11 +344,27 @@ class Guibbon:
         self.winname = winname
         self.window.title(self.winname)
         iconpath = os.path.join( os.path.dirname(os.path.abspath(__file__)) , "icons", "icon32.png")
-        self.icon = PIL.ImageTk.PhotoImage(PIL.Image.open(iconpath))
-
-        if self.icon is None:
-            print("Warning: could not load guibbon icon")
-        self.window.iconphoto(False, cast(tk.PhotoImage, self.icon))
+        
+        # Load icon using PIL and keep a strong reference
+        try:
+            pil_icon = PIL.Image.open(iconpath)
+            # Convert to tk.PhotoImage properly
+            self.icon = tk.PhotoImage(file=iconpath)
+            self.window.iconphoto(False, self.icon)
+        except Exception as e:
+            # If that fails, try alternative method or skip
+            try:
+                # Alternative: use PIL ImageTk but ensure it's kept in memory
+                pil_icon = PIL.Image.open(iconpath)
+                self.icon = PIL.ImageTk.PhotoImage(pil_icon)
+                # Store in root to keep reference alive across all windows
+                if not hasattr(Guibbon.root, '_icon_ref'):
+                    Guibbon.root._icon_ref = []
+                Guibbon.root._icon_ref.append(self.icon)
+                self.window.iconphoto(False, self.icon)
+            except Exception as e2:
+                print(f"Warning: could not load guibbon icon: {e}, {e2}")
+                self.icon = None
 
         self.window.bind("<KeyPress>", Guibbon.keyboard.on_event)
         self.window.bind("<KeyRelease>", Guibbon.keyboard.on_event)
