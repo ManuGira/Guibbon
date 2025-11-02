@@ -83,6 +83,8 @@ class ColorSpaceWidget:
         self.on_drag = on_drag
         self.on_release = on_release
 
+        assert len(initial_color_space) > 1
+
         self.color_space: ColorSpace = []
         for rgb_vector in initial_color_space:
             r, g, b = rgb_vector
@@ -156,7 +158,7 @@ class ColorSpaceWidget:
         # Convert to PIL Image and then to PhotoImage for tkinter
         from PIL import Image, ImageTk
         pil_img = Image.fromarray(img_rgb)
-        self.photo_img = ImageTk.PhotoImage(image=pil_img)
+        self.photo_img = ImageTk.PhotoImage(image=pil_img, master=self.visual_canvas)
 
         # Clear canvas and display the image
         self.visual_canvas.delete("all")
