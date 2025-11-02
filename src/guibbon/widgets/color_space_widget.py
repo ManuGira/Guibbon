@@ -4,7 +4,7 @@ from typing import Callable, Optional
 import numpy as np
 import cv2
 
-from .multislider_widget import MultiSliderOverlay, MultiSliderState
+from .multi_slider_widget import MultiSliderOverlay, MultiSliderState
 
 Vector3Di = tuple[int, int, int]
 # A color space is a list of 3d vectors, the sum of which is 255 for each component

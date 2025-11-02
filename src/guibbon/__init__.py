@@ -16,7 +16,7 @@ from .widgets.button_widget import ButtonWidget, CallbackButton
 from .widgets.check_button_list_widget import CheckButtonListWidget, CallbackCheckButtonList
 from .widgets.check_button_widget import CheckButtonWidget, CallbackCheckButton
 from .widgets.color_picker_widget import ColorPickerWidget, CallbackColorPicker
-from .widgets.multislider_widget import MultiSliderWidget, CallbackMultiSlider
+from .widgets.multi_slider_widget import MultiSliderWidget, CallbackMultiSlider
 from .widgets.color_space_widget import ColorSpaceWidget, CallbackColorSpace, ColorSpace
 from .widgets.radio_buttons_widget import RadioButtonsWidget, CallbackRadioButtons
 from .widgets.slider_widget import SliderWidget, CallbackSlider
