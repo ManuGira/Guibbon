@@ -129,7 +129,7 @@ class ColorSpaceWidget:
         self.visual_canvas.update_idletasks()
         height = self.visual_canvas.winfo_height()
         width = height
-        radius = (height - 20) // 3
+        radius = max(1, (height - 20) // 3)  # Ensure radius is at least 1 for cv2.circle
 
         def create_image(color: Vector3Di, theta: float) -> np.ndarray[tuple[int, int, int], np.dtype[np.uint8]]:
             # Create a black RGB image using numpy
