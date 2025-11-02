@@ -14,6 +14,28 @@ from guibbon import transform_matrix as tmat
 eps = sys.float_info.epsilon
 
 
+# Shared Tk root for all tests to avoid tkinter instability
+_tk_root = None
+
+
+def setUpModule():
+    """Create a single shared Tk root for all tests in this module"""
+    global _tk_root
+    _tk_root = tk.Tk()
+    _tk_root.withdraw()  # Hide the window
+
+
+def tearDownModule():
+    """Destroy the shared Tk root after all tests"""
+    global _tk_root
+    if _tk_root:
+        try:
+            _tk_root.destroy()
+        except tk.TclError:
+            pass
+        _tk_root = None
+
+
 @dataclasses.dataclass
 class Event:
     x: int = 0
@@ -34,10 +56,12 @@ class TestImageViewer(unittest.TestCase):
         self.point_xy_list: Point2DList = []
         self.img = np.zeros(shape=(100, 200), dtype=np.uint8)
 
-        # create an instance of the image viewer
-        self.root = tk.Tk()
-        self.root.withdraw()  # Hide the window to prevent flashing during tests
-        self.frame = tk.Frame(self.root)
+        # create an instance of the image viewer using shared root
+        self.frame = tk.Frame(_tk_root, width=1000, height=1000)
+        self.frame.pack(expand=True, fill='both')
+        _tk_root.update_idletasks()
+        _tk_root.update()
+        
         self.image_viewer = ImageViewer(self.frame, height=1000, width=1000)
 
         # create 2 interactive points. The second one doesnt implement all callbacks
@@ -79,11 +103,10 @@ class TestImageViewer(unittest.TestCase):
             self.image_viewer.canvas.delete("all")  # Clear all canvas items
             if hasattr(self.image_viewer, 'imgtk'):
                 del self.image_viewer.imgtk
-            self.root.update_idletasks()
-        except Exception:
+            _tk_root.update_idletasks()
+            self.frame.destroy()
+        except (Exception, tk.TclError):
             pass
-        finally:
-            self.root.destroy()
 
     def iteractive_point_event(self, event):
         self.iteractive_point_event_count += 1

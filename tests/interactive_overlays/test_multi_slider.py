@@ -2,16 +2,41 @@ import unittest
 import tkinter as tk
 from guibbon.widgets.multi_slider_widget import MultiSliderOverlay
 
+
+# Shared Tk root for all tests to avoid tkinter instability
+_tk_root = None
+
+
+def setUpModule():
+    """Create a single shared Tk root for all tests in this module"""
+    global _tk_root
+    _tk_root = tk.Tk()
+    _tk_root.withdraw()  # Hide the window
+
+
+def tearDownModule():
+    """Destroy the shared Tk root after all tests"""
+    global _tk_root
+    if _tk_root:
+        try:
+            _tk_root.destroy()
+        except tk.TclError:
+            pass
+        _tk_root = None
+
+
 class TestMultiSliderOverlay(unittest.TestCase):
     def setUp(self):
-        self.root = tk.Tk()
-        self.root.withdraw()
-        self.canvas = tk.Canvas(self.root, width=200, height=30)
+        # Use the shared root and create a canvas as a child
+        self.canvas = tk.Canvas(_tk_root, width=200, height=30)
         self.callback_count = 0
         self.last_positions_values = None
 
     def tearDown(self):
-        self.root.destroy()
+        try:
+            self.canvas.destroy()
+        except tk.TclError:
+            pass
 
     def callback(self, positions_values):
         self.callback_count += 1

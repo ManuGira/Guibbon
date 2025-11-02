@@ -4,21 +4,44 @@ import tkinter as tk
 from guibbon.widgets.color_space_widget import ColorSpaceWidget, ColorSpace
 
 
+# Shared Tk root for all tests to avoid tkinter instability
+_tk_root = None
+
+
+def setUpModule():
+    """Create a single shared Tk root for all tests in this module"""
+    global _tk_root
+    _tk_root = tk.Tk()
+    _tk_root.withdraw()  # Hide the window
+
+
+def tearDownModule():
+    """Destroy the shared Tk root after all tests"""
+    global _tk_root
+    if _tk_root:
+        try:
+            _tk_root.destroy()
+        except tk.TclError:
+            pass
+        _tk_root = None
+
+
 class TestColorSpaceWidget(unittest.TestCase):
     """Test suite for ColorSpaceWidget"""
 
     def setUp(self) -> None:
         """Set up test fixtures"""
-        self.root = tk.Tk()
-        self.frame = tk.Frame(self.root)
-        # Pack and update to ensure canvas dimensions are set
-        self.frame.pack()
-        self.root.update_idletasks()
+        # Use a Frame as child of the shared root instead of creating new Tk()
+        self.frame = tk.Frame(_tk_root, width=400, height=300)
+        self.frame.pack(expand=True, fill='both')
+        # Update to ensure frame is rendered and has dimensions
+        _tk_root.update_idletasks()
+        _tk_root.update()
 
     def tearDown(self) -> None:
         """Clean up after tests"""
         try:
-            self.root.destroy()
+            self.frame.destroy()
         except tk.TclError:
             pass
 
