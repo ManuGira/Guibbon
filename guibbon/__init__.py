@@ -17,6 +17,7 @@ from .widgets.check_button_list_widget import CheckButtonListWidget, CallbackChe
 from .widgets.check_button_widget import CheckButtonWidget, CallbackCheckButton
 from .widgets.color_picker_widget import ColorPickerWidget, CallbackColorPicker
 from .widgets.multislider_widget import MultiSliderWidget, CallbackMultiSlider
+from .widgets.color_space_widget import ColorSpaceWidget, CallbackColorSpace, ColorSpace
 from .widgets.radio_buttons_widget import RadioButtonsWidget, CallbackRadioButtons
 from .widgets.slider_widget import SliderWidget, CallbackSlider
 from .widgets.treeview_widget import TreeviewWidget, CallbackTreeview, TreeNode
@@ -117,6 +118,11 @@ def create_custom_widget(winname, CustomWidgetClass: Type[WidgetInterface], *par
 def create_slider(winname: str, slider_name: str, values: Sequence[Any], on_change: CallbackSlider, initial_index: int = 0) -> SliderWidget:
     slider_instance: SliderWidget = Guibbon.get_instance(winname).create_slider(slider_name, values, on_change, initial_index)
     return slider_instance
+
+def create_color_space_widget(winname: str, color_space_name: str, initial_color_space: ColorSpace, on_drag: Optional[CallbackColorSpace] = None,
+                              on_release: Optional[CallbackColorSpace] = None) -> ColorSpaceWidget:
+    color_space_widget: ColorSpaceWidget = Guibbon.get_instance(winname).create_color_space_widget(color_space_name, initial_color_space, on_drag, on_release)
+    return color_space_widget
 
 
 def create_multislider(winname: str, multislider_name: str, values: Sequence[Any], initial_indexes: Sequence[int], on_drag: Optional[CallbackMultiSlider] = None,
@@ -401,12 +407,18 @@ class Guibbon:
     def get_slider_instance(self, slider_name: str):
         return self.sliders_by_names[slider_name]
 
+    def create_color_space_widget(self, color_space_name: str, initial_color_space: ColorSpace, on_drag: Optional[CallbackColorSpace] = None,
+                                  on_release: Optional[CallbackColorSpace] = None) -> ColorSpaceWidget:
+        tk_frame = tk.Frame(self.ctrl_frame, bg=COLORS.widget)
+        tk_frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
+        color_space_widget = ColorSpaceWidget(tk_frame, color_space_name, initial_color_space, on_drag, on_release, COLORS.widget)
+        return color_space_widget
+
     def create_multislider(self, multislider_name: str, values: Sequence[Any], initial_indexes: Sequence[int], on_drag: Optional[CallbackMultiSlider] = None,
                            on_release: Optional[CallbackMultiSlider] = None) -> MultiSliderWidget:
         tk_frame = tk.Frame(self.ctrl_frame, bg=COLORS.widget)
         tk_frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
         multi_slider_widget = MultiSliderWidget(tk_frame, multislider_name, values, initial_indexes, on_drag, on_release, COLORS.widget)
-        # multi_slider_widget.multi_slider.update_canvas()
         return multi_slider_widget
 
     def create_custom_widget(self, CustomWidgetClass: Type[WidgetInterface], *params) -> WidgetInterface:

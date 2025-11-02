@@ -1,19 +1,14 @@
 import tkinter as tk
 from typing import Callable, Any, Sequence, Optional
 
-from mypy.literals import literal
-
 from guibbon.interactive_overlays import Point
 from guibbon.typedef import Point2Di
 
 MultiSliderState = list[tuple[int, Any]]
 CallbackMultiSlider = Callable[[MultiSliderState], None]
 
-
 class MultiSliderWidget:
-    colors = {
-        "grey": "#%02x%02x%02x" % (191, 191, 191),
-    }
+
 
     def __init__(self,
                  tk_frame: tk.Frame,
@@ -100,6 +95,10 @@ class MultiSliderWidget:
 
 
 class MultiSliderOverlay:
+    colors = {
+        "grey": "#%02x%02x%02x" % (191, 191, 191),
+    }
+
     def __init__(self,
                  canvas: tk.Canvas,
                  values: Sequence[Any],
@@ -114,9 +113,9 @@ class MultiSliderOverlay:
         self.on_release = on_release
 
         self.line_ids = []
-        self.line_ids.append(self.canvas.create_line(-1, -1, -1, -1, fill=MultiSliderWidget.colors["grey"], width=3))
+        self.line_ids.append(self.canvas.create_line(-1, -1, -1, -1, fill=MultiSliderOverlay.colors["grey"], width=3))
         for i in range(len(values)):
-            self.line_ids.append(self.canvas.create_line(-1, -1, -1, -1, fill=MultiSliderWidget.colors["grey"], width=3))
+            self.line_ids.append(self.canvas.create_line(-1, -1, -1, -1, fill=MultiSliderOverlay.colors["grey"], width=3))
 
         #self.positions_values: MultiSliderState = []
         self.cursors: list[Point] = []
@@ -130,11 +129,13 @@ class MultiSliderOverlay:
 
     def add_cursor(self, position: int = 0):
         new_cursor_id = len(self.cursors)
-        on_drag_lambda = lambda event, k_=new_cursor_id: self.on_drag_callback(k_, event)
+        def on_drag_wrap(event: tk.Event) -> None:
+            return self.on_drag_callback(new_cursor_id, event)
+
         cursor = Point(
             canvas=self.canvas,
             point_xy=(-1, -1),
-            on_drag=on_drag_lambda,
+            on_drag=on_drag_wrap,
             on_release=None if self.on_release is None else self.on_release_callback,
         )
         self.cursors.append(cursor)

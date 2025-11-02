@@ -88,6 +88,9 @@ def demo_cv():
         gbn.create_button(winname, "add cursor", lambda: multislider.add_cursor(len(multislider.get_positions())))
         gbn.create_button(winname, "remove cursor", lambda: multislider.remove_cursor())
 
+
+        gbn.create_color_space_widget(winname, "color space", initial_color_space=[[255, 0, 0], [0, 255, 0], [0, 0, 255]], on_drag=lambda x:print("color space", x))
+
     cv2.namedWindow("ok")
 
     while gbn.Guibbon.is_instance(winname):  # cv2.getWindowProperty(title, cv2.WND_PROP_VISIBLE) > 0.5:
