@@ -30,7 +30,6 @@ class TreeNode:
         lines = []
         data_str = "" if self.value is None else str(self.value)
         lines.append(f"{self.name}: {data_str}")
-        print(self.name)
         for child in self.children.values():
             indent_str = "  : " * indent + "  + "
             lines.append(indent_str + child.str(indent + 1))
@@ -40,7 +39,6 @@ class TreeNode:
         return self.str()
 
     def depth_first_walk(self):
-        print(self.name)
         yield [self.name], self.value, self
         for child in self.children.values():
             for subpath, subname, subchild in child.depth_first_walk():
