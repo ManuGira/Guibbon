@@ -3,7 +3,7 @@ import re
 import time
 import tkinter as tk
 import PIL
-from typing import Optional, Type, Sequence, Any, cast
+from typing import Optional, Type, Sequence, Any
 
 import cv2
 
@@ -16,6 +16,8 @@ from .widgets.button_widget import ButtonWidget, CallbackButton
 from .widgets.check_button_list_widget import CheckButtonListWidget, CallbackCheckButtonList
 from .widgets.check_button_widget import CheckButtonWidget, CallbackCheckButton
 from .widgets.color_picker_widget import ColorPickerWidget, CallbackColorPicker
+from .widgets.multi_slider_widget import MultiSliderWidget, CallbackMultiSlider
+from .widgets.color_space_widget import ColorSpaceWidget, CallbackColorSpace, ColorSpace
 from .widgets.radio_buttons_widget import RadioButtonsWidget, CallbackRadioButtons
 from .widgets.slider_widget import SliderWidget, CallbackSlider
 from .widgets.treeview_widget import TreeviewWidget, CallbackTreeview, TreeNode
@@ -117,6 +119,17 @@ def create_slider(winname: str, slider_name: str, values: Sequence[Any], on_chan
     slider_instance: SliderWidget = Guibbon.get_instance(winname).create_slider(slider_name, values, on_change, initial_index)
     return slider_instance
 
+def create_color_space_widget(winname: str, color_space_name: str, initial_color_space: ColorSpace, on_drag: Optional[CallbackColorSpace] = None,
+                              on_release: Optional[CallbackColorSpace] = None) -> ColorSpaceWidget:
+    color_space_widget: ColorSpaceWidget = Guibbon.get_instance(winname).create_color_space_widget(color_space_name, initial_color_space, on_drag, on_release)
+    return color_space_widget
+
+
+def create_multislider(winname: str, multislider_name: str, values: Sequence[Any], initial_indexes: Sequence[int], on_drag: Optional[CallbackMultiSlider] = None,
+                       on_release: Optional[CallbackMultiSlider] = None) -> MultiSliderWidget:
+    multislider_instance: MultiSliderWidget = Guibbon.get_instance(winname).create_multislider(multislider_name, values, initial_indexes, on_drag, on_release)
+    return multislider_instance
+
 
 def get_slider_instance(winname: str, slider_name: str) -> SliderWidget:
     slider_instance: SliderWidget = Guibbon.get_instance(winname).get_slider_instance(slider_name)
@@ -138,12 +151,12 @@ def createTrackbar(trackbarName, windowName, value, count, onChange):
 
 def setTrackbarPos(trackbarname, winname, pos):
     trackbar_instance = get_slider_instance(winname, trackbarname)
-    trackbar_instance.set_index(pos)
+    trackbar_instance.set_position(pos)
 
 
 def getTrackbarPos(trackbarname, winname):
     trackbar_instance = get_slider_instance(winname, trackbarname)
-    return trackbar_instance.get_index()
+    return trackbar_instance.get_position()
 
 
 def setTrackbarMin(trackbarname, winname, minval):
@@ -151,7 +164,7 @@ def setTrackbarMin(trackbarname, winname, minval):
     current_minval = trackbar_instance.get_values()[0]
     maxval = trackbar_instance.get_values()[-1]
     values = list(range(minval, maxval + 1))
-    new_index = max(trackbar_instance.get_index() + current_minval - minval, 0)
+    new_index = max(trackbar_instance.get_position() + current_minval - minval, 0)
     trackbar_instance.set_values(values, new_index)
 
 
@@ -331,8 +344,29 @@ class Guibbon:
         self.winname = winname
         self.window.title(self.winname)
         iconpath = os.path.join( os.path.dirname(os.path.abspath(__file__)) , "icons", "icon32.png")
-        self.icon = PIL.ImageTk.PhotoImage(PIL.Image.open(iconpath))
-        self.window.iconphoto(False, cast(tk.PhotoImage, self.icon))
+        
+        # Load icon using PIL and keep a strong reference
+        self.icon: Optional[tk.PhotoImage] = None
+        try:
+            pil_icon = PIL.Image.open(iconpath)
+            # Convert to tk.PhotoImage properly
+            self.icon = tk.PhotoImage(file=iconpath)
+            self.window.iconphoto(False, self.icon)
+        except Exception as e:
+            # If that fails, try alternative method or skip
+            try:
+                # Alternative: use PIL ImageTk but ensure it's kept in memory
+                pil_icon = PIL.Image.open(iconpath)
+                pil_photo = PIL.ImageTk.PhotoImage(pil_icon)
+                # Store in root to keep reference alive across all windows
+                if not hasattr(Guibbon.root, '_icon_ref'):
+                    setattr(Guibbon.root, '_icon_ref', [])
+                icon_refs: list[Any] = getattr(Guibbon.root, '_icon_ref')
+                icon_refs.append(pil_photo)
+                self.window.iconphoto(False, pil_photo)  # type: ignore[arg-type]
+            except Exception as e2:
+                print(f"Warning: could not load guibbon icon: {e}, {e2}")
+                self.icon = None
 
         self.window.bind("<KeyPress>", Guibbon.keyboard.on_event)
         self.window.bind("<KeyRelease>", Guibbon.keyboard.on_event)
@@ -393,6 +427,20 @@ class Guibbon:
 
     def get_slider_instance(self, slider_name: str):
         return self.sliders_by_names[slider_name]
+
+    def create_color_space_widget(self, color_space_name: str, initial_color_space: ColorSpace, on_drag: Optional[CallbackColorSpace] = None,
+                                  on_release: Optional[CallbackColorSpace] = None) -> ColorSpaceWidget:
+        tk_frame = tk.Frame(self.ctrl_frame, bg=COLORS.widget)
+        tk_frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
+        color_space_widget = ColorSpaceWidget(tk_frame, color_space_name, initial_color_space, on_drag, on_release, COLORS.widget)
+        return color_space_widget
+
+    def create_multislider(self, multislider_name: str, values: Sequence[Any], initial_indexes: Sequence[int], on_drag: Optional[CallbackMultiSlider] = None,
+                           on_release: Optional[CallbackMultiSlider] = None) -> MultiSliderWidget:
+        tk_frame = tk.Frame(self.ctrl_frame, bg=COLORS.widget)
+        tk_frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
+        multi_slider_widget = MultiSliderWidget(tk_frame, multislider_name, values, initial_indexes, on_drag, on_release, COLORS.widget)
+        return multi_slider_widget
 
     def create_custom_widget(self, CustomWidgetClass: Type[WidgetInterface], *params) -> WidgetInterface:
         tk_frame = tk.Frame(self.ctrl_frame, bg=COLORS.widget)

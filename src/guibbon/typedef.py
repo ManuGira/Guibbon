@@ -1,11 +1,12 @@
 from typing import Optional, Callable
 import numpy as np
 import numpy.typing as npt
-import tkinter as tk
 import abc
+import tkinter as tk
 
 Image_t = npt.NDArray[np.uint8]
 
+Point2Di = tuple[int, int]
 Point2D = tuple[float, float]
 
 Point2DList = list[Point2D]
@@ -37,6 +38,10 @@ class InteractivePoint(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def set_visible(self, value: bool):
         pass
+
+    @abc.abstractmethod
+    def delete(self):
+        raise NotImplementedError()
 
 
 class InteractivePolygon(metaclass=abc.ABCMeta):

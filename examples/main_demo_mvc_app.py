@@ -30,7 +30,7 @@ class DemoMVCApp:
         slider = gbn.create_slider(self.winname, "slider", [0, 10, 20, 30], lambda index, val: print("slider", index, val), 2)
         my_widget = gbn.create_custom_widget(self.winname, MyCustomWidget, "Are you all right?", lambda: print("no"), lambda: print("yes"))
         print(my_widget)
-        slider.set_index(1)
+        slider.set_position(1)
 
         gbn.createTrackbar("trackbar", self.winname, 2, 4, lambda val: print("trackbar", val))
         gbn.setTrackbarPos("trackbar", self.winname, 1)
