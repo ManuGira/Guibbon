@@ -345,6 +345,9 @@ class Guibbon:
         self.window.title(self.winname)
         iconpath = os.path.join( os.path.dirname(os.path.abspath(__file__)) , "icons", "icon32.png")
         self.icon = PIL.ImageTk.PhotoImage(PIL.Image.open(iconpath))
+
+        if self.icon is None:
+            print("Warning: could not load guibbon icon")
         self.window.iconphoto(False, cast(tk.PhotoImage, self.icon))
 
         self.window.bind("<KeyPress>", Guibbon.keyboard.on_event)
