@@ -1,7 +1,6 @@
 import unittest
-import tkinter as tk
 import guibbon as gbn
-from guibbon.widgets.multi_slider_widget import MultiSliderWidget, MultiSliderOverlay
+from guibbon.widgets.multi_slider_widget import MultiSliderWidget
 
 
 class TestMultiSliderWidget(unittest.TestCase):

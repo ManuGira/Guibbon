@@ -57,6 +57,7 @@ class TestImageViewer(unittest.TestCase):
         self.img = np.zeros(shape=(100, 200), dtype=np.uint8)
 
         # create an instance of the image viewer using shared root
+        assert _tk_root is not None
         self.frame = tk.Frame(_tk_root, width=1000, height=1000)
         self.frame.pack(expand=True, fill='both')
         _tk_root.update_idletasks()
@@ -100,6 +101,7 @@ class TestImageViewer(unittest.TestCase):
     def tearDown(self) -> None:
         # Proper cleanup to avoid tkinter image reference issues
         try:
+            assert _tk_root is not None
             self.image_viewer.canvas.delete("all")  # Clear all canvas items
             if hasattr(self.image_viewer, 'imgtk'):
                 del self.image_viewer.imgtk

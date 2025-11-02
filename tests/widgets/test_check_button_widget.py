@@ -33,6 +33,7 @@ class TestCheckButtonWidget(unittest.TestCase):
     def setUp(self) -> None:
         """Set up test fixtures"""
         # Use a Frame as child of the shared root instead of creating new Tk()
+        assert _tk_root is not None
         self.frame = tk.Frame(_tk_root, width=400, height=300)
         self.frame.pack(expand=True, fill='both')
         # Update to ensure frame is rendered and has dimensions
@@ -268,6 +269,7 @@ class TestCheckButtonWidget(unittest.TestCase):
         )
 
         # Directly set the variable
+        assert _tk_root is not None
         widget.var.set(True)
         _tk_root.update_idletasks()
         
