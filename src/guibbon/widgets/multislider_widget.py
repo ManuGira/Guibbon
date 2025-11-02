@@ -47,7 +47,7 @@ class MultiSliderWidget:
     def update_label(self) -> None:
         values = self.multi_slider_overlay.get_values()
         positions = self.multi_slider_overlay.get_positions()
-        pvalues = [values[pos] for pos in positions]
+        pvalues = [str(values[pos]) for pos in positions]
         self.label_txt.set("[" + ", ".join(pvalues) + "]")
 
 
