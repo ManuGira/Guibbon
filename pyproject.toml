@@ -2,15 +2,18 @@
 name = "guibbon"
 version = "0.4.0-dev"
 description = "Very high level GUI with an API similar to the HighGUI of OpenCV"
-authors = ["Manu Gira <manu.gira@outlook.com>"]
+authors = [
+    {name = "Manu Gira", email = "manu.gira@outlook.com"}
+]
 readme = "docs/index.md"
-repository = "https://github.com/ManuGira/Guibbon.git"
-keywords = ["GUI", "Tkinter", "OpenCV"]
 requires-python = ">=3.10"
 dependencies = [
     "opencv-python>=4.12.0.88",
     "pillow>=12.0.0",
 ]
+
+[project.urls]
+repository = "https://github.com/ManuGira/Guibbon.git"
 
 [dependency-groups]
 dev = [
@@ -24,8 +27,12 @@ dev = [
     "types-toml>=0.10.8.20240310",
 ]
 
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [tool.pytest.ini_options]
-#addopts = "--cov-report=term --cov-report=html:build/pytest_coverage_html --cov=guibbon"
+addopts = "--cov-report=term --cov-report=html:build/pytest_coverage_html --cov=guibbon"
 testpaths = ["tests"]
 cache_dir = "build/.pytest_cache"
 

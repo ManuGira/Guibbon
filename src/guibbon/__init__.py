@@ -3,7 +3,7 @@ import re
 import time
 import tkinter as tk
 import PIL
-from typing import Optional, Type, Sequence, Any, cast
+from typing import Optional, Type, Sequence, Any
 
 import cv2
 
@@ -346,6 +346,7 @@ class Guibbon:
         iconpath = os.path.join( os.path.dirname(os.path.abspath(__file__)) , "icons", "icon32.png")
         
         # Load icon using PIL and keep a strong reference
+        self.icon: Optional[tk.PhotoImage] = None
         try:
             pil_icon = PIL.Image.open(iconpath)
             # Convert to tk.PhotoImage properly
@@ -356,12 +357,13 @@ class Guibbon:
             try:
                 # Alternative: use PIL ImageTk but ensure it's kept in memory
                 pil_icon = PIL.Image.open(iconpath)
-                self.icon = PIL.ImageTk.PhotoImage(pil_icon)
+                pil_photo = PIL.ImageTk.PhotoImage(pil_icon)
                 # Store in root to keep reference alive across all windows
                 if not hasattr(Guibbon.root, '_icon_ref'):
-                    Guibbon.root._icon_ref = []
-                Guibbon.root._icon_ref.append(self.icon)
-                self.window.iconphoto(False, self.icon)
+                    setattr(Guibbon.root, '_icon_ref', [])
+                icon_refs: list[Any] = getattr(Guibbon.root, '_icon_ref')
+                icon_refs.append(pil_photo)
+                self.window.iconphoto(False, pil_photo)  # type: ignore[arg-type]
             except Exception as e2:
                 print(f"Warning: could not load guibbon icon: {e}, {e2}")
                 self.icon = None

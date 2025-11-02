@@ -90,7 +90,8 @@ class MultiSliderWidget:
         return self.multi_slider_overlay.get_values()
 
     def set_values(self, values: Sequence[Any], new_position=None, trigger_callback=True):
-        self.multi_slider_overlay.set_values(values, new_position, trigger_callback)
+        # MultiSliderOverlay.set_values doesn't accept new_position parameter
+        self.multi_slider_overlay.set_values(values, trigger_callback)
         self.update_label()
 
 
@@ -130,7 +131,8 @@ class MultiSliderOverlay:
     def add_cursor(self, position: int = 0):
         new_cursor_id = len(self.cursors)
         def on_drag_wrap(event: tk.Event) -> None:
-            return self.on_drag_callback(new_cursor_id, event)
+            self.on_drag_callback(new_cursor_id, event)
+            return None
 
         cursor = Point(
             canvas=self.canvas,

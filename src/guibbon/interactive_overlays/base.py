@@ -1,8 +1,8 @@
-from typing import Sequence, Optional
+from typing import Optional
 
 import numpy as np
 
-from guibbon.typedef import Point2D, Point2DList, CallbackPoint, CallbackPolygon, CallbackRect, InteractivePolygon, InteractivePoint
+from guibbon.typedef import Point2D, Point2DList, CallbackPoint, InteractivePoint
 
 import enum
 import tkinter as tk

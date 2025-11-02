@@ -1,10 +1,10 @@
 import tkinter as tk
-from typing import Callable, Any, Optional
+from typing import Callable, Optional
 
 import numpy as np
 import cv2
 
-from .multislider_widget import MultiSliderWidget, MultiSliderOverlay, MultiSliderState, CallbackMultiSlider
+from .multislider_widget import MultiSliderOverlay, MultiSliderState
 
 Vector3Di = tuple[int, int, int]
 # A color space is a list of 3d vectors, the sum of which is 255 for each component
@@ -109,7 +109,7 @@ class ColorSpaceWidget:
                 canvas=canvas,
                 values=range(256),
                 initial_positions=initial_rgb_segments[channel],
-                on_drag=lambda positions_values, channel_=channel: self.on_drag_callback(channel_, positions_values),
+                on_drag=lambda positions_values, channel_=channel: self.on_drag_callback(channel_, positions_values),  # type: ignore[misc]
                 on_release=self.on_release_callback,
             )
             self.multi_slider_overlays.append(multi_slider_overlay)
@@ -129,7 +129,7 @@ class ColorSpaceWidget:
         width = height
         radius = (height - 20) // 3
 
-        def create_image(color: Vector3Di, theta: float) -> np.ndarray:
+        def create_image(color: Vector3Di, theta: float) -> np.ndarray[tuple[int, int, int], np.dtype[np.uint8]]:
             # Create a black RGB image using numpy
             img = np.zeros((height, width, 3), dtype=np.uint8)
 
@@ -141,10 +141,9 @@ class ColorSpaceWidget:
 
             thickness = -1  # Filled circle
 
-            if isinstance(color[0], np.int64):
-                print("convert color to int32")
-
-            cv2.circle(img, circle_center, radius, color, thickness)
+            # Convert color tuple to proper format for cv2.circle
+            color_tuple = (int(color[0]), int(color[1]), int(color[2]))
+            cv2.circle(img, tuple(circle_center.tolist()), radius, color_tuple, thickness)
 
             return img
 
