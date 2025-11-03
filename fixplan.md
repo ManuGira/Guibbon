@@ -182,3 +182,35 @@ Before implementing, we should verify:
 1. Does `uv python install` include Tcl/Tk on Windows?
 2. Can we use a different Python installation method?
 3. Should we switch from `uv python pin` to `actions/setup-python`?
+
+## Final Implementation Summary
+
+### Changes Made
+
+1. **Modified `.github/workflows/tests.yml`**:
+   - Added `actions/setup-python@v5` step for Windows before uv setup
+   - Made `uv python pin` conditional to run only on Ubuntu
+   - Windows now uses Python from actions/setup-python with Tcl/Tk included
+   - Ubuntu continues to use uv-managed Python with apt-installed python3-tk
+
+### Why This Solution Works
+
+The root cause was that `uv python pin` on Windows installs a minimal Python distribution without Tcl/Tk libraries. The official Python distributions from `actions/setup-python` include full Tcl/Tk support out of the box.
+
+By using `actions/setup-python` for Windows:
+- Python comes with Tcl/Tk pre-installed and properly configured
+- No additional installation or environment variable configuration needed
+- `uv` will detect and use this Python installation automatically
+- Tests can create Tk root windows without errors
+
+### Next Steps
+
+The changes have been committed and pushed. The fix will be validated when:
+1. CI runs on the PR branch
+2. Windows tests complete successfully 
+3. All 178 tests pass (175 currently passing + 3 fixed)
+
+If the CI run is successful, this confirms that:
+- ✅ Tcl/Tk is properly available on Windows
+- ✅ Tests can create Tk widgets without errors
+- ✅ Cross-platform compatibility is maintained
