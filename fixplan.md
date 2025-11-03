@@ -102,58 +102,48 @@ From `.github/workflows/tests.yml`:
 
 **Choose Option 1**: Properly install Tcl/Tk on Windows runners
 
-### Implementation Steps
+### Implementation Steps - COMPLETED ✅
 
-1. **Add Windows Tcl/Tk Installation Step**
-   - Add a conditional step before "Run tests (Windows)" in `.github/workflows/tests.yml`
-   - Use `choco` (Chocolatey) or download Tcl/Tk directly
-   - Set `TCL_LIBRARY` and `TK_LIBRARY` environment variables
+1. **Use actions/setup-python for Windows** - DONE
+   - Added `actions/setup-python@v5` step for Windows before uv setup
+   - This ensures Python is installed with full Tcl/Tk support
+   - Only runs on Windows (`if: ${{ matrix.os == 'windows-latest' }}`)
 
-2. **Verify Installation**
-   - Test that tkinter can import successfully
-   - Print diagnostic information for debugging
+2. **Conditional Python Setup** - DONE
+   - Windows: Uses `actions/setup-python` which includes Tcl/Tk
+   - Ubuntu: Uses `uv python pin` after installing python3-tk via apt
 
-3. **Set Environment Variables**
-   - Ensure Python can find Tcl/Tk libraries by setting proper paths
+3. **Keep uv for Dependency Management** - DONE
+   - `uv` is still used for installing project dependencies and running tests
+   - But the Python interpreter itself comes from `actions/setup-python` on Windows
 
-### Proposed Code Changes
+### Implemented Solution
 
-#### `.github/workflows/tests.yml` modifications:
+The fix modifies `.github/workflows/tests.yml` to:
 
+1. **Add Python setup for Windows before uv**:
 ```yaml
-- name: Install tkinter dependencies (Windows only)
+- name: Set up Python with Tcl/Tk support (Windows only)
   if: ${{ matrix.os == 'windows-latest' }}
-  run: |
-    echo "Setting up Tcl/Tk for Python on Windows"
-    # Python on Windows from setup-python should include tkinter
-    # Verify it's available
-    python -c "import tkinter; print('tkinter available'); import sys; print(f'Python: {sys.executable}')"
-
-- name: Run tests (Windows)
-  if: matrix.os == 'windows-latest'
-  run: |
-    echo "Running tests on Windows"
-    uv run pytest
+  uses: actions/setup-python@v5
+  with:
+    python-version: ${{ matrix.python-version }}
 ```
 
-If verification fails, may need to install Tcl/Tk explicitly:
-
+2. **Make uv Python pinning conditional (Ubuntu only)**:
 ```yaml
-- name: Install Tcl/Tk (Windows only)
-  if: ${{ matrix.os == 'windows-latest' }}
+- name: Set up Python version ${{ matrix.python-version }}
+  if: ${{ matrix.os == 'ubuntu-latest' }}
   run: |
-    # Install Tcl/Tk via Chocolatey
-    choco install tcl --version=8.6.13 -y
-    # Set environment variables for Python to find Tcl/Tk
-    echo "TCL_LIBRARY=C:\Tcl\lib\tcl8.6" >> $GITHUB_ENV
-    echo "TK_LIBRARY=C:\Tcl\lib\tk8.6" >> $GITHUB_ENV
+    uv python pin ${{ matrix.python-version }}
 ```
 
-### Alternative: Use actions/setup-python with Explicit Tcl/Tk
-
-The Python installations from the `actions/setup-python` action should include Tcl/Tk. The issue might be that we're using `uv` to manage Python versions, which might not include Tcl/Tk.
-
-**Better solution**: Ensure we're using the system Python that includes Tcl/Tk, or verify the Python from `uv` includes it.
+This approach:
+- ✅ Uses official Python builds with Tcl/Tk on Windows
+- ✅ Maintains existing Ubuntu workflow  
+- ✅ Works across all Python versions (3.10-3.13)
+- ✅ No additional package installation needed
+- ✅ Minimal changes to existing workflow
 
 ## Testing Strategy
 
