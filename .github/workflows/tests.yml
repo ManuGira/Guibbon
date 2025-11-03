@@ -15,10 +15,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install uv from astral.sh
-        run: |
-          curl -LsSf https://astral.sh/uv/install.sh | sh
-          export PATH="$HOME/.cargo/bin:$PATH"
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v4
 
       - name: Set up Python version 3.12
         run: |
@@ -52,9 +50,8 @@ jobs:
         run: |
           sudo apt-get update && sudo apt-get install -y python3-tk
 
-      - name: Install uv from astral.sh
-        run: |
-          curl -LsSf https://astral.sh/uv/install.sh | sh
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v4
 
       - name: Set up Python version ${{ matrix.python-version }}
         run: |
