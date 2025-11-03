@@ -86,6 +86,26 @@ uv run mypy .
   3. Break long lines properly
   4. Follow consistent naming conventions
 
+### Network/Firewall Issues
+
+**Problem**: CI fails with apt-get update errors or timeout accessing esm.ubuntu.com
+- **Causes**:
+  - Firewall blocking access to Ubuntu ESM (Extended Security Maintenance) repositories
+  - Network timeout when accessing package repositories
+  - ESM repositories requiring authentication or being unavailable
+
+- **Solutions**:
+  1. Disable ESM repositories before running apt-get update:
+     ```bash
+     sudo sed -i 's/^deb.*esm.ubuntu.com/#&/' /etc/apt/sources.list.d/*.list 2>/dev/null || true
+     ```
+  2. Add retry and timeout options to apt-get update:
+     ```bash
+     sudo apt-get update -o Acquire::Retries=3 -o Acquire::http::Timeout=10
+     ```
+  3. Ensure error handling with `|| true` to continue on non-critical failures
+  4. Consider caching dependencies or using pre-installed packages when possible
+
 ## Step-by-Step Troubleshooting Process
 
 ### 1. Identify the Failing Check
