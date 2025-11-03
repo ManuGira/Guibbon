@@ -1,0 +1,280 @@
+﻿2025-11-03T16:35:40.7435533Z ##[group]Run echo "Running tests"
+echo "Running tests"
+uv run pytest
+shell: C:\Program Files\Git\bin\bash.EXE --noprofile --norc -e -o pipefail {0}
+env:
+  UV_TOOL_BIN_DIR: D:\a\_temp\uv-tool-bin-dir
+  UV_TOOL_DIR: D:\a\_temp\uv-tool-dir
+  UV_CACHE_DIR: D:\a\_temp\setup-uv-cache
+Running tests
+Using CPython 3.13.9 interpreter at: C:\hostedtoolcache\windows\Python\3.13.9\x64\python.exe
+Creating virtual environment at: .venv
+   Building guibbon @ file:///D:/a/Guibbon/Guibbon
+Downloading numpy (12.0MiB)
+Downloading pygments (1.2MiB)
+Downloading opencv-python (37.2MiB)
+Downloading mkdocs (3.7MiB)
+Downloading mypy (9.4MiB)
+Downloading pillow (6.7MiB)
+Downloading ruff (13.0MiB)
+ Downloading pillow
+ Downloading mkdocs
+ Downloading ruff
+ Downloading pygments
+ Downloading opencv-python
+ Downloading numpy
+ Downloading mypy
+      Built guibbon @ file:///D:/a/Guibbon/Guibbon
+Installed 38 packages in 294ms
+============================= test session starts =============================
+platform win32 -- Python 3.13.9, pytest-8.4.2, pluggy-1.6.0
+cachedir: build\.pytest_cache
+rootdir: D:\a\Guibbon\Guibbon
+configfile: pyproject.toml
+testpaths: tests
+plugins: cov-7.0.0
+collected 178 items
+
+tests\interactive_overlays\test_base.py .........                        [  5%]
+tests\interactive_overlays\test_multi_slider.py EEE                      [  6%]
+tests\interactive_overlays\test_polygons.py ...........                  [ 12%]
+tests\test_image_viewer.py ....................................          [ 33%]
+tests\test_init.py ............                                          [ 39%]
+tests\test_mouse_pan.py ..                                               [ 41%]
+tests\test_transform_matrix.py ......                                    [ 44%]
+tests\test_typedef.py ...                                                [ 46%]
+tests\widgets\test_button_widget.py .                                    [ 46%]
+tests\widgets\test_check_button_widget.py .................              [ 56%]
+tests\widgets\test_color_picker_widget.py ......................         [ 68%]
+tests\widgets\test_color_space_widget.py ...............                 [ 76%]
+tests\widgets\test_multi_slider_widget.py ...............                [ 85%]
+tests\widgets\test_radio_button_widget.py ..                             [ 86%]
+tests\widgets\test_slider_widget.py .                                    [ 87%]
+tests\widgets\test_treeview_widget.py .......................            [100%]
+
+=================================== ERRORS ====================================
+__ ERROR at setup of TestMultiSliderOverlay.test_canvas_to_slider_conversion __
+
+    def setUpModule():
+        """Create a single shared Tk root for all tests in this module"""
+        global _tk_root
+>       _tk_root = tk.Tk()
+                   ^^^^^^^
+
+tests\interactive_overlays\test_multi_slider.py:13: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <tkinter.Tk object .>, screenName = None, baseName = 'pytest'
+className = 'Tk', useTk = True, sync = False, use = None
+
+    def __init__(self, screenName=None, baseName=None, className='Tk',
+                 useTk=True, sync=False, use=None):
+        """Return a new top level widget on screen SCREENNAME. A new Tcl interpreter will
+        be created. BASENAME will be used for the identification of the profile file (see
+        readprofile).
+        It is constructed from sys.argv[0] without extensions if None is given. CLASSNAME
+        is the name of the widget class."""
+        self.master = None
+        self.children = {}
+        self._tkloaded = False
+        # to avoid recursions in the getattr code in case of failure, we
+        # ensure that self.tk is always _something_.
+        self.tk = None
+        if baseName is None:
+            import os
+            baseName = os.path.basename(sys.argv[0])
+            baseName, ext = os.path.splitext(baseName)
+            if ext not in ('.py', '.pyc'):
+                baseName = baseName + ext
+        interactive = False
+>       self.tk = _tkinter.create(screenName, baseName, className, interactive, wantobjects, useTk, sync, use)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       _tkinter.TclError: Can't find a usable init.tcl in the following directories: 
+E           {C:\hostedtoolcache\windows\Python\3.13.9\x64\tcl\tcl8.6}
+E       
+E       C:/hostedtoolcache/windows/Python/3.13.9/x64/tcl/tcl8.6/init.tcl: couldn't read file "C:/hostedtoolcache/windows/Python/3.13.9/x64/tcl/tcl8.6/init.tcl": No error
+E       couldn't read file "C:/hostedtoolcache/windows/Python/3.13.9/x64/tcl/tcl8.6/init.tcl": No error
+E           while executing
+E       "source C:/hostedtoolcache/windows/Python/3.13.9/x64/tcl/tcl8.6/init.tcl"
+E           ("uplevel" body line 1)
+E           invoked from within
+E       "uplevel #0 [list source $tclfile]"
+E       
+E       
+E       This probably means that Tcl wasn't installed properly.
+
+C:\hostedtoolcache\windows\Python\3.13.9\x64\Lib\tkinter\__init__.py:2465: TclError
+________ ERROR at setup of TestMultiSliderOverlay.test_create_overlay _________
+
+    def setUpModule():
+        """Create a single shared Tk root for all tests in this module"""
+        global _tk_root
+>       _tk_root = tk.Tk()
+                   ^^^^^^^
+
+tests\interactive_overlays\test_multi_slider.py:13: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <tkinter.Tk object .>, screenName = None, baseName = 'pytest'
+className = 'Tk', useTk = True, sync = False, use = None
+
+    def __init__(self, screenName=None, baseName=None, className='Tk',
+                 useTk=True, sync=False, use=None):
+        """Return a new top level widget on screen SCREENNAME. A new Tcl interpreter will
+        be created. BASENAME will be used for the identification of the profile file (see
+        readprofile).
+        It is constructed from sys.argv[0] without extensions if None is given. CLASSNAME
+        is the name of the widget class."""
+        self.master = None
+        self.children = {}
+        self._tkloaded = False
+        # to avoid recursions in the getattr code in case of failure, we
+        # ensure that self.tk is always _something_.
+        self.tk = None
+        if baseName is None:
+            import os
+            baseName = os.path.basename(sys.argv[0])
+            baseName, ext = os.path.splitext(baseName)
+            if ext not in ('.py', '.pyc'):
+                baseName = baseName + ext
+        interactive = False
+>       self.tk = _tkinter.create(screenName, baseName, className, interactive, wantobjects, useTk, sync, use)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       _tkinter.TclError: Can't find a usable init.tcl in the following directories: 
+E           {C:\hostedtoolcache\windows\Python\3.13.9\x64\tcl\tcl8.6}
+E       
+E       C:/hostedtoolcache/windows/Python/3.13.9/x64/tcl/tcl8.6/init.tcl: couldn't read file "C:/hostedtoolcache/windows/Python/3.13.9/x64/tcl/tcl8.6/init.tcl": No error
+E       couldn't read file "C:/hostedtoolcache/windows/Python/3.13.9/x64/tcl/tcl8.6/init.tcl": No error
+E           while executing
+E       "source C:/hostedtoolcache/windows/Python/3.13.9/x64/tcl/tcl8.6/init.tcl"
+E           ("uplevel" body line 1)
+E           invoked from within
+E       "uplevel #0 [list source $tclfile]"
+E       
+E       
+E       This probably means that Tcl wasn't installed properly.
+
+C:\hostedtoolcache\windows\Python\3.13.9\x64\Lib\tkinter\__init__.py:2465: TclError
+__ ERROR at setup of TestMultiSliderOverlay.test_slider_to_canvas_conversion __
+
+    def setUpModule():
+        """Create a single shared Tk root for all tests in this module"""
+        global _tk_root
+>       _tk_root = tk.Tk()
+                   ^^^^^^^
+
+tests\interactive_overlays\test_multi_slider.py:13: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <tkinter.Tk object .>, screenName = None, baseName = 'pytest'
+className = 'Tk', useTk = True, sync = False, use = None
+
+    def __init__(self, screenName=None, baseName=None, className='Tk',
+                 useTk=True, sync=False, use=None):
+        """Return a new top level widget on screen SCREENNAME. A new Tcl interpreter will
+        be created. BASENAME will be used for the identification of the profile file (see
+        readprofile).
+        It is constructed from sys.argv[0] without extensions if None is given. CLASSNAME
+        is the name of the widget class."""
+        self.master = None
+        self.children = {}
+        self._tkloaded = False
+        # to avoid recursions in the getattr code in case of failure, we
+        # ensure that self.tk is always _something_.
+        self.tk = None
+        if baseName is None:
+            import os
+            baseName = os.path.basename(sys.argv[0])
+            baseName, ext = os.path.splitext(baseName)
+            if ext not in ('.py', '.pyc'):
+                baseName = baseName + ext
+        interactive = False
+>       self.tk = _tkinter.create(screenName, baseName, className, interactive, wantobjects, useTk, sync, use)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       _tkinter.TclError: Can't find a usable init.tcl in the following directories: 
+E           {C:\hostedtoolcache\windows\Python\3.13.9\x64\tcl\tcl8.6}
+E       
+E       C:/hostedtoolcache/windows/Python/3.13.9/x64/tcl/tcl8.6/init.tcl: couldn't read file "C:/hostedtoolcache/windows/Python/3.13.9/x64/tcl/tcl8.6/init.tcl": No error
+E       couldn't read file "C:/hostedtoolcache/windows/Python/3.13.9/x64/tcl/tcl8.6/init.tcl": No error
+E           while executing
+E       "source C:/hostedtoolcache/windows/Python/3.13.9/x64/tcl/tcl8.6/init.tcl"
+E           ("uplevel" body line 1)
+E           invoked from within
+E       "uplevel #0 [list source $tclfile]"
+E       
+E       
+E       This probably means that Tcl wasn't installed properly.
+
+C:\hostedtoolcache\windows\Python\3.13.9\x64\Lib\tkinter\__init__.py:2465: TclError
+=============================== tests coverage ================================
+_______________ coverage: platform win32, python 3.13.9-final-0 _______________
+
+Name                                               Stmts   Miss  Cover
+----------------------------------------------------------------------
+src\guibbon\__init__.py                              320     69    78%
+src\guibbon\colors.py                                  5      0   100%
+src\guibbon\image_viewer.py                          244     33    86%
+src\guibbon\interactive_overlays\__init__.py           3      0   100%
+src\guibbon\interactive_overlays\base.py             146      3    98%
+src\guibbon\interactive_overlays\multi_slider.py     129     30    77%
+src\guibbon\interactive_overlays\polygons.py         117      4    97%
+src\guibbon\keyboard_event_handler.py                 60     22    63%
+src\guibbon\mouse_pan.py                              29      0   100%
+src\guibbon\transform_matrix.py                       31      0   100%
+src\guibbon\typedef.py                                16      0   100%
+src\guibbon\widgets\button_widget.py                  16      2    88%
+src\guibbon\widgets\check_button_list_widget.py       29     22    24%
+src\guibbon\widgets\check_button_widget.py            18      0   100%
+src\guibbon\widgets\color_picker_widget.py            44      0   100%
+src\guibbon\widgets\color_space_widget.py            106      0   100%
+src\guibbon\widgets\multi_slider_widget.py            46      0   100%
+src\guibbon\widgets\radio_buttons_widget.py           50      0   100%
+src\guibbon\widgets\slider_widget.py                  43      1    98%
+src\guibbon\widgets\treeview_widget.py                76     19    75%
+src\guibbon\widgets\widget.py                          3      0   100%
+src\guibbon\wrapped_tk_widgets.py                     34     11    68%
+----------------------------------------------------------------------
+TOTAL                                               1565    216    86%
+Coverage HTML written to dir build/pytest_coverage_html
+=========================== short test summary info ===========================
+ERROR tests/interactive_overlays/test_multi_slider.py::TestMultiSliderOverlay::test_canvas_to_slider_conversion - _tkinter.TclError: Can't find a usable init.tcl in the following directories: 
+    {C:\hostedtoolcache\windows\Python\3.13.9\x64\tcl\tcl8.6}
+
+C:/hostedtoolcache/windows/Python/3.13.9/x64/tcl/tcl8.6/init.tcl: couldn't read file "C:/hostedtoolcache/windows/Python/3.13.9/x64/tcl/tcl8.6/init.tcl": No error
+couldn't read file "C:/hostedtoolcache/windows/Python/3.13.9/x64/tcl/tcl8.6/init.tcl": No error
+    while executing
+"source C:/hostedtoolcache/windows/Python/3.13.9/x64/tcl/tcl8.6/init.tcl"
+    ("uplevel" body line 1)
+    invoked from within
+"uplevel #0 [list source $tclfile]"
+
+
+This probably means that Tcl wasn't installed properly.
+ERROR tests/interactive_overlays/test_multi_slider.py::TestMultiSliderOverlay::test_create_overlay - _tkinter.TclError: Can't find a usable init.tcl in the following directories: 
+    {C:\hostedtoolcache\windows\Python\3.13.9\x64\tcl\tcl8.6}
+
+C:/hostedtoolcache/windows/Python/3.13.9/x64/tcl/tcl8.6/init.tcl: couldn't read file "C:/hostedtoolcache/windows/Python/3.13.9/x64/tcl/tcl8.6/init.tcl": No error
+couldn't read file "C:/hostedtoolcache/windows/Python/3.13.9/x64/tcl/tcl8.6/init.tcl": No error
+    while executing
+"source C:/hostedtoolcache/windows/Python/3.13.9/x64/tcl/tcl8.6/init.tcl"
+    ("uplevel" body line 1)
+    invoked from within
+"uplevel #0 [list source $tclfile]"
+
+
+This probably means that Tcl wasn't installed properly.
+ERROR tests/interactive_overlays/test_multi_slider.py::TestMultiSliderOverlay::test_slider_to_canvas_conversion - _tkinter.TclError: Can't find a usable init.tcl in the following directories: 
+    {C:\hostedtoolcache\windows\Python\3.13.9\x64\tcl\tcl8.6}
+
+C:/hostedtoolcache/windows/Python/3.13.9/x64/tcl/tcl8.6/init.tcl: couldn't read file "C:/hostedtoolcache/windows/Python/3.13.9/x64/tcl/tcl8.6/init.tcl": No error
+couldn't read file "C:/hostedtoolcache/windows/Python/3.13.9/x64/tcl/tcl8.6/init.tcl": No error
+    while executing
+"source C:/hostedtoolcache/windows/Python/3.13.9/x64/tcl/tcl8.6/init.tcl"
+    ("uplevel" body line 1)
+    invoked from within
+"uplevel #0 [list source $tclfile]"
+
+
+This probably means that Tcl wasn't installed properly.
+======================= 175 passed, 3 errors in 15.03s ========================
+Process completed with exit code 1.
