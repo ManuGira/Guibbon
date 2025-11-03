@@ -54,7 +54,6 @@ jobs:
         uses: astral-sh/setup-uv@v4
 
       - name: Set up Python version ${{ matrix.python-version }}
-        id: setup-python
         run: |
           uv python pin ${{ matrix.python-version }}
 
