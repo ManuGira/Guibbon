@@ -274,11 +274,24 @@ class Guibbon:
 
     @staticmethod
     def init():
-        Guibbon.root = tk.Tk()
-        Guibbon.is_alive = True
-        Guibbon.keyboard = KeyboardEventHandler()
-        Guibbon.root.withdraw()
-        Guibbon.reset()
+        # Retry logic for flaky tkinter initialization on Windows
+        max_retries = 3
+        for attempt in range(max_retries):
+            try:
+                Guibbon.root = tk.Tk()
+                Guibbon.is_alive = True
+                Guibbon.keyboard = KeyboardEventHandler()
+                Guibbon.root.withdraw()
+                Guibbon.reset()
+                break
+            except tk.TclError:
+                if attempt < max_retries - 1:
+                    # Sleep briefly and retry
+                    time.sleep(0.1)
+                    continue
+                else:
+                    # Last attempt failed, re-raise the error
+                    raise
 
     @staticmethod
     def reset():

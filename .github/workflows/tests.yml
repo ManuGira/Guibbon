@@ -54,6 +54,7 @@ jobs:
         uses: astral-sh/setup-uv@v4
 
       - name: Set up Python version ${{ matrix.python-version }}
+        id: setup-python
         run: |
           uv python pin ${{ matrix.python-version }}
 
@@ -70,4 +71,18 @@ jobs:
         if: matrix.os == 'windows-latest'
         run: |
           echo "Running tests"
+          # Get Python location and set TCL/TK paths
+          $pythonPath = (python -c "import sys; print(sys.prefix)")
+          echo "Python location: $pythonPath"
+          $env:TCL_LIBRARY = "$pythonPath\tcl\tcl8.6"
+          $env:TK_LIBRARY = "$pythonPath\tcl\tk8.6"
+          echo "TCL_LIBRARY: $env:TCL_LIBRARY"
+          echo "TK_LIBRARY: $env:TK_LIBRARY"
+          # List the tcl directory to verify it exists
+          if (Test-Path "$pythonPath\tcl") {
+            echo "TCL directory exists"
+            Get-ChildItem "$pythonPath\tcl" -ErrorAction SilentlyContinue
+          } else {
+            echo "Warning: TCL directory not found at $pythonPath\tcl"
+          }
           uv run pytest
