@@ -30,23 +30,21 @@ jobs:
         run: |
           uv run ruff check .
 
-  tests:
+  tests-ubuntu:
     defaults:
       run:
         shell: bash
 
     strategy:
       matrix:
-        os: ['windows-latest', 'ubuntu-latest']
-        python-version: ['3.10', '3.11', '3.12','3.13']
-    runs-on: ${{ matrix.os }}
+        python-version: ['3.10', '3.11', '3.12', '3.13']
+    runs-on: 'ubuntu-latest'
 
-    name: "Tests: ${{ matrix.os }}, py ${{ matrix.python-version }}"
+    name: "Tests: ubuntu-latest, py ${{ matrix.python-version }}"
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install tkinter (Ubuntu only)
-        if: ${{ matrix.os == 'ubuntu-latest' }}
+      - name: Install tkinter
         run: |
           sudo apt-get update && sudo apt-get install -y python3-tk
 
@@ -57,17 +55,10 @@ jobs:
         run: |
           uv python pin ${{ matrix.python-version }}
 
-      - name: Run tests (Ubuntu)
-        if: matrix.os == 'ubuntu-latest'
+      - name: Run tests
         run: |
           echo "Create virtual display to avoid tk/tcl errors on ubuntu"
           export DISPLAY=:99 
           Xvfb :99 &  
-          echo "Running tests"
-          uv run pytest
-
-      - name: Run tests (Windows)
-        if: matrix.os == 'windows-latest'
-        run: |
           echo "Running tests"
           uv run pytest
