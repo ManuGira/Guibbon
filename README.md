@@ -59,15 +59,21 @@ $ uv run ruff check --fix .
 ```
 
 ### Publishing to PyPI
-Update the version number in `pyproject.toml` and then build and publish using uv to ensure the project environment is used.
+Update the version number in `pyproject.toml` and then build and publish using uv's native commands.
 
 Build source and wheel distributions:
 ```
-$ uv run python -m build
+$ uv build
 ```
-Publish to PyPI with twine through uv:
+
+Publish to PyPI using a token:
 ```
-$ uv run python -m twine upload -r pypi dist/* -u __token__ -p <paste the secret token here (very long string starting with "pypi-")>
+$ uv publish --token <your-pypi-token>
+```
+
+Publish to PyPI test repository:
+```
+$ uv publish --publish-url https://test.pypi.org/legacy/ --token <your-test-pypi-token>
 ```
 
 ## TODO
