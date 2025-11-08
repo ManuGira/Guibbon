@@ -1,7 +1,10 @@
 ## Release Notes
-#### v0.4.0-dev
-###### Features
+#### v0.4.0
+###### Breaking Changes
 * **Python version support**: Guibbon now supports Python 3.10 to 3.13 and drops support for Python <3.10
+###### Features
+* **MultiSlider Widget**: A slider widget with multiple thumbs to select multiple values on a single line
+* **ColorSpace Widget**: A widget to create your own color space
 
 #### v0.3.0
 ###### Features
