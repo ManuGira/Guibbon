@@ -3,40 +3,42 @@ from typing import Any, Sequence, Optional
 
 from guibbon.interactive_overlays import MultiSliderOverlay, MultiSliderState, CallbackMultiSlider
 
-
-class MultiSliderWidget:
-
+class MultiSliderWidget():
 
     def __init__(self,
-                 tk_frame: tk.Frame,
-                 multi_slider_name: str,
-                 values: Sequence[Any],
-                 initial_positions: Sequence[int],
-                 on_drag: Optional[CallbackMultiSlider] = None,
-                 on_release: Optional[CallbackMultiSlider] = None,
-                 widget_color=None):
+            multi_slider_name: str,
+            values: Sequence[Any],
+            initial_positions: Sequence[int],
+            on_drag: Optional[CallbackMultiSlider] = None,
+            on_release: Optional[CallbackMultiSlider] = None,
+            widget_color=None):
+        self.multi_slider_name = multi_slider_name
+        self.values = [v for v in values]
+        self.initial_positions = [v for v in initial_positions]
+        self.on_drag = on_drag
+        self.on_release = on_release
+        self.widget_color = widget_color
 
-        frame_top = tk.Frame(tk_frame, bg=widget_color)
-        self.name = tk.StringVar(value=multi_slider_name)
-        tk.Label(master=frame_top, textvariable=self.name, bg=widget_color).pack(padx=2, side=tk.LEFT)
+
+    def build(self, master: tk.Frame) -> None:
+        label_frame = tk.Frame(master=master, bg=self.widget_color)
+        self.name = tk.StringVar(value=self.multi_slider_name)
+        tk.Label(master=label_frame, textvariable=self.name, bg=self.widget_color).pack(padx=2, side=tk.LEFT)
         self.label_txt = tk.StringVar()
-        tk.Label(master=frame_top, textvariable=self.label_txt, bg=widget_color).pack(padx=2, side=tk.TOP)
+        tk.Label(master=label_frame, textvariable=self.label_txt, bg=self.widget_color).pack(padx=2, side=tk.TOP)
 
-        frame_top.pack(side=tk.TOP, fill=tk.X, expand=1)
+        label_frame.pack(side=tk.TOP, fill=tk.X, expand=1)
 
-        canvas = tk.Canvas(master=tk_frame, height=21, borderwidth=0, bg=widget_color)
+        canvas = tk.Canvas(master=master, height=21, borderwidth=0, bg=self.widget_color)
         canvas.pack(side=tk.TOP, fill=tk.X)
 
         self.multi_slider_overlay = MultiSliderOverlay(
             canvas,
-            values,
-            initial_positions,
+            self.values,
+            self.initial_positions,
             on_drag=self.on_drag_callback,
             on_release=self.on_release_callback,
         )
-
-        self.on_drag = on_drag
-        self.on_release = on_release
 
         self.update_label()
 

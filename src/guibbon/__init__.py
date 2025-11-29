@@ -21,7 +21,6 @@ from .widgets.color_space_widget import ColorSpaceWidget, CallbackColorSpace, Co
 from .widgets.radio_buttons_widget import RadioButtonsWidget, CallbackRadioButtons
 from .widgets.slider_widget import SliderWidget, CallbackSlider
 from .widgets.treeview_widget import TreeviewWidget, CallbackTreeview, TreeNode
-from .widgets.widget import WidgetInterface
 
 __version__ = "0.4.0"
 
@@ -110,9 +109,9 @@ def get_button_instance(winname: str, text: str) -> ButtonWidget:
     return Guibbon.get_instance(winname).get_button_instance(text)
 
 
-def create_custom_widget(winname, CustomWidgetClass: Type[WidgetInterface], *params) -> WidgetInterface:
-    widget_instance = Guibbon.get_instance(winname).create_custom_widget(CustomWidgetClass, *params)
-    return widget_instance
+# def create_custom_widget(winname, CustomWidgetClass: Type[WidgetInterface], *params) -> WidgetInterface:
+#     widget_instance = Guibbon.get_instance(winname).create_custom_widget(CustomWidgetClass, *params)
+#     return widget_instance
 
 
 def create_slider(winname: str, slider_name: str, values: Sequence[Any], on_change: CallbackSlider, initial_index: int = 0) -> SliderWidget:
@@ -386,7 +385,7 @@ class Guibbon:
         dummy_canvas.pack()
 
         self.sliders_by_names: dict[str, SliderWidget] = {}
-        self.custom_widtgets_by_names: dict[str, WidgetInterface] = {}
+        # self.custom_widtgets_by_names: dict[str, WidgetInterface] = {}
         self.radio_buttons_by_names: dict[str, RadioButtonsWidget] = {}
         self.buttons_by_names: dict[str, ButtonWidget] = {}
 
@@ -442,11 +441,18 @@ class Guibbon:
         multi_slider_widget = MultiSliderWidget(tk_frame, multislider_name, values, initial_indexes, on_drag, on_release, COLORS.widget)
         return multi_slider_widget
 
-    def create_custom_widget(self, CustomWidgetClass: Type[WidgetInterface], *params) -> WidgetInterface:
+    def add(self, widget: MultiSliderWidget) -> None:
+        # tk_frame = tk.Frame(self.ctrl_frame, bg=COLORS.widget)
         tk_frame = tk.Frame(self.ctrl_frame, bg=COLORS.widget)
-        widget_instance = CustomWidgetClass(tk_frame, *params)
         tk_frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
-        return widget_instance
+        widget.build(tk_frame)
+
+
+    # def create_custom_widget(self, CustomWidgetClass: Type[WidgetInterface], *params) -> WidgetInterface:
+    #     tk_frame = tk.Frame(self.ctrl_frame, bg=COLORS.widget)
+    #     widget_instance = CustomWidgetClass(tk_frame, *params)
+    #     tk_frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
+    #     return widget_instance
 
     def create_radio_buttons(self, name: str, options: list[str], on_change: CallbackRadioButtons) -> RadioButtonsWidget:
         tk_frame = tk.Frame(self.ctrl_frame, bg=COLORS.widget)

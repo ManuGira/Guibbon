@@ -44,6 +44,7 @@ class MiniDemoOldAPI():
 class MiniDemoNewAPI():
     def __init__(self):
         self.img = cv2.imread("ressources/dog.jpg")
+        self.img = cv2.resize(self.img, None, fx=0.5, fy=0.5)
         self.res = self.img.copy()
 
         self.gbn_window: gbn.Guibbon = gbn.create_window("Demo Guibbon New API")
@@ -52,14 +53,14 @@ class MiniDemoNewAPI():
         multislider: gbn.MultiSliderWidget = gbn.MultiSliderWidget(
             "multi slider",
             multislider_values,
-            initial_indexes=[0, 255],
+            initial_positions=[0, 255],
             on_drag=self.on_drag_multislider,
         )
         self.gbn_window.add(multislider)
 
     def start(self):
         while self.gbn_window:  # cv2.getWindowProperty(title, cv2.WND_PROP_VISIBLE) > 0.5:
-            self.gbn_window.imshow(self.winname, self.res, mode=gbn.MODE.P100)
+            self.gbn_window.imshow(self.res, mode=gbn.MODE.P100)
             gbn.waitKeyEx(1)
 
     def on_drag_multislider(self, multislider_state:list[tuple[int, Any]]):
