@@ -1,28 +1,28 @@
 import tkinter as tk
 from typing import Any, Sequence, Optional
+import dataclasses
 
 from guibbon.interactive_overlays import MultiSliderOverlay, MultiSliderState, CallbackMultiSlider
+from .base import BuildableWidget, BaseWidget
 
-class MultiSliderWidget():
+@dataclasses.dataclass
+class MultiSliderWidget(BaseWidget, BuildableWidget):
+    name: str
+    values: Sequence[Any]
+    initial_positions: Sequence[int]
+    on_drag: Optional[CallbackMultiSlider] = None
+    on_release: Optional[CallbackMultiSlider] = None
+    widget_color: Any = None
 
-    def __init__(self,
-            multi_slider_name: str,
-            values: Sequence[Any],
-            initial_positions: Sequence[int],
-            on_drag: Optional[CallbackMultiSlider] = None,
-            on_release: Optional[CallbackMultiSlider] = None,
-            widget_color=None):
-        self.multi_slider_name = multi_slider_name
-        self.values = [v for v in values]
-        self.initial_positions = [v for v in initial_positions]
-        self.on_drag = on_drag
-        self.on_release = on_release
-        self.widget_color = widget_color
+    def __post_init__(self) -> None:
+        # ensure we hold lists (copy input sequences) like the original implementation
+        self.values = list(self.values)
+        self.initial_positions = list(self.initial_positions)
 
 
     def build(self, master: tk.Frame) -> None:
         label_frame = tk.Frame(master=master, bg=self.widget_color)
-        self.name = tk.StringVar(value=self.multi_slider_name)
+        self.name = tk.StringVar(value=self.name)
         tk.Label(master=label_frame, textvariable=self.name, bg=self.widget_color).pack(padx=2, side=tk.LEFT)
         self.label_txt = tk.StringVar()
         tk.Label(master=label_frame, textvariable=self.label_txt, bg=self.widget_color).pack(padx=2, side=tk.TOP)
@@ -92,5 +92,3 @@ class MultiSliderWidget():
         # MultiSliderOverlay.set_values doesn't accept new_position parameter
         self.multi_slider_overlay.set_values(values, trigger_callback)
         self.update_label()
-
-

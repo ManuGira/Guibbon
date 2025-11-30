@@ -21,6 +21,7 @@ from .widgets.color_space_widget import ColorSpaceWidget, CallbackColorSpace, Co
 from .widgets.radio_buttons_widget import RadioButtonsWidget, CallbackRadioButtons
 from .widgets.slider_widget import SliderWidget, CallbackSlider
 from .widgets.treeview_widget import TreeviewWidget, CallbackTreeview, TreeNode
+from .widgets.base import BuildableWidget
 
 __version__ = "0.4.0"
 
@@ -434,25 +435,12 @@ class Guibbon:
         color_space_widget = ColorSpaceWidget(tk_frame, color_space_name, initial_color_space, on_drag, on_release, COLORS.widget)
         return color_space_widget
 
-    def create_multislider(self, multislider_name: str, values: Sequence[Any], initial_indexes: Sequence[int], on_drag: Optional[CallbackMultiSlider] = None,
-                           on_release: Optional[CallbackMultiSlider] = None) -> MultiSliderWidget:
-        tk_frame = tk.Frame(self.ctrl_frame, bg=COLORS.widget)
-        tk_frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
-        multi_slider_widget = MultiSliderWidget(tk_frame, multislider_name, values, initial_indexes, on_drag, on_release, COLORS.widget)
-        return multi_slider_widget
 
-    def add(self, widget: MultiSliderWidget) -> None:
-        # tk_frame = tk.Frame(self.ctrl_frame, bg=COLORS.widget)
+    def add(self, widget: BuildableWidget) -> None:
         tk_frame = tk.Frame(self.ctrl_frame, bg=COLORS.widget)
         tk_frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
         widget.build(tk_frame)
 
-
-    # def create_custom_widget(self, CustomWidgetClass: Type[WidgetInterface], *params) -> WidgetInterface:
-    #     tk_frame = tk.Frame(self.ctrl_frame, bg=COLORS.widget)
-    #     widget_instance = CustomWidgetClass(tk_frame, *params)
-    #     tk_frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
-    #     return widget_instance
 
     def create_radio_buttons(self, name: str, options: list[str], on_change: CallbackRadioButtons) -> RadioButtonsWidget:
         tk_frame = tk.Frame(self.ctrl_frame, bg=COLORS.widget)
