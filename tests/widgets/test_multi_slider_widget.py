@@ -25,15 +25,15 @@ class TestMultiSliderWidget(unittest.TestCase):
         values = [0, 1, 2, 3, 4, 5]
         initial_positions = [1, 3]
         
-        ms = gbn.create_multislider(
-            winname=self.winname,
-            multislider_name="Test MultiSlider",
+        ms = MultiSliderWidget(
+            name="Test MultiSlider",
             values=values,
-            initial_indexes=initial_positions,
+            initial_positions=initial_positions,
             on_drag=self.callback,
             on_release=self.callback
         )
-        
+        self.guibbon_instance.add(ms)
+
         self.assertIsNotNone(ms)
         self.assertIsInstance(ms, MultiSliderWidget)
         
@@ -50,13 +50,13 @@ class TestMultiSliderWidget(unittest.TestCase):
         values = list(range(10))
         initial_positions = [2, 5, 8]
         
-        ms = gbn.create_multislider(
-            winname=self.winname,
-            multislider_name="Test",
+        ms = MultiSliderWidget(
+            name="Test",
             values=values,
-            initial_indexes=initial_positions
+            initial_positions=initial_positions
         )
-        
+        self.guibbon_instance.add(ms)
+
         positions = ms.get_positions()
         self.assertEqual(positions, initial_positions)
         self.assertEqual(len(positions), 3)
@@ -66,14 +66,14 @@ class TestMultiSliderWidget(unittest.TestCase):
         values = list(range(10))
         initial_positions = [1, 5]
         
-        ms = gbn.create_multislider(
-            winname=self.winname,
-            multislider_name="Test",
+        ms = MultiSliderWidget(
+            name="Test",
             values=values,
-            initial_indexes=initial_positions,
+            initial_positions=initial_positions,
             on_drag=self.callback
         )
-        
+        self.guibbon_instance.add(ms)
+
         self.callback_count = 0
         new_positions = [3, 7]
         ms.set_positions(new_positions, trigger_callback=False)
@@ -90,15 +90,15 @@ class TestMultiSliderWidget(unittest.TestCase):
         values = list(range(10))
         initial_positions = [1, 5]
         
-        ms = gbn.create_multislider(
-            winname=self.winname,
-            multislider_name="Test",
+        ms = MultiSliderWidget(
+            name="Test",
             values=values,
-            initial_indexes=initial_positions,
+            initial_positions=initial_positions,
             on_drag=self.callback,
             on_release=self.callback
         )
-        
+        self.guibbon_instance.add(ms)
+
         self.callback_count = 0
         new_positions = [2, 6]
         ms.set_positions(new_positions, trigger_callback=True)
@@ -116,13 +116,13 @@ class TestMultiSliderWidget(unittest.TestCase):
         values = ['a', 'b', 'c', 'd', 'e']
         initial_positions = [0, 2]
         
-        ms = gbn.create_multislider(
-            winname=self.winname,
-            multislider_name="Test",
+        ms = MultiSliderWidget(
+            name="Test",
             values=values,
-            initial_indexes=initial_positions
+            initial_positions=initial_positions
         )
-        
+        self.guibbon_instance.add(ms)
+
         result_values = ms.get_values()
         self.assertEqual(result_values, values)
         # Verify it's a copy, not the same list
@@ -133,14 +133,14 @@ class TestMultiSliderWidget(unittest.TestCase):
         initial_values = list(range(5))
         initial_positions = [1, 3]
         
-        ms = gbn.create_multislider(
-            winname=self.winname,
-            multislider_name="Test",
+        ms = MultiSliderWidget(
+            name="Test",
             values=initial_values,
-            initial_indexes=initial_positions,
+            initial_positions=initial_positions,
             on_drag=self.callback
         )
-        
+        self.guibbon_instance.add(ms)
+
         self.callback_count = 0
         new_values = list(range(10, 20))
         ms.set_values(new_values, trigger_callback=False)
@@ -157,15 +157,15 @@ class TestMultiSliderWidget(unittest.TestCase):
         initial_values = list(range(5))
         initial_positions = [1, 3]
         
-        ms = gbn.create_multislider(
-            winname=self.winname,
-            multislider_name="Test",
+        ms = MultiSliderWidget(
+            name="Test",
             values=initial_values,
-            initial_indexes=initial_positions,
+            initial_positions=initial_positions,
             on_drag=self.callback,
             on_release=self.callback
         )
-        
+        self.guibbon_instance.add(ms)
+
         self.callback_count = 0
         new_values = list(range(10, 20))
         ms.set_values(new_values, trigger_callback=True)
@@ -178,13 +178,13 @@ class TestMultiSliderWidget(unittest.TestCase):
         values = list(range(10))
         initial_positions = [2]
         
-        ms = gbn.create_multislider(
-            winname=self.winname,
-            multislider_name="Test",
+        ms = MultiSliderWidget(
+            name="Test",
             values=values,
-            initial_indexes=initial_positions
+            initial_positions=initial_positions
         )
-        
+        self.guibbon_instance.add(ms)
+
         # Initially should have 1 cursor
         self.assertEqual(len(ms.get_positions()), 1)
         
@@ -201,13 +201,13 @@ class TestMultiSliderWidget(unittest.TestCase):
         values = list(range(10))
         initial_positions = [2, 5, 8]
         
-        ms = gbn.create_multislider(
-            winname=self.winname,
-            multislider_name="Test",
+        ms = MultiSliderWidget(
+            name="Test",
             values=values,
-            initial_indexes=initial_positions
+            initial_positions=initial_positions
         )
-        
+        self.guibbon_instance.add(ms)
+
         # Initially should have 3 cursors
         self.assertEqual(len(ms.get_positions()), 3)
         
@@ -223,13 +223,13 @@ class TestMultiSliderWidget(unittest.TestCase):
         values = list(range(10))
         initial_positions = [5]
         
-        ms = gbn.create_multislider(
-            winname=self.winname,
-            multislider_name="Test",
+        ms = MultiSliderWidget(
+            name="Test",
             values=values,
-            initial_indexes=initial_positions
+            initial_positions=initial_positions
         )
-        
+        self.guibbon_instance.add(ms)
+
         # Try to remove the only cursor
         ms.remove_cursor()
         
@@ -242,13 +242,13 @@ class TestMultiSliderWidget(unittest.TestCase):
         initial_values = list(range(10))
         initial_positions = [3, 7, 9]
         
-        ms = gbn.create_multislider(
-            winname=self.winname,
-            multislider_name="Test",
+        ms = MultiSliderWidget(
+            name="Test",
             values=initial_values,
-            initial_indexes=initial_positions
+            initial_positions=initial_positions
         )
-        
+        self.guibbon_instance.add(ms)
+
         # Set shorter value list
         new_values = list(range(5))
         ms.set_values(new_values, trigger_callback=False)
@@ -263,13 +263,13 @@ class TestMultiSliderWidget(unittest.TestCase):
         values = list(range(10))
         initial_positions = [2]
         
-        ms = gbn.create_multislider(
-            winname=self.winname,
-            multislider_name="Test",
+        ms = MultiSliderWidget(
+            name="Test",
             values=values,
-            initial_indexes=initial_positions
+            initial_positions=initial_positions
         )
-        
+        self.guibbon_instance.add(ms)
+
         # Set more positions than current cursors
         new_positions = [1, 3, 5, 7]
         ms.set_positions(new_positions, trigger_callback=False)
@@ -284,13 +284,13 @@ class TestMultiSliderWidget(unittest.TestCase):
         values = list(range(10))
         initial_positions = [1, 3, 5, 7]
         
-        ms = gbn.create_multislider(
-            winname=self.winname,
-            multislider_name="Test",
+        ms = MultiSliderWidget(
+            name="Test",
             values=values,
-            initial_indexes=initial_positions
+            initial_positions=initial_positions
         )
-        
+        self.guibbon_instance.add(ms)
+
         # Set fewer positions than current cursors
         new_positions = [2, 6]
         ms.set_positions(new_positions, trigger_callback=False)
@@ -305,14 +305,14 @@ class TestMultiSliderWidget(unittest.TestCase):
         values = ['apple', 'banana', 'cherry', 'date']
         initial_positions = [0, 2]
         
-        ms = gbn.create_multislider(
-            winname=self.winname,
-            multislider_name="Test",
+        ms = MultiSliderWidget(
+            name="Test",
             values=values,
-            initial_indexes=initial_positions,
+            initial_positions=initial_positions,
             on_drag=self.callback
         )
-        
+        self.guibbon_instance.add(ms)
+
         # Trigger callback by setting positions
         new_positions = [1, 3]
         ms.set_positions(new_positions, trigger_callback=True)
@@ -327,15 +327,15 @@ class TestMultiSliderWidget(unittest.TestCase):
         initial_positions = [1, 3]
         
         # Should not raise exception
-        ms = gbn.create_multislider(
-            winname=self.winname,
-            multislider_name="Test",
+        ms = MultiSliderWidget(
+            name="Test",
             values=values,
-            initial_indexes=initial_positions,
+            initial_positions=initial_positions,
             on_drag=None,
             on_release=None
         )
-        
+        self.guibbon_instance.add(ms)
+
         # Operations should work without callbacks
         ms.set_positions([0, 4], trigger_callback=True)
         ms.add_cursor(2)
