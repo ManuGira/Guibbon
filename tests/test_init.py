@@ -18,18 +18,16 @@ class TestPackage(unittest.TestCase):
         toml_data = toml.load("pyproject.toml")
         version_line = toml_data["project"]["version"]
         ver1 = version_line.split()[-1]
-        ver1 = ver1.replace(".dev0", "-dev")  # I don't know where the ".dev0" comes from but it corresponds to my "-dev"
         self.assertEqual(ver0, ver1, "Package version (in pyproject.toml) and __version__ (in __init__.py) must match")
 
     def test_version_format(self):
-        mtch = re.match(r"(\d+).(\d+).(\d+)((-dev)?)$", gbn.__version__)
-        self.assertIsNotNone(mtch, 'Version number must match regex: ' + r"(\d+).(\d+).(\d+)((-dev)?)$")
+        mtch = re.match(r"(\d+).(\d+).(\d+)((.dev(\d+))?)$", gbn.__version__)
+        self.assertIsNotNone(mtch, 'Version number must match regex: ' + r"(\d+).(\d+).(\d+)((.dev(\d+)?)$")
 
     def test_version_info_format(self):
         version_digits, mode = gbn.__version_info__
         version = ".".join([str(digit) for digit in version_digits])
-        if mode is not None:
-            version += "-" + mode
+        version += mode
         self.assertEqual(version, gbn.__version__)
 
 

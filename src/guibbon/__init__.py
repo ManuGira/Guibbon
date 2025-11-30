@@ -23,11 +23,11 @@ from .widgets.slider_widget import SliderWidget, CallbackSlider
 from .widgets.treeview_widget import TreeviewWidget, CallbackTreeview, TreeNode
 from .widgets.base import BuildableWidget
 
-__version__ = "0.4.0"
+__version__ = "0.5.0.dev1"
 
 
 def compute_version_info():
-    mtch = re.match(r"(\d+).(\d+).(\d+)((-dev)?)$", __version__)
+    mtch = re.match(r"(\d+).(\d+).(\d+)((.dev(\d+))?)$", __version__)
 
     if mtch is None:
         return [(0, 0, 0), ""]
@@ -37,7 +37,7 @@ def compute_version_info():
     build_nb = mtch.group(3)
 
     lastindex: int = 0 if mtch.lastindex is None else mtch.lastindex
-    mode = "dev" if "dev" in mtch.group(lastindex) else None
+    mode = mtch.group(lastindex) if lastindex >= 4 else ""
 
     return [(major, minor, build_nb), mode]
 
