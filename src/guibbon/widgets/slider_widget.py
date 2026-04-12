@@ -2,33 +2,44 @@ import tkinter as tk
 from typing import Callable, Any, Sequence
 
 CallbackSlider = Callable[[int, Any], None]
+from .base import BuildableWidget, BaseWidget
+import dataclasses
 
 
-class SliderWidget:
-    def __init__(self, tk_frame: tk.Frame, slider_name: str, values: Sequence[Any], initial_position: int, on_change: CallbackSlider, widget_color):
-        self.name = tk.StringVar()
-        self.name.set(slider_name)
+@dataclasses.dataclass
+class SliderWidget(BuildableWidget, BaseWidget):
+    name: str
+    values: Sequence[Any]
+    initial_position: int
+    on_change: CallbackSlider
+    widget_color: Any = None
 
-        self.values = values
-        self.on_change = on_change
+    def __post_init__(self, ):
+        self.name_var = tk.StringVar()
+        self.name_var.set(self.name)
+
+        # ensure we hold lists (copy input sequences) like the original implementation
+        self.values = list(self.values)
         self.value_var = tk.StringVar()
 
-        frame_top = tk.Frame(tk_frame, bg=widget_color)
-        tk.Label(master=frame_top, textvariable=self.name, bg=widget_color).pack(padx=2, side=tk.LEFT)
-        self.value_var.set(self.values[initial_position])
-        tk.Label(master=frame_top, textvariable=self.value_var, bg=widget_color).pack(padx=2, side=tk.TOP)
+    def build(self, master: tk.Frame) -> None:
+        frame_top = tk.Frame(master, bg=self.widget_color)
+        tk.Label(master=frame_top, textvariable=self.name_var, bg=self.widget_color).pack(padx=2, side=tk.LEFT)
+        self.value_var.set(self.values[self.initial_position])
+        tk.Label(master=frame_top, textvariable=self.value_var, bg=self.widget_color).pack(padx=2, side=tk.TOP)
         frame_top.pack(side=tk.TOP, fill=tk.X, expand=1)
 
         count = len(self.values)
-        self.tk_scale = tk.Scale(tk_frame, from_=0, to=count - 1, orient=tk.HORIZONTAL, bg=widget_color, borderwidth=0, showvalue=False)
-        self.tk_scale.set(initial_position)
+        self.tk_scale = tk.Scale(master, from_=0, to=count - 1, orient=tk.HORIZONTAL, bg=self.widget_color,
+                                 borderwidth=0, showvalue=False)
+        self.tk_scale.set(self.initial_position)
 
         self.tk_scale["command"] = self.callback
         self.tk_scale.pack(padx=2, fill=tk.X, expand=1)
 
     def __setattr__(self, key, value):
         if key == "name" and key in self.__dict__.keys():
-            self.name.set(value)
+            self.name_var.set(value)
         else:
             return super().__setattr__(key, value)
 

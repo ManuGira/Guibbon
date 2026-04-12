@@ -3,7 +3,7 @@ import re
 import time
 import tkinter as tk
 import PIL
-from typing import Optional, Type, Sequence, Any
+from typing import Optional, Sequence, Any
 
 import cv2
 
@@ -16,7 +16,7 @@ from .widgets.button_widget import ButtonWidget, CallbackButton
 from .widgets.check_button_list_widget import CheckButtonListWidget, CallbackCheckButtonList
 from .widgets.check_button_widget import CheckButtonWidget, CallbackCheckButton
 from .widgets.color_picker_widget import ColorPickerWidget, CallbackColorPicker
-from .widgets.multi_slider_widget import MultiSliderWidget, CallbackMultiSlider, MultiSliderState
+from .widgets.multi_slider_widget import MultiSliderWidget, CallbackMultiSlider, MultiSliderState as MultiSliderState
 from .widgets.color_space_widget import ColorSpaceWidget, CallbackColorSpace, ColorSpace
 from .widgets.radio_buttons_widget import RadioButtonsWidget, CallbackRadioButtons
 from .widgets.slider_widget import SliderWidget, CallbackSlider
@@ -123,12 +123,6 @@ def create_color_space_widget(winname: str, color_space_name: str, initial_color
                               on_release: Optional[CallbackColorSpace] = None) -> ColorSpaceWidget:
     color_space_widget: ColorSpaceWidget = Guibbon.get_instance(winname).create_color_space_widget(color_space_name, initial_color_space, on_drag, on_release)
     return color_space_widget
-
-
-def create_multislider(winname: str, multislider_name: str, values: Sequence[Any], initial_indexes: Sequence[int], on_drag: Optional[CallbackMultiSlider] = None,
-                       on_release: Optional[CallbackMultiSlider] = None) -> MultiSliderWidget:
-    multislider_instance: MultiSliderWidget = Guibbon.get_instance(winname).create_multislider(multislider_name, values, initial_indexes, on_drag, on_release)
-    return multislider_instance
 
 
 def get_slider_instance(winname: str, slider_name: str) -> SliderWidget:
