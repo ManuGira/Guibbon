@@ -1,6 +1,5 @@
 # type: ignore
 
-import sys
 import cv2
 import guibbon as gbn
 import numpy as np
