@@ -1,4 +1,9 @@
 ## Release Notes
+#### v0.5.0.dev1
+###### Breaking Changes
+* **New Widget Interface**: The `guibbon.WidgetInterface` has been updated. Custom widgets and built-in widgets now both inherit from the new `guibbon.BaseWidget` class. 
+
+
 #### v0.4.0
 ###### Breaking Changes
 * **Python version support**: Guibbon now supports Python 3.10 to 3.13 and drops support for Python <3.10

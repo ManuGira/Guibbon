@@ -3,7 +3,7 @@ import re
 import time
 import tkinter as tk
 import PIL
-from typing import Optional, Type, Sequence, Any
+from typing import Optional, Sequence, Any
 
 import cv2
 
@@ -16,18 +16,18 @@ from .widgets.button_widget import ButtonWidget, CallbackButton
 from .widgets.check_button_list_widget import CheckButtonListWidget, CallbackCheckButtonList
 from .widgets.check_button_widget import CheckButtonWidget, CallbackCheckButton
 from .widgets.color_picker_widget import ColorPickerWidget, CallbackColorPicker
-from .widgets.multi_slider_widget import MultiSliderWidget, CallbackMultiSlider
+from .widgets.multi_slider_widget import MultiSliderWidget, CallbackMultiSlider, MultiSliderState as MultiSliderState
 from .widgets.color_space_widget import ColorSpaceWidget, CallbackColorSpace, ColorSpace
 from .widgets.radio_buttons_widget import RadioButtonsWidget, CallbackRadioButtons
 from .widgets.slider_widget import SliderWidget, CallbackSlider
 from .widgets.treeview_widget import TreeviewWidget, CallbackTreeview, TreeNode
-from .widgets.widget import WidgetInterface
+from .widgets.base import BuildableWidget
 
-__version__ = "0.4.0"
+__version__ = "0.5.0.dev1"
 
 
 def compute_version_info():
-    mtch = re.match(r"(\d+).(\d+).(\d+)((-dev)?)$", __version__)
+    mtch = re.match(r"(\d+).(\d+).(\d+)((.dev(\d+))?)$", __version__)
 
     if mtch is None:
         return [(0, 0, 0), ""]
@@ -37,7 +37,7 @@ def compute_version_info():
     build_nb = mtch.group(3)
 
     lastindex: int = 0 if mtch.lastindex is None else mtch.lastindex
-    mode = "dev" if "dev" in mtch.group(lastindex) else None
+    mode = mtch.group(lastindex) if lastindex >= 4 else ""
 
     return [(major, minor, build_nb), mode]
 
@@ -110,9 +110,9 @@ def get_button_instance(winname: str, text: str) -> ButtonWidget:
     return Guibbon.get_instance(winname).get_button_instance(text)
 
 
-def create_custom_widget(winname, CustomWidgetClass: Type[WidgetInterface], *params) -> WidgetInterface:
-    widget_instance = Guibbon.get_instance(winname).create_custom_widget(CustomWidgetClass, *params)
-    return widget_instance
+# def create_custom_widget(winname, CustomWidgetClass: Type[WidgetInterface], *params) -> WidgetInterface:
+#     widget_instance = Guibbon.get_instance(winname).create_custom_widget(CustomWidgetClass, *params)
+#     return widget_instance
 
 
 def create_slider(winname: str, slider_name: str, values: Sequence[Any], on_change: CallbackSlider, initial_index: int = 0) -> SliderWidget:
@@ -123,12 +123,6 @@ def create_color_space_widget(winname: str, color_space_name: str, initial_color
                               on_release: Optional[CallbackColorSpace] = None) -> ColorSpaceWidget:
     color_space_widget: ColorSpaceWidget = Guibbon.get_instance(winname).create_color_space_widget(color_space_name, initial_color_space, on_drag, on_release)
     return color_space_widget
-
-
-def create_multislider(winname: str, multislider_name: str, values: Sequence[Any], initial_indexes: Sequence[int], on_drag: Optional[CallbackMultiSlider] = None,
-                       on_release: Optional[CallbackMultiSlider] = None) -> MultiSliderWidget:
-    multislider_instance: MultiSliderWidget = Guibbon.get_instance(winname).create_multislider(multislider_name, values, initial_indexes, on_drag, on_release)
-    return multislider_instance
 
 
 def get_slider_instance(winname: str, slider_name: str) -> SliderWidget:
@@ -386,7 +380,7 @@ class Guibbon:
         dummy_canvas.pack()
 
         self.sliders_by_names: dict[str, SliderWidget] = {}
-        self.custom_widtgets_by_names: dict[str, WidgetInterface] = {}
+        # self.custom_widtgets_by_names: dict[str, WidgetInterface] = {}
         self.radio_buttons_by_names: dict[str, RadioButtonsWidget] = {}
         self.buttons_by_names: dict[str, ButtonWidget] = {}
 
@@ -435,18 +429,12 @@ class Guibbon:
         color_space_widget = ColorSpaceWidget(tk_frame, color_space_name, initial_color_space, on_drag, on_release, COLORS.widget)
         return color_space_widget
 
-    def create_multislider(self, multislider_name: str, values: Sequence[Any], initial_indexes: Sequence[int], on_drag: Optional[CallbackMultiSlider] = None,
-                           on_release: Optional[CallbackMultiSlider] = None) -> MultiSliderWidget:
-        tk_frame = tk.Frame(self.ctrl_frame, bg=COLORS.widget)
-        tk_frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
-        multi_slider_widget = MultiSliderWidget(tk_frame, multislider_name, values, initial_indexes, on_drag, on_release, COLORS.widget)
-        return multi_slider_widget
 
-    def create_custom_widget(self, CustomWidgetClass: Type[WidgetInterface], *params) -> WidgetInterface:
+    def add(self, widget: BuildableWidget) -> None:
         tk_frame = tk.Frame(self.ctrl_frame, bg=COLORS.widget)
-        widget_instance = CustomWidgetClass(tk_frame, *params)
         tk_frame.pack(padx=4, pady=4, side=tk.TOP, fill=tk.X, expand=1)
-        return widget_instance
+        widget.build(tk_frame)
+
 
     def create_radio_buttons(self, name: str, options: list[str], on_change: CallbackRadioButtons) -> RadioButtonsWidget:
         tk_frame = tk.Frame(self.ctrl_frame, bg=COLORS.widget)

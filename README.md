@@ -22,6 +22,10 @@ More info:
   - [Release Notes](./docs/release_notes.md)
   - [Getting Started (user installation)](./docs/getting_started.md)
 
+## Docs & Guidance
+- Detailed documentation lives in `docs/index.md`.
+- Copilot agent instructions (auto-loaded in PyCharm) are in `.github/agents/copilot_agent_instructions.md`.
+
 ## Development 
 
 The project is configured in `pyproject.toml`. It contains dependecies, and configs for continuous integration.
