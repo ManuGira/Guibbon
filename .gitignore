@@ -4,3 +4,4 @@ build
 .venv
 dist
 site
+.vscode/settings.json
