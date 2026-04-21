@@ -16,19 +16,39 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Set up uv
-        uses: astral-sh/setup-uv@v4
+        uses: astral-sh/setup-uv@v5
 
-      - name: Set up Python version 3.12
-        run: |
-          uv python pin 3.12
+      - name: Set up Python
+        run: uv python install 3.12
 
-      - name: Type check with mypy
-        run: |
-          uv run mypy .
+      - name: Install dependencies
+        run: uv sync --dev
 
-      - name: Lint check with ruff
+      - name: Check code formatting with ruff
+        id: ruff
         run: |
+          uv add --dev ruff
           uv run ruff check .
+        continue-on-error: true
+
+      - name: Type check with ty
+        id: ty
+        run: |
+          uv add --dev ty
+          uv run ty check .
+        continue-on-error: true
+
+      - name: Check lint results
+        if: steps.ruff.outcome == 'failure' || steps.ty.outcome == 'failure'
+        run: |
+          echo "❌ Linting failed:"
+          if [ "${{ steps.ruff.outcome }}" == "failure" ]; then
+            echo "  - Ruff found issues (see 'Check code formatting with ruff' for details)"
+          fi
+          if [ "${{ steps.ty.outcome }}" == "failure" ]; then
+            echo "  - Ty found issues (see 'Type check with ty' for details)"
+          fi
+          exit 1
 
   tests-ubuntu:
     defaults:

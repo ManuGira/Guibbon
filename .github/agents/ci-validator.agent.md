@@ -21,7 +21,7 @@ Run the ci.ps1 script with ordered checks:
 This executes in order:
 1. **Tests** (`pytest` with coverage)
 2. **Linting** (`ruff check --fix`)
-3. **Type checking** (`ty check .`)
+3. **Type checking** (`ty check`)
 
 All three must pass for work to be complete.
 
@@ -37,7 +37,7 @@ uv run python -m pytest tests/ -v
 uv run ruff check --fix
 
 # Type checking only
-uv run ty check .
+uv run ty check guibbon
 ```
 
 This is useful if you want to focus on fixing one type of issue at a time.
@@ -114,10 +114,10 @@ Code Implementation
 Run from workspace root: `d:\DataEmmanuel\Programmation\Guibbon`
 
 ### "uv not found"
-Install uv: `pip install uv` or see README.md
+uv must be found. Warn user and stop there if not available.
 
 ### Tests timeout
 Increase pytest timeout or disable flaky tests temporarily with `@pytest.mark.skip(reason="flaky")`
 
 ### Coverage drops unexpectedly
-New code must include tests. Check `htmlcov/` report for what's untested.
+New code must include tests. Check `build/pytest_coverage_html` report for what's untested.

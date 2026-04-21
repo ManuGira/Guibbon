@@ -22,14 +22,14 @@ uv run pytest
 
 ### 2. Format Check
 ```bash
-uv run ruff check
+uv run ruff check --fix
 ```
 - Checks code formatting and linting rules
 - Expected: No errors or warnings
 
 ### 3. Type Check
 ```bash
-uv run ty .
+uv run ty check
 ```
 - Verifies type annotations and type safety
 - Expected: Success with no type errors
