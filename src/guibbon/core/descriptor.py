@@ -12,27 +12,20 @@ When a user interacts with a widget (drag slider, click radio button):
   3. App reads triggered_callbacks; builds ["field.on_drag", "field.on_release"] list
   4. App clears triggered_callbacks for next cycle
 
+This module defines only the **framework contracts** (abstract bases).
+Concrete descriptors (SliderDescriptor, RadioDescriptor, …) live in their
+respective component packages (e.g. guibbon.controller) and are unknown here.
+Users may create their own descriptors by subclassing BuildableDescriptor.
+
 Class hierarchy:
-    Descriptor (ABC)
-    └── BuildableDescriptor (adds optional widget_class)
-        ├── SliderDescriptor
-        └── RadioDescriptor
-
-Usage:
-    @guibbon.params
-    class Params:
-        size: int = SliderDescriptor(values=range(1, 11), default=5)
-        mode: str = RadioDescriptor(options=["fast", "accurate"], default="fast")
-
-    descriptor = Params.__guibbon_descriptors__["size"]
-    descriptor.on_widget_change("drag")       # User dragged slider
-    descriptor.get_triggered_descriptors("size")  # -> ["size.on_drag"]
+    Descriptor (ABC) — base contract
+    └── BuildableDescriptor — adds optional widget_class for custom widgets
 """
 
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Any, Iterable
+from typing import Any
 
 
 # ---------------------------------------------------------------------------
@@ -96,8 +89,7 @@ class Descriptor(ABC):
 class BuildableDescriptor(Descriptor):
     """Descriptor that can carry a custom ``widget_class``.
 
-    This is the standard base for all built-in descriptors (Slider, Radio, …)
-    and for user-defined custom widgets.
+    This is the standard base for all built-in and user-defined descriptors.
 
     ``widget_class`` may be set at the class level by subclasses:
 
@@ -114,101 +106,3 @@ class BuildableDescriptor(Descriptor):
     def on_widget_change(self, trigger_type: str) -> None:  # pragma: no cover
         """Default no-op; concrete subclasses override to track events."""
         pass
-
-
-# ---------------------------------------------------------------------------
-# SliderDescriptor
-# ---------------------------------------------------------------------------
-
-class SliderDescriptor(BuildableDescriptor):
-    """Descriptor backed by a slider widget.
-
-    Supports two callback modes that can be enabled independently:
-      - ``on_drag`` — fires continuously while the user moves the slider.
-      - ``on_release`` — fires once when the user releases the slider thumb.
-
-    Args:
-        values: Ordered iterable of valid slider values.
-        default: Initial value; must be present in *values*.
-        on_drag: Fire the callback during slider movement.
-        on_release: Fire the callback when the slider is released.
-
-    Raises:
-        ValueError: If *default* is not in *values*.
-
-    Example:
-        size_desc = SliderDescriptor(values=range(1, 11), default=5, on_drag=True)
-        size_desc.on_widget_change("drag")
-        size_desc.get_triggered_descriptors("size")  # -> ["size.on_drag"]
-    """
-
-    def __init__(
-        self,
-        values: Iterable,
-        default: Any,
-        on_drag: bool = True,
-        on_release: bool = False,
-    ) -> None:
-        self.values = list(values)
-        if default not in self.values:
-            raise ValueError(f"default {default!r} is not in values {self.values}")
-        self.on_drag = on_drag
-        self.on_release = on_release
-        super().__init__(default)
-
-    def on_widget_change(self, trigger_type: str) -> None:
-        """Track drag/release events if the corresponding flag is enabled.
-
-        Args:
-            trigger_type: ``"drag"`` or ``"release"``.
-        """
-        if trigger_type == "drag" and self.on_drag:
-            self.triggered_callbacks.append("on_drag")
-        elif trigger_type == "release" and self.on_release:
-            self.triggered_callbacks.append("on_release")
-
-
-# ---------------------------------------------------------------------------
-# RadioDescriptor
-# ---------------------------------------------------------------------------
-
-class RadioDescriptor(BuildableDescriptor):
-    """Descriptor backed by radio buttons or a dropdown widget.
-
-    Supports a single callback mode:
-      - ``on_change`` — fires when the user selects a new option.
-
-    Args:
-        options: Ordered list of valid options.
-        default: Initially selected option; must be present in *options*.
-        on_change: Fire the callback when the selection changes.
-
-    Raises:
-        ValueError: If *default* is not in *options*.
-
-    Example:
-        mode_desc = RadioDescriptor(options=["fast", "accurate"], default="fast")
-        mode_desc.on_widget_change("change")
-        mode_desc.get_triggered_descriptors("mode")  # -> ["mode.on_change"]
-    """
-
-    def __init__(
-        self,
-        options: list[str],
-        default: str,
-        on_change: bool = True,
-    ) -> None:
-        self.options = options
-        if default not in self.options:
-            raise ValueError(f"default {default!r} is not in options {self.options}")
-        self.on_change = on_change
-        super().__init__(default)
-
-    def on_widget_change(self, trigger_type: str) -> None:
-        """Track change events if ``on_change`` is enabled.
-
-        Args:
-            trigger_type: ``"change"`` (other values are silently ignored).
-        """
-        if trigger_type == "change" and self.on_change:
-            self.triggered_callbacks.append("on_change")

@@ -12,10 +12,9 @@ Tests cover:
 import pytest
 
 import guibbon
+from guibbon import RadioDescriptor, SliderDescriptor
 from guibbon.core import (
     GetPath,
-    RadioDescriptor,
-    SliderDescriptor,
     _make_tracked_type,
 )
 

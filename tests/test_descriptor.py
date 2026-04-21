@@ -15,11 +15,10 @@ Tests cover:
 import pytest
 
 import guibbon
+from guibbon.controller import RadioDescriptor, SliderDescriptor
 from guibbon.core.descriptor import (
     BuildableDescriptor,
     Descriptor,
-    RadioDescriptor,
-    SliderDescriptor,
 )
 
 

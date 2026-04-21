@@ -3,16 +3,16 @@
 Main exports:
   - params: Decorator for parameter classes (@guibbon.params)
   - GetPath: Reconstruct dotted paths from tracked values
-  - Descriptor, BuildableDescriptor: Descriptor base classes
-  - SliderDescriptor, RadioDescriptor: Concrete descriptor types
+  - Descriptor, BuildableDescriptor: Descriptor base classes (framework contracts)
   - _BaseDescriptor: Backward-compatible alias for Descriptor
+
+Note: Concrete descriptors (SliderDescriptor, RadioDescriptor, …) live in their
+respective component packages (e.g. guibbon.controller), not here.
 """
 
 from .descriptor import (
     BuildableDescriptor,
     Descriptor,
-    RadioDescriptor,
-    SliderDescriptor,
 )
 from .params import (
     GetPath,
@@ -29,8 +29,6 @@ __all__ = [
     "GetPath",
     "Descriptor",
     "BuildableDescriptor",
-    "SliderDescriptor",
-    "RadioDescriptor",
     "_BaseDescriptor",
     "_params_decorator",
     "_make_tracked_type",
