@@ -7,7 +7,7 @@ description: Fix CI errors
 
 ## Role in Workflow
 
-**Invoked AFTER** [CI Validator](ci-validator.md) detects failures.
+**Invoked AFTER** [CI Validator](ci-validator.agent.md) detects failures.
 
 - **CI Validator**: ✅ Checks if all gates pass (yes/no report)
 - **CI Fixer**: 🔧 Solves specific issues (how to fix them)
