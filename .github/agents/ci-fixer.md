@@ -5,6 +5,13 @@ description: Fix CI errors
 
 # CI-Fixer Agent
 
+## Role in Workflow
+
+**Invoked AFTER** [CI Validator](ci-validator.md) detects failures.
+
+- **CI Validator**: ✅ Checks if all gates pass (yes/no report)
+- **CI Fixer**: 🔧 Solves specific issues (how to fix them)
+
 ## Purpose
 Fix code issues that cause GitHub Actions CI failures, ensuring that tests, formatting, and type checks pass both locally and in CI environments.
 
@@ -13,22 +20,22 @@ Fix code issues that cause GitHub Actions CI failures, ensuring that tests, form
 Before pushing, verify all CI checks pass locally:
 
 ### 1. Run Tests
-```bash
-uv run pytest
+```powershell
+uv run pytest -v
 ```
 - Runs all unit tests
 - Checks code coverage
 - Expected: All tests passing, coverage ≥ 80%
 
 ### 2. Format Check
-```bash
+```powershell
 uv run ruff check --fix src tests examples
 ```
 - Checks code formatting and linting rules
 - Expected: No errors or warnings
 
 ### 3. Type Check
-```bash
+```powershell
 uv run ty check
 ```
 - Verifies type annotations and type safety

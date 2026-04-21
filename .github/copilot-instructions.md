@@ -39,32 +39,39 @@ Guibbon is a Python GUI package wrapping Tkinter for interactive scientific imag
 
 ## Commands
 
-```bash
-uv sync                                    # Install dependencies
-uv run python -m pytest tests/ -v          # Run all tests
+```powershell
+uv run pytest                                  # Run all tests
 uv run python -m guibbon.examples.demo_params  # Run demo
-uv run ci.ps1                              # Run all CI checks (tests, ruff, ty)
+./ci.ps1                                       # Run all CI checks (tests, ruff, ty)
 ```
 
-## Quality Gate: CI Validation
+## Quality Gate: CI Validation Workflow
 
-**After coding work completes**, invoke the **CI Validator** agent to verify all checks pass:
+**Before committing or creating a PR**, follow this workflow:
 
-```bash
-uv run ci.ps1
+### Step 1: Run CI Validator
+Invoke **[CI Validator](\.github\agents\ci-validator.md)** agent to verify all checks pass locally:
+
+```powershell
+./ci.ps1
 ```
 
-This runs:
-1. **Tests** — `pytest` with coverage
-2. **Linting** — `ruff check --fix`
-3. **Type checking** — `ty check .`
+This sequentially runs:
+1. **Tests** — `uv run pytest` with coverage
+2. **Linting** — `uv run ruff check --fix src tests examples` (auto-fixes most issues)
+3. **Type checking** — `uv run ty check`
 
-**Benefits**:
-- Catch issues **before** committing
-- All checks pass **before** PR creation
-- Consistent with GitHub Actions CI environment
+### Step 2: If CI Validator Fails
+Invoke **[Github Actions fixer](\.github\agents\ci-fixer.md)** agent to solve specific issues:
+- Test failures → test debugging guidance
+- Ruff failures → formatting/import fixes
+- Type check failures → annotation fixes
 
-**When it fails**: Type `@CI Validator` in chat to invoke the agent for analysis and fix guidance. It's auto-discovered from `.github/agents/`.
+**Benefits of this workflow**:
+- ✅ Catch issues **before** committing
+- ✅ All checks pass **before** PR creation
+- ✅ Consistent with GitHub Actions CI environment
+- ✅ Two agents handle different phases (verify vs. fix)
 
 ## Questions?
 
