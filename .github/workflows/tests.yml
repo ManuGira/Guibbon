@@ -26,16 +26,12 @@ jobs:
 
       - name: Check code formatting with ruff
         id: ruff
-        run: |
-          uv add --dev ruff
-          uv run ruff check src tests examples
+        run: uv run ruff check src tests examples
         continue-on-error: true
 
       - name: Type check with ty
         id: ty
-        run: |
-          uv add --dev ty
-          uv run ty check .
+        run: uv run ty check .
         continue-on-error: true
 
       - name: Check lint results
