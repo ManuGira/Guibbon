@@ -5,7 +5,7 @@ description = "Very high level GUI with an API similar to the HighGUI of OpenCV"
 authors = [
     {name = "Manu Gira", email = "manu.gira@outlook.com"}
 ]
-readme = "docs/index.md"
+readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "opencv-python>=4.12.0.88",
@@ -19,12 +19,10 @@ repository = "https://github.com/ManuGira/Guibbon.git"
 dev = [
     "mkdocs>=1.6.1",
     "mkdocstrings[python]>=0.30.1",
-    "mypy>=1.18.2",
     "pytest>=8.4.2",
     "pytest-cov>=7.0.0",
     "ruff>=0.14.2",
-    "toml>=0.10.2",
-    "types-toml>=0.10.8.20240310",
+    "ty>=0.0.29",
 ]
 
 [build-system]
@@ -61,19 +59,35 @@ exclude_also = [
 [tool.ruff]
 line-length = 160
 cache-dir = "build/.ruff_cache"
+exclude = ["build", "guibbon0", "_bmad", ".github"]
 
-[tool.mypy]
-check_untyped_defs = true
-disallow_any_generics = true
-ignore_missing_imports = true
-no_implicit_optional = true
-show_error_codes = true
-strict_equality = true
-warn_redundant_casts = true
-warn_return_any = true
-warn_unreachable = true
-warn_unused_configs = true
-implicit_reexport = true
-pretty = true
-cache_dir = "build/.mypy_cache"
-exclude = "build/"
+[tool.ty.rules]
+redundant-cast = "warn"
+unsupported-base = "ignore"
+
+[tool.ty.environment]
+root = ["src", "tests", "examples"]
+
+[tool.ty.src]
+include = ["src", "tests", "examples"]
+
+[tool.ty.terminal]
+output-format = "full"
+
+[tool.ty.analysis]
+allowed-unresolved-imports = []
+
+[[tool.ty.overrides]]
+include = ["tests"]
+
+[tool.ty.overrides.rules]
+invalid-assignment = "ignore"
+unresolved-attribute = "ignore"
+
+[[tool.ty.overrides]]
+include = ["examples"]
+
+[tool.ty.overrides.rules]
+invalid-assignment = "ignore"
+unresolved-attribute = "ignore"
+unresolved-import = "ignore"
