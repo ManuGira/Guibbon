@@ -32,7 +32,11 @@ from __future__ import annotations
 
 import dataclasses
 from dataclasses import dataclass, fields, is_dataclass
-from typing import Any, Iterable
+from typing import Any
+
+from .descriptor import (
+    Descriptor,
+)
 
 
 # ---------------------------------------------------------------------------
@@ -149,78 +153,12 @@ def GetPath(obj: Any) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Base descriptor class
+# Backward-compatible alias
 # ---------------------------------------------------------------------------
 
-class _BaseDescriptor:
-    """Base class for all Guibbon parameter descriptors.
-
-    Descriptors hold metadata (default value, options, etc.) about a parameter.
-    They are stored on the CLASS and never modified; only referenced for
-    metadata. Current parameter VALUES are stored on INSTANCES, wrapped in
-    tracked subclasses.
-
-    Attributes:
-        default: The default value for this parameter
-        triggered_callbacks: List of callback types that fired (e.g., ["on_drag"])
-        isVisible: Whether this parameter widget should be visible in the UI
-    """
-
-    def __init__(self, default: Any) -> None:
-        self.default = default
-        self.triggered_callbacks: list[str] = []
-        self.isVisible: bool = True
-
-
-# ---------------------------------------------------------------------------
-# Concrete descriptor classes
-# ---------------------------------------------------------------------------
-
-class SliderDescriptor(_BaseDescriptor):
-    """Descriptor backed by a slider widget.
-
-    Args:
-        values: Iterable of valid slider values
-        default: Initial slider value (must be in values)
-        on_drag: If True, append "on_drag" to triggered_callbacks while dragging
-        on_release: If True, append "on_release" when user releases the slider
-    """
-
-    def __init__(
-        self,
-        values: Iterable,
-        default: Any,
-        on_drag: bool = True,
-        on_release: bool = False,
-    ) -> None:
-        self.values = list(values)
-        if default not in self.values:
-            raise ValueError(f"default {default!r} is not in values {self.values}")
-        self.on_drag = on_drag
-        self.on_release = on_release
-        super().__init__(default)
-
-
-class RadioDescriptor(_BaseDescriptor):
-    """Descriptor backed by radio buttons or dropdown.
-
-    Args:
-        options: List of valid options (strings or other values)
-        default: Initial selected option (must be in options)
-        on_change: If True, append "on_change" to triggered_callbacks when option changes
-    """
-
-    def __init__(
-        self,
-        options: list[str],
-        default: str,
-        on_change: bool = True,
-    ) -> None:
-        self.options = options
-        if default not in self.options:
-            raise ValueError(f"default {default!r} is not in options {self.options}")
-        self.on_change = on_change
-        super().__init__(default)
+# _BaseDescriptor is kept as an alias so any existing code referencing it
+# continues to work while the canonical base class is now Descriptor.
+_BaseDescriptor = Descriptor
 
 
 # ---------------------------------------------------------------------------
@@ -248,7 +186,7 @@ def _params_decorator(cls: type) -> type:
     descriptors: dict[str, _BaseDescriptor] = {}
     for name in annotations:
         value = getattr(cls, name, dataclasses.MISSING)
-        if isinstance(value, _BaseDescriptor):
+        if isinstance(value, Descriptor):
             descriptors[name] = value
             # Replace the descriptor with its plain default so @dataclass
             # sees a normal default value (not a descriptor object).

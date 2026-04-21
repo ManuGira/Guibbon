@@ -17,10 +17,14 @@ Usage:
         size: int = SliderDescriptor(values=range(1, 11), default=5)
 """
 
-from .core.params import (
-    GetPath,
+from .core.descriptor import (
+    BuildableDescriptor,
+    Descriptor,
     RadioDescriptor,
     SliderDescriptor,
+)
+from .core.params import (
+    GetPath,
     params,
 )
 
@@ -28,6 +32,8 @@ __version__ = "2.0.0-dev"
 __all__ = [
     "params",
     "GetPath",
+    "Descriptor",
+    "BuildableDescriptor",
     "SliderDescriptor",
     "RadioDescriptor",
 ]
