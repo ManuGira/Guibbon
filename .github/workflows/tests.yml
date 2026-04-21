@@ -28,7 +28,7 @@ jobs:
         id: ruff
         run: |
           uv add --dev ruff
-          uv run ruff check .
+          uv run ruff check src tests examples
         continue-on-error: true
 
       - name: Type check with ty

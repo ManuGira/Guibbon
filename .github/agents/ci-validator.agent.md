@@ -34,7 +34,7 @@ Each of the three checks can also be run individually without using the ci.ps1 s
 uv run python -m pytest tests/ -v
 
 # Linting only (with auto-fix)
-uv run ruff check --fix
+uv run ruff check --fix src tests examples
 
 # Type checking only
 uv run ty check guibbon

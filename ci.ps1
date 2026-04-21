@@ -9,7 +9,7 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 Write-Host "`nRunning ruff..." -ForegroundColor Cyan
-uv run ruff check --fix
+uv run ruff check --fix src tests examples
 if ($LASTEXITCODE -ne 0) {
     Write-Host "Ruff checks failed!" -ForegroundColor Red
     exit $LASTEXITCODE

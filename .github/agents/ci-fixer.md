@@ -22,7 +22,7 @@ uv run pytest
 
 ### 2. Format Check
 ```bash
-uv run ruff check --fix
+uv run ruff check --fix src tests examples
 ```
 - Checks code formatting and linting rules
 - Expected: No errors or warnings

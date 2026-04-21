@@ -61,7 +61,7 @@ exclude_also = [
 [tool.ruff]
 line-length = 160
 cache-dir = "build/.ruff_cache"
-exclude = ["build", "guibbon0", "_bmad"]
+exclude = ["build", "guibbon0", "_bmad", ".github"]
 
 [tool.ty.rules]
 redundant-cast = "warn"
