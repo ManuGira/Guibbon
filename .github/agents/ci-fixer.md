@@ -29,7 +29,7 @@ uv run ruff check
 
 ### 3. Type Check
 ```bash
-uv run mypy .
+uv run ty .
 ```
 - Verifies type annotations and type safety
 - Expected: Success with no type errors
@@ -55,11 +55,11 @@ uv run mypy .
   4. Make file paths platform-independent with `pathlib` or `os.path`
   5. Check for hardcoded absolute paths
 
-### Type Check Failures (mypy)
+### Type Check Failures (ty)
 
-**Problem**: mypy errors in CI but not locally
+**Problem**: ty errors in CI but not locally
 - **Causes**:
-  - Different mypy version
+  - Different ty version
   - Missing type stubs
   - Optional/None type issues
   - Type narrowing not recognized
@@ -110,7 +110,7 @@ uv run mypy .
 
 ### 1. Identify the Failing Check
 - Read the GitHub Actions log carefully
-- Note which check failed: pytest, ruff, or mypy
+- Note which check failed: pytest, ruff, or ty
 - Copy the exact error messages
 
 ### 2. Reproduce Locally
@@ -120,7 +120,7 @@ rm -rf .pytest_cache __pycache__ build/
 
 # Run the specific failing check
 uv run pytest -v  # for test failures
-uv run mypy .     # for type errors
+uv run ty .     # for type errors
 uv run ruff check # for format errors
 ```
 
@@ -133,7 +133,7 @@ uv run ruff check # for format errors
 ### 4. Verify the Fix
 ```bash
 # Run all checks together
-uv run pytest && uv run mypy . && uv run ruff check
+uv run pytest && uv run ty . && uv run ruff check
 ```
 
 ## Best Practices for CI Stability
@@ -162,7 +162,7 @@ uv run pytest && uv run mypy . && uv run ruff check
 | Issue | Command | Fix |
 |-------|---------|-----|
 | Test fails | `uv run pytest -v` | Check test isolation, cleanup |
-| Type error | `uv run mypy .` | Add assertions, fix annotations |
+| Type error | `uv run ty .` | Add assertions, fix annotations |
 | Format error | `uv run ruff check` | Run with `--fix` flag |
 | Import error | Check logs | Add missing dependency |
 | Coverage low | `uv run pytest --cov` | Add more tests |
