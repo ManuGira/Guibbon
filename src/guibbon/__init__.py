@@ -21,8 +21,6 @@ from .core.params import (
     GetPath,
     RadioDescriptor,
     SliderDescriptor,
-    _BaseDescriptor,
-    _params_decorator,
     params,
 )
 

@@ -31,7 +31,7 @@ Example:
 from __future__ import annotations
 
 import dataclasses
-from dataclasses import dataclass, field, fields, is_dataclass
+from dataclasses import dataclass, fields, is_dataclass
 from typing import Any, Iterable
 
 
