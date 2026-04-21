@@ -61,6 +61,7 @@ exclude_also = [
 [tool.ruff]
 line-length = 160
 cache-dir = "build/.ruff_cache"
+exclude = ["build", "guibbon0", "_bmad"]
 
 [tool.ty.rules]
 redundant-cast = "warn"
@@ -70,10 +71,25 @@ unsupported-base = "ignore"
 root = ["src", "tests", "examples"]
 
 [tool.ty.src]
-include = ["src"]
+include = ["src", "tests", "examples"]
 
 [tool.ty.terminal]
 output-format = "full"
 
 [tool.ty.analysis]
 allowed-unresolved-imports = []
+
+[[tool.ty.overrides]]
+include = ["tests"]
+
+[tool.ty.overrides.rules]
+invalid-assignment = "ignore"
+unresolved-attribute = "ignore"
+
+[[tool.ty.overrides]]
+include = ["examples"]
+
+[tool.ty.overrides.rules]
+invalid-assignment = "ignore"
+unresolved-attribute = "ignore"
+unresolved-import = "ignore"

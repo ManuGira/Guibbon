@@ -10,17 +10,13 @@ Tests cover:
 """
 
 import pytest
-from dataclasses import fields
 
 import guibbon
 from guibbon.core import (
     GetPath,
     RadioDescriptor,
     SliderDescriptor,
-    _BaseDescriptor,
     _make_tracked_type,
-    _track_fields,
-    _wrap_value,
 )
 
 
@@ -268,7 +264,6 @@ class TestNestedParams:
 
     def test_nested_params_class(self):
         """Nested @guibbon.params classes structure correctly."""
-        from dataclasses import field
 
         @guibbon.params
         class Resolution:
