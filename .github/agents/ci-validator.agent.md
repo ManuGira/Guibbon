@@ -49,7 +49,7 @@ This is useful if you want to focus on fixing one type of issue at a time.
 - **Before** creating a pull request
 
 ✅ **If all checks pass** → Ready to commit and create PR  
-❌ **If any fail** → Invoke **[Github Actions fixer](ci-fixer.md)** agent for targeted solutions
+❌ **If any fail** → Invoke **[Github Actions fixer](ci-fixer.agent.md)** agent for targeted solutions
 
 ## Success Criteria
 

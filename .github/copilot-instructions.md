@@ -50,7 +50,7 @@ uv run python -m guibbon.examples.demo_params  # Run demo
 **Before committing or creating a PR**, follow this workflow:
 
 ### Step 1: Run CI Validator
-Invoke **[CI Validator](\.github\agents\ci-validator.md)** agent to verify all checks pass locally:
+Invoke **[CI Validator](\.github\agents\ci-validator.agent.md)** agent to verify all checks pass locally:
 
 ```powershell
 ./ci.ps1
@@ -62,7 +62,7 @@ This sequentially runs:
 3. **Type checking** — `uv run ty check`
 
 ### Step 2: If CI Validator Fails
-Invoke **[Github Actions fixer](\.github\agents\ci-fixer.md)** agent to solve specific issues:
+Invoke **[Github Actions fixer](\.github\agents\ci-fixer.agent.md)** agent to solve specific issues:
 - Test failures → test debugging guidance
 - Ruff failures → formatting/import fixes
 - Type check failures → annotation fixes

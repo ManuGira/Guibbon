@@ -90,7 +90,7 @@ Descriptor (Base)
 
 **Descriptor Responsibilities:**
 - Store metadata (ranges, options, defaults)
-- Manage visibility state (isVisible bool)
+- Manage visibility state (is_visible bool)
 - Generate trigger IDs
 - Create widget instances via factory method
 - Validate descriptor coherence with callback signature
@@ -335,7 +335,7 @@ class Params:
 
 6. DYNAMIC VISIBILITY (inside on_change)
    - Check modified_descriptors: if "filter_type.on_change" in modified_descriptors
-   - Update descriptor.isVisible based on current params state
+   - Update descriptor.is_visible based on current params state
    - Component detects visibility change on next render
 ```
 
@@ -402,9 +402,9 @@ def on_change(self, params: Params, modified_descriptors: list[str]) -> np.ndarr
     if "filter_type.on_change" in modified_descriptors:
         # Type selector changed; update visibility
         if params.filter_type == "Gaussian":
-            self.params.__guibbon_descriptors__["sigma"].isVisible = True
+            self.params.__guibbon_descriptors__["sigma"].is_visible = True
         else:
-            self.params.__guibbon_descriptors__["sigma"].isVisible = False
+            self.params.__guibbon_descriptors__["sigma"].is_visible = False
     
     return self.apply_filter(params)
 ```
@@ -585,7 +585,7 @@ class Params:
 5. DYNAMIC VISIBILITY (inside on_change)
    └─> if "type.on_change" in modified_descriptors:
        └─> if params.type == "Gaussian":
-           └─> descriptors.sigma.isVisible = True
+           └─> descriptors.sigma.is_visible = True
 ```
 
 ---
@@ -741,7 +741,7 @@ from guibbon import params as guibbon_params
 4. **Descriptor Logic**
    - `descriptor.triggered_callbacks` tracks ("on_drag", "on_release", etc.)
    - Multiple callbacks per descriptor supported
-   - Visibility toggle (`isVisible`) works
+   - Visibility toggle (`is_visible`) works
    - Descriptor metadata accessible via `Params.__guibbon_descriptors__`
 
 5. **Modified Descriptors Collection**
@@ -846,11 +846,11 @@ def test_dynamic_visibility_in_callback():
     # Inside callback: update visibility based on current params
     if \"filter_type.on_change\" in modified_descriptors:
         if params.filter_type == \"Gaussian\":
-            params.__guibbon_descriptors__['sigma'].isVisible = True
+            params.__guibbon_descriptors__['sigma'].is_visible = True
         else:
-            params.__guibbon_descriptors__['sigma'].isVisible = False
+            params.__guibbon_descriptors__['sigma'].is_visible = False
     
-    assert params.__guibbon_descriptors__['sigma'].isVisible == True
+    assert params.__guibbon_descriptors__['sigma'].is_visible == True
 ```
 
 ### **What's NOT Tested (Acceptable Flakiness)**
@@ -1089,7 +1089,7 @@ app.run()
    - Usage: `@guibbon.params` decorator on user classes
 
 2. **`descriptor.py`: Base Descriptor Classes**
-   - `Descriptor`: Abstract base with metadata (name, default, isVisible, triggered_callbacks)
+   - `Descriptor`: Abstract base with metadata (name, default, is_visible, triggered_callbacks)
    - `BuildableDescriptor`: For custom widgets (widget_class attribute)
    - `SliderDescriptor`: int/float with values range, callback modes (on_drag, on_release)
    - `RadioDescriptor`: str/int with options, on_change callback
@@ -1156,7 +1156,7 @@ All core logic already exists in draft.py (200+ lines). Phase 1 is extracting, r
 ## Open Questions for Implementation
 
 1. **Error handling:** What happens if user's on_change() raises an exception?
-2. **Visibility toggle:** When descriptor.isVisible changes, how quickly does widget hide?
+2. **Visibility toggle:** When descriptor.is_visible changes, how quickly does widget hide?
 3. **Image input pattern:** Should ImageViewer support multiple images or single?
 4. **Type hints:** How strictly to enforce type coherence between descriptor and field?
 5. **State persistence:** Should app support save/load of params state?
