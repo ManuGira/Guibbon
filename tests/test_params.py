@@ -350,11 +350,11 @@ class TestDescriptorMetadata:
         assert slider.triggered_callbacks == ["on_drag"]
 
     def test_descriptor_visibility(self):
-        """Descriptors have isVisible flag (default True)."""
+        """Descriptors have is_visible flag (default True)."""
         slider = SliderDescriptor(values=range(1, 11), default=5)
-        assert slider.isVisible is True
-        slider.isVisible = False
-        assert slider.isVisible is False
+        assert slider.is_visible is True
+        slider.is_visible = False
+        assert slider.is_visible is False
 
 
 # ---------------------------------------------------------------------------
@@ -393,11 +393,11 @@ class TestCallbackPatterns:
         # Pattern: dynamic visibility based on current params
         if "filter_type.on_change" in modified_descriptors:
             if params.filter_type == "Gaussian":
-                Params.__guibbon_descriptors__['sigma'].isVisible = True
+                Params.__guibbon_descriptors__['sigma'].is_visible = True
             else:
-                Params.__guibbon_descriptors__['sigma'].isVisible = False
+                Params.__guibbon_descriptors__['sigma'].is_visible = False
 
-        assert Params.__guibbon_descriptors__['sigma'].isVisible is True
+        assert Params.__guibbon_descriptors__['sigma'].is_visible is True
 
     def test_pattern_matching_on_callbacks(self):
         """Test common pattern matching idioms on modified_descriptors."""

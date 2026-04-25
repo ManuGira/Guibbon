@@ -7,7 +7,7 @@ Tests cover:
   - RadioDescriptor: metadata, on_widget_change, get_triggered_descriptors
   - Callback flags (on_drag, on_release, on_change enable/disable)
   - triggered_callbacks accumulation and clearing
-  - isVisible visibility flag
+  - is_visible visibility flag
   - Invalid defaults (ValueError)
   - Integration with @guibbon.params decorator
 """
@@ -70,17 +70,17 @@ class TestDescriptorBaseAttributes:
         assert desc.default == "B"
 
     def test_is_visible_defaults_to_true(self):
-        """isVisible is True by default for all descriptors."""
+        """is_visible is True by default for all descriptors."""
         slider = SliderDescriptor(values=range(1, 11), default=5)
         radio = RadioDescriptor(options=["A", "B"], default="A")
-        assert slider.isVisible is True
-        assert radio.isVisible is True
+        assert slider.is_visible is True
+        assert radio.is_visible is True
 
     def test_is_visible_can_be_set(self):
-        """isVisible can be toggled."""
+        """is_visible can be toggled."""
         desc = SliderDescriptor(values=range(1, 11), default=5)
-        desc.isVisible = False
-        assert desc.isVisible is False
+        desc.is_visible = False
+        assert desc.is_visible is False
 
     def test_triggered_callbacks_starts_empty(self):
         """triggered_callbacks is empty list on creation."""
@@ -429,12 +429,12 @@ class TestDescriptorInstanceIndependence:
         assert d2.triggered_callbacks == []
 
     def test_two_slider_descriptors_have_independent_visibility(self):
-        """Setting isVisible on one does not affect the other."""
+        """Setting is_visible on one does not affect the other."""
         d1 = SliderDescriptor(values=range(1, 11), default=5)
         d2 = SliderDescriptor(values=range(1, 11), default=3)
-        d1.isVisible = False
-        assert d1.isVisible is False
-        assert d2.isVisible is True
+        d1.is_visible = False
+        assert d1.is_visible is False
+        assert d2.is_visible is True
 
 
 # ---------------------------------------------------------------------------

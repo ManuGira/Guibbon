@@ -40,14 +40,14 @@ class Descriptor(ABC):
 
     Attributes:
         default: The default value for this parameter.
-        isVisible: Whether this parameter's widget should be visible in the UI.
+        is_visible: Whether this parameter's widget should be visible in the UI.
         triggered_callbacks: Callback names that fired this cycle (e.g., ["on_drag"]).
                              Cleared by the app at the start of each cycle.
     """
 
     def __init__(self, default: Any) -> None:
         self.default = default
-        self.isVisible: bool = True
+        self.is_visible: bool = True
         self.triggered_callbacks: list[str] = []
 
     @abstractmethod

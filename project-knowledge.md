@@ -58,7 +58,7 @@ These decisions are final. Do not revisit or propose alternatives.
 - `_wrap_value(value, parent, field_name)`: Wraps values with parent tracking
 - `_track_fields(instance)`: Recursively wraps all dataclass fields
 - `GetPath(obj)`: Walks parent chain to reconstruct dotted paths
-- `_BaseDescriptor`: Base with default, triggered_callbacks, isVisible
+- `_BaseDescriptor`: Base with default, triggered_callbacks, is_visible
 - `SliderDescriptor`: values range, on_drag/on_release flags
 - `RadioDescriptor`: options list, on_change flag
 - `_params_decorator(cls)`: Extracts descriptors → applies @dataclass → wraps __init__ with tracking

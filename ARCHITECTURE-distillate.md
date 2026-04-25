@@ -85,7 +85,7 @@ class Params:
 ## Descriptor System
 
 ### Base Descriptor (Metadata Storage)
-- Stores: name, default value, visibility (isVisible bool), triggered_callbacks list
+- Stores: name, default value, visibility (is_visible bool), triggered_callbacks list
 - Generates trigger IDs; creates widget instances via factory method
 - Validates descriptor/callback coherence with callback signature
 
@@ -126,7 +126,7 @@ class Params:
 5. Builds modified_descriptors list: ["size.on_drag", "resolution.width.on_release"]
 6. Clears all triggered_callbacks for next cycle
 7. Calls on_change(params, modified_descriptors)
-8. Dynamic visibility inside callback: check modified_descriptors to update descriptor.isVisible
+8. Dynamic visibility inside callback: check modified_descriptors to update descriptor.is_visible
 
 ## Usage Patterns & Examples
 
@@ -223,7 +223,7 @@ guibbon2/
 - `_wrap_value(value, parent, field_name)`: Wraps values with parent tracking
 - `_track_fields(instance)`: Recursively wraps all dataclass fields
 - `GetPath(obj)`: Walks parent chain to reconstruct dotted paths
-- `_BaseDescriptor` base class: default, triggered_callbacks, isVisible
+- `_BaseDescriptor` base class: default, triggered_callbacks, is_visible
 - `SliderDescriptor`: values range, on_drag/on_release flags
 - `RadioDescriptor`: options list, on_change flag
 - `_params_decorator(cls)`: Complete decorator logic
@@ -258,7 +258,7 @@ guibbon2/
 - **Descriptor logic:** `triggered_callbacks` tracking; metadata storage; visibility
 - **Modified descriptors collection:** App collects triggered_callbacks; builds list; clears for next cycle
 - **Callback injection:** Receives params + modified_descriptors; type coherence
-- **Dynamic visibility:** Callback can check modified_descriptors and update descriptor.isVisible
+- **Dynamic visibility:** Callback can check modified_descriptors and update descriptor.is_visible
 
 ### Test Files
 - `test_params.py`: 30 passing tests
@@ -301,7 +301,7 @@ uv run python -m guibbon.examples.demo_params  # Run demo
 ## Open Questions for Implementation
 
 - Error handling: What if user's on_change() raises exception?
-- Visibility toggle speed: How quickly does widget hide when descriptor.isVisible changes?
+- Visibility toggle speed: How quickly does widget hide when descriptor.is_visible changes?
 - Image input pattern: Multiple images or single?
 - Type enforcement: How strict should type coherence be between descriptor and field?
 - State persistence: Should app support save/load of params state?
