@@ -70,11 +70,40 @@ class Params:
 - Public methods: `add_component(component)`, `is_running()`, `wait(timeout_ms)`, property `need_update`
 - Coordinates component widget creation; detects when params change → sets need_update
 
-### BuildableWidget Protocol
-- Any widget must implement: `build(self, parent: tk.Frame) → None` (populates parent frame)
-- Zero framework coupling; user writes plain Tkinter
-- User creates `MyWidget(BuildableWidget)` with `build()` method; framework calls it at startup
-- Widget manages its own Tkinter objects; modifies parent params via callback references
+### BuildableWidget Protocol (Framework-Agnostic)
+- **CRITICAL:** Protocol must NOT reference any framework directly (no `tk.Frame`, no `QWidget`, etc.)
+- Protocol: `build(self, parent: Any) → None` — framework-specific parent container
+- Zero framework coupling; users write framework-specific code (Tkinter, nicegui, PySide6, etc.)
+- User creates `MyWidget(BuildableWidget)` with `build()` method; framework calls it with appropriate parent
+- Widget manages its own framework objects; modifies parent params via callback references
+
+**Multi-Framework Examples:**
+
+```python
+# Tkinter Implementation
+class MySlider(BuildableWidget):
+    def build(self, parent: Any) -> None:
+        # parent is tk.Frame
+        scale = tk.Scale(parent, from_=1, to=10)
+        scale.pack()
+
+# nicegui Implementation (Future)
+class MySlider(BuildableWidget):
+    def build(self, parent: Any) -> None:
+        # parent is nicegui container or None
+        with parent or ui.row():
+            ui.slider(min=1, max=10)
+
+# PySide6 Implementation (Future)
+class MySlider(BuildableWidget):
+    def build(self, parent: Any) -> None:
+        # parent is QWidget
+        layout = QVBoxLayout(parent)
+        slider = QSlider(Qt.Horizontal)
+        layout.addWidget(slider)
+```
+
+**Design Principle:** Same protocol works with ANY GUI framework; no refactoring needed when swapping frameworks.
 
 ## Descriptor System
 
@@ -231,7 +260,7 @@ guibbon/
 - New example: `examples/demo_descriptors.py` demonstrating descriptor system
 
 ### NOT YET STARTED — Remaining Phase 1 (modules 3-4)
-- `buildable.py`: BuildableWidget protocol definition
+- `buildable.py`: Framework-agnostic BuildableWidget protocol (NO framework imports; uses `Any` for parent type)
 - `app.py`: App orchestrator (need_update cascading, modified_descriptors collection, main loop skeleton)
 
 ### NOT YET STARTED — Phase 2 (Week 3-4)

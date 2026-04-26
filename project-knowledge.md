@@ -36,10 +36,10 @@ These decisions are final. Do not revisit or propose alternatives.
 ### 4. Architecture principles
 - Params-centric: single `@guibbon.params` dataclass instance is the single source of truth
 - Component independence: ImageViewer, Controller, App orchestrator are decoupled
-- `BuildableWidget` protocol for zero-framework-coupling widget injection
+- `BuildableWidget` protocol for zero-framework-coupling widget injection (framework-agnostic: ANY framework supported)
 - Cascading `need_update` property aggregates children's flags
-- Tkinter now, pluggable for PySide6 later
-- 100% test coverage of non-GUI code; accept tkinter rendering flakiness
+- Tkinter now, pluggable for nicegui/PySide6/other frameworks later (same protocol works for all)
+- 100% test coverage of non-GUI code; accept framework rendering flakiness
 
 ### 5. Callback access pattern
 - User has full access to params via `self.params` (not passed as parameter)
@@ -70,7 +70,7 @@ These decisions are final. Do not revisit or propose alternatives.
 - New example: `examples/demo_descriptors.py` demonstrating descriptor API and usage
 
 ### NOT YET STARTED — Remaining Phase 1
-- `buildable.py`: `BuildableWidget` protocol
+- `buildable.py`: Framework-agnostic BuildableWidget protocol (NO framework imports; parent: Any)
 - `app.py`: App orchestrator (need_update cascading, modified_descriptors collection, main loop skeleton)
 
 ### NOT YET STARTED — Phases 2-4
