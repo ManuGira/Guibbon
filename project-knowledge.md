@@ -73,10 +73,14 @@ These decisions are final. Do not revisit or propose alternatives.
 - `BuildableWidget` protocol: `@runtime_checkable` structural Protocol, framework-agnostic, zero imports
 - Single `build(self, parent: Any)` method; supports Tkinter, nicegui, PySide6
 - **24 tests passing** in `test_buildable.py` covering protocol structure, framework-agnosticism, structural satisfaction
-- **Total Phase 1 tests: 113 passing** (30 + 59 + 24)
 
-### NOT YET STARTED — Remaining Phase 1
-- `app.py`: App orchestrator (need_update cascading, modified_descriptors collection, main loop skeleton)
+### COMPLETED — Phase 1, Module 4: `app.py`
+- `App` class: Params orchestrator, component registration, need_update cascading, modified_descriptors collection
+- `HasNeedUpdate` protocol: Component contract for need_update property
+- Methods: `add_component()`, `is_running()`, `wait()`, `collect_modified_descriptors()`, `clear_modified_descriptors()`, `stop()`
+- Property: `need_update` cascades from all registered components (OR logic)
+- **27 tests passing** in `test_app.py` covering initialization, component lifecycle, need_update cascading, callback collection
+- **Phase 1 COMPLETE: 140 total tests passing** (30 + 59 + 24 + 27)
 
 ### NOT YET STARTED — Phases 2-4
 - Phase 2: Controller component, ImageViewer component (port from Guibbon1), App GUI integration
@@ -92,9 +96,11 @@ These decisions are final. Do not revisit or propose alternatives.
 - `src/guibbon/controller/slider.py` — SliderDescriptor implementation (Module 2, COMPLETED)
 - `src/guibbon/controller/radio.py` — RadioDescriptor implementation (Module 2, COMPLETED)
 - `src/guibbon/core/buildable.py` — BuildableWidget protocol (Module 3, COMPLETED)
+- `src/guibbon/core/app.py` — App orchestrator (Module 4, COMPLETED)
 - `tests/test_params.py` — 30 tests for params.py (Module 1)
 - `tests/test_descriptor.py` — 59 tests for descriptor.py + controller (Module 2)
 - `tests/test_buildable.py` — 24 tests for buildable.py (Module 3)
+- `tests/test_app.py` — 27 tests for app.py (Module 4)
 - `examples/demo_params.py` — params decorator demo (`uv run python -m guibbon.examples.demo_params`)
 - `examples/demo_descriptors.py` — descriptor system demo (`uv run python -m guibbon.examples.demo_descriptors`)
 

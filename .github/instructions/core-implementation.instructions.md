@@ -55,3 +55,24 @@ After implementing a module:
 .\ci.ps1  # Must pass: pytest + ruff + ty
 ```
 Then invoke the **PR Reviewer** agent before merging.
+
+## Git Workflow
+
+Always use native `git` commands directly instead of MCP tools. Examples:
+
+```powershell
+# Create a new branch
+git checkout -b feat/core-module-N-feature-name
+
+# Stage and commit changes
+git add src/guibbon/core/module.py tests/test_module.py
+git commit -m "feat(core): description of module implementation"
+
+# View current branch
+git branch --show-current
+
+# Check diff before committing
+git diff src/guibbon/core/module.py
+```
+
+**Rationale**: Native git is simpler, faster, and less error-prone than MCP wrapper tools.
