@@ -58,14 +58,18 @@ These decisions are final. Do not revisit or propose alternatives.
 - `_wrap_value(value, parent, field_name)`: Wraps values with parent tracking
 - `_track_fields(instance)`: Recursively wraps all dataclass fields
 - `GetPath(obj)`: Walks parent chain to reconstruct dotted paths
-- `_BaseDescriptor`: Base with default, triggered_callbacks, is_visible
-- `SliderDescriptor`: values range, on_drag/on_release flags
-- `RadioDescriptor`: options list, on_change flag
 - `_params_decorator(cls)`: Extracts descriptors → applies @dataclass → wraps __init__ with tracking
-- **30 tests passing** covering tracked types, GetPath, decorator, descriptors, callback patterns
+- **30 tests passing** covering tracked types, GetPath, decorator patterns
+
+### COMPLETED — Phase 1, Module 2: `descriptor.py` + `controller/`
+- `Descriptor` (ABC): Base with default, triggered_callbacks, is_visible, `on_widget_change()`, `get_triggered_descriptors()`
+- `BuildableDescriptor`: Descriptor with optional widget_class for custom widgets
+- `SliderDescriptor` (in `controller/`): values range, on_drag/on_release flags
+- `RadioDescriptor` (in `controller/`): options list, on_change flag
+- **59 tests passing** in `test_descriptor.py` covering descriptor system, modified_descriptors patterns
+- New example: `examples/demo_descriptors.py` demonstrating descriptor API and usage
 
 ### NOT YET STARTED — Remaining Phase 1
-- `descriptor.py`: Proper descriptor base classes with `on_widget_change()`, `get_triggered_descriptors()`, `BuildableDescriptor` with widget_class
 - `buildable.py`: `BuildableWidget` protocol
 - `app.py`: App orchestrator (need_update cascading, modified_descriptors collection, main loop skeleton)
 
@@ -77,11 +81,15 @@ These decisions are final. Do not revisit or propose alternatives.
 ## Key Reference Files
 
 - `ARCHITECTURE.md` — comprehensive design blueprint (all sections updated to reflect current decisions)
-- `Guibbon2Draft/draft.py` — working prototype of @guibbon.params (200+ lines, smoke test passes)
-- `src/guibbon/core/params.py` — production implementation extracted from draft
-- `tests/test_params.py` — 30 passing tests
-- `src/guibbon/examples/demo_params.py` — working demo (`uv run python -m guibbon.examples.demo_params`)
-- `Usage example.md` — concrete usage specification for all three patterns
+- `.github/instructions/core-implementation.instructions.md` — Phase 1 core implementation patterns and rules
+- `src/guibbon/core/params.py` — `@guibbon.params` decorator (Module 1, COMPLETED)
+- `src/guibbon/core/descriptor.py` — Descriptor base classes (Module 2, COMPLETED)
+- `src/guibbon/controller/slider.py` — SliderDescriptor implementation (Module 2, COMPLETED)
+- `src/guibbon/controller/radio.py` — RadioDescriptor implementation (Module 2, COMPLETED)
+- `tests/test_params.py` — 30 tests for params.py (Module 1)
+- `tests/test_descriptor.py` — 59 tests for descriptor.py + controller (Module 2)
+- `examples/demo_params.py` — params decorator demo (`uv run python -m guibbon.examples.demo_params`)
+- `examples/demo_descriptors.py` — descriptor system demo (`uv run python -m guibbon.examples.demo_descriptors`)
 
 ## Development Commands
 

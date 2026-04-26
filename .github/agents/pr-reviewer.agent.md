@@ -47,8 +47,17 @@ Review pull requests **after** CI passes and before merge. Checks code quality, 
 - ✅ Module docstring explains purpose
 - ✅ Class/function docstrings include examples for public APIs
 - ✅ Comments explain "why" not "what"
+- ✅ `project-knowledge.md` updated (implementation status, test counts, key files)
+- ✅ `ARCHITECTURE.md` updated (module org, status, reference files, commands)
 
 ## Common Review Findings
+
+### Documentation Issues
+- Implementation Status out of sync (test counts, module completion status)
+- New files not listed in project-knowledge.md Key Reference Files
+- Module Organization diagram doesn't match code structure
+- Examples/commands in `ARCHITECTURE.md` still reference old filenames
+- Development Commands section missing new demos
 
 ### Architecture Issues
 - Tracked values wrapping inconsistency: ensure all dataclass fields wrapped via `_wrap_value()`

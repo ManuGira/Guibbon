@@ -57,6 +57,7 @@ This is useful if you want to focus on fixing one type of issue at a time.
 ✅ No ruff violations  
 ✅ No type errors (ty)  
 ✅ Coverage ≥ target (currently checked but not enforced)  
+✅ Documentation files up to date (project-knowledge.md, ARCHITECTURE.md)
 
 ## Common Failure Patterns
 
@@ -96,6 +97,24 @@ This is useful if you want to focus on fixing one type of issue at a time.
 2. Add missing type hints or fix type mismatches
 3. Re-invoke coding agent if unclear how to fix
 4. Re-run ci-validator
+
+### Documentation Out of Date
+
+**When to check**:
+- After changes to `src/guibbon/core/` or `src/guibbon/controller/`
+- When implementation status changes (modules completed, test counts updated)
+- When new examples are added
+
+**Update required**:
+- `project-knowledge.md` — Implementation Status section with test counts
+- `ARCHITECTURE.md` — Module Organization, Implementation Status & Roadmap, Reference Files, Development Commands
+
+**What to do**:
+1. Review if changes affect implementation status
+2. Update test counts if new tests added
+3. Update module completion status if modules finished
+4. Update reference file lists if new files created
+5. Verify examples/commands still accurate
 
 
 
