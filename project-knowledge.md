@@ -82,8 +82,16 @@ These decisions are final. Do not revisit or propose alternatives.
 - **27 tests passing** in `test_app.py` covering initialization, component lifecycle, need_update cascading, callback collection
 - **Phase 1 COMPLETE: 140 total tests passing** (30 + 59 + 24 + 27)
 
-### NOT YET STARTED — Phases 2-4
-- Phase 2: Controller component, ImageViewer component (port from Guibbon1), App GUI integration
+### COMPLETED — Phase 2a: `controller/controller.py`
+- `Controller` component: discovers buildable descriptors from params, including nested params trees
+- Routes supported control descriptors (`SliderDescriptor`, `RadioDescriptor`, custom `BuildableDescriptor.widget_class`) to control-side widgets
+- Tracks local `need_update` state; widget events update params and append descriptor callbacks
+- Default Tk widget adapters for slider and radio descriptors; custom widget classes receive controller context
+- `App.collect_modified_descriptors()` and `clear_modified_descriptors()` now recurse into nested params for consistency with controller routing
+- **25 tests passing** in `test_controller.py`; repo total now **167 passing tests**
+
+### NOT YET STARTED — Remaining Phases 2-4
+- Phase 2b: ImageViewer component (port from Guibbon1), App GUI integration, demo app wiring
 - Phase 3: Base classes (ControllerAppBase, InteractiveImageAppBase, simple show/wait)
 - Phase 4: Documentation, examples, API reference
 
@@ -95,12 +103,14 @@ These decisions are final. Do not revisit or propose alternatives.
 - `src/guibbon/core/descriptor.py` — Descriptor base classes (Module 2, COMPLETED)
 - `src/guibbon/controller/slider.py` — SliderDescriptor implementation (Module 2, COMPLETED)
 - `src/guibbon/controller/radio.py` — RadioDescriptor implementation (Module 2, COMPLETED)
+- `src/guibbon/controller/controller.py` — Controller component assembly (Phase 2a, COMPLETED)
 - `src/guibbon/core/buildable.py` — BuildableWidget protocol (Module 3, COMPLETED)
 - `src/guibbon/core/app.py` — App orchestrator (Module 4, COMPLETED)
 - `tests/test_params.py` — 30 tests for params.py (Module 1)
 - `tests/test_descriptor.py` — 59 tests for descriptor.py + controller (Module 2)
 - `tests/test_buildable.py` — 24 tests for buildable.py (Module 3)
 - `tests/test_app.py` — 27 tests for app.py (Module 4)
+- `tests/test_controller.py` — 25 tests for controller.py (Phase 2a)
 - `examples/demo_params.py` — params decorator demo (`uv run python -m guibbon.examples.demo_params`)
 - `examples/demo_descriptors.py` — descriptor system demo (`uv run python -m guibbon.examples.demo_descriptors`)
 

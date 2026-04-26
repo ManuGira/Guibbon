@@ -37,6 +37,7 @@ Example:
 
 from __future__ import annotations
 
+from dataclasses import is_dataclass
 from typing import Any, Protocol, runtime_checkable
 
 
@@ -145,18 +146,7 @@ class App:
         Returns:
             List of "field.callback_type" strings (e.g., ["size.on_drag"]).
         """
-        modified: list[str] = []
-
-        # Get all descriptors from params class
-        descriptors = getattr(self.params.__class__, "__guibbon_descriptors__", {})
-
-        for field_name, descriptor in descriptors.items():
-            # Read descriptor's triggered_callbacks
-            triggered = getattr(descriptor, "triggered_callbacks", [])
-            for callback_type in triggered:
-                modified.append(f"{field_name}.{callback_type}")
-
-        return modified
+        return self._collect_modified_descriptors(self.params)
 
     def clear_modified_descriptors(self) -> None:
         """Clear triggered_callbacks from all descriptors.
@@ -164,12 +154,50 @@ class App:
         Should be called after processing modified_descriptors in the
         main loop to reset state for the next event cycle.
         """
-        descriptors = getattr(self.params.__class__, "__guibbon_descriptors__", {})
-
-        for descriptor in descriptors.values():
-            if hasattr(descriptor, "triggered_callbacks"):
-                descriptor.triggered_callbacks.clear()
+        self._clear_modified_descriptors(self.params)
 
     def stop(self) -> None:
         """Stop the app."""
         self._running = False
+
+    def _collect_modified_descriptors(
+        self,
+        instance: Any,
+        prefix: str = "",
+    ) -> list[str]:
+        modified: list[str] = []
+        descriptors = getattr(instance.__class__, "__guibbon_descriptors__", {})
+        for field_name, descriptor in descriptors.items():
+            field_path = f"{prefix}.{field_name}" if prefix else field_name
+            modified.extend(descriptor.get_triggered_descriptors(field_path))
+
+        if not is_dataclass(instance):
+            return modified
+
+        for field_name in getattr(instance.__class__, "__annotations__", {}):
+            value = getattr(instance, field_name, None)
+            if (
+                value is not None
+                and is_dataclass(value)
+                and hasattr(value.__class__, "__guibbon_descriptors__")
+            ):
+                field_path = f"{prefix}.{field_name}" if prefix else field_name
+                modified.extend(self._collect_modified_descriptors(value, field_path))
+        return modified
+
+    def _clear_modified_descriptors(self, instance: Any) -> None:
+        descriptors = getattr(instance.__class__, "__guibbon_descriptors__", {})
+        for descriptor in descriptors.values():
+            descriptor.triggered_callbacks.clear()
+
+        if not is_dataclass(instance):
+            return
+
+        for field_name in getattr(instance.__class__, "__annotations__", {}):
+            value = getattr(instance, field_name, None)
+            if (
+                value is not None
+                and is_dataclass(value)
+                and hasattr(value.__class__, "__guibbon_descriptors__")
+            ):
+                self._clear_modified_descriptors(value)

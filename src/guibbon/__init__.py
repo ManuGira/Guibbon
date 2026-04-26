@@ -17,7 +17,7 @@ Usage:
         size: int = SliderDescriptor(values=range(1, 11), default=5)
 """
 
-from .controller import RadioDescriptor, SliderDescriptor
+from .controller import Controller, RadioDescriptor, SliderDescriptor
 from .core.descriptor import (
     BuildableDescriptor,
     Descriptor,
@@ -33,6 +33,7 @@ __all__ = [
     "GetPath",
     "Descriptor",
     "BuildableDescriptor",
+    "Controller",
     "SliderDescriptor",
     "RadioDescriptor",
 ]

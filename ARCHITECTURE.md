@@ -230,7 +230,7 @@ guibbon/
 │   ├── slider.py           # SliderDescriptor (✅ COMPLETED)
 │   ├── radio.py            # RadioDescriptor (✅ COMPLETED)
 │   ├── __init__.py         # Public API exports
-│   └── controller.py       # Component (Phase 2)
+│   └── controller.py       # Component (✅ PHASE 2A COMPLETED)
 ├── image_viewer/
 │   ├── image_viewer.py     # Component (Phase 2)
 │   └── descriptors/        # Interactive descriptors (Phase 2)
@@ -273,8 +273,15 @@ guibbon/
 - **27 tests passing** covering initialization, component lifecycle, need_update cascading, callback collection, integration cycles
 - **PHASE 1 COMPLETE: 140 total tests passing** (30 + 59 + 24 + 27), 100% coverage (168 statements)
 
-### NOT YET STARTED — Phase 2 (Controller & ImageViewer Components)
-- Controller component assembly
+### COMPLETED — Phase 2a: controller/controller.py
+- `Controller` component discovers buildable descriptors from the params tree, including nested params objects
+- Supports `SliderDescriptor`, `RadioDescriptor`, and any `BuildableDescriptor` with `widget_class` set
+- Public API: `Controller(params)`, `add_descriptor()`, `build(parent)`, property `need_update`
+- Widget events update params values directly and append to descriptor `triggered_callbacks`
+- `App` nested descriptor collection now matches controller routing for dotted paths like `resolution.width`
+- **25 tests passing** covering descriptor discovery, nested routing, widget assembly, Tk widget adapter behavior, package exports
+
+### NOT YET STARTED — Remaining Phase 2 (ImageViewer + App Integration)
 - ImageViewer component (port from Guibbon1)
 - App GUI integration + event loop
 - need_update cascading across components
@@ -296,13 +303,15 @@ guibbon/
 - **@guibbon.params decorator:** Extracts metadata; applies @dataclass; wraps __init__ with tracking; recursive nesting
 - **Descriptor logic:** `triggered_callbacks` tracking; metadata storage; visibility
 - **Modified descriptors collection:** App collects triggered_callbacks; builds list; clears for next cycle
+- **Controller routing:** Nested params discovery, supported descriptor filtering, widget selection, param updates from widget events
 - **Callback injection:** Receives params + modified_descriptors; type coherence
 - **Dynamic visibility:** Callback can check modified_descriptors and update descriptor.is_visible
 
 ### Test Files
 - `test_params.py`: 30 passing tests (Module 1)
 - `test_descriptor.py`: 59 passing tests (Module 2) — ABC enforcement, metadata, callbacks, integration with @guibbon.params
-- `test_app_orchestration.py` (planned): need_update cascading, descriptor collection (Module 4)
+- `test_app.py`: 29 passing tests (Module 4) — need_update cascading, nested descriptor collection, descriptor clearing
+- `test_controller.py`: 25 passing tests (Phase 2a) — nested routing, widget assembly, default Tk adapters, exports
 
 ### What's NOT Tested (Acceptable)
 - Tkinter widget rendering (flaky)
@@ -326,7 +335,7 @@ guibbon/
 
 ```bash
 uv sync                                            # Install dependencies
-uv run python -m pytest tests/ -v                  # Run all tests (89 passing)
+uv run python -m pytest tests/ -v                  # Run all tests (167 passing)
 uv run python -m guibbon.examples.demo_params      # Run params demo
 uv run python -m guibbon.examples.demo_descriptors # Run descriptor demo
 ```
@@ -344,6 +353,10 @@ uv run python -m guibbon.examples.demo_descriptors # Run descriptor demo
 - `src/guibbon/controller/radio.py` — RadioDescriptor
 - `tests/test_descriptor.py` — 59 passing tests
 - `examples/demo_descriptors.py` — descriptor system demo
+
+**Phase 2a (controller component):**
+- `src/guibbon/controller/controller.py` — Controller component assembly + default Tk adapters
+- `tests/test_controller.py` — 25 passing tests
 
 **Design documents:**
 - `ARCHITECTURE.md` — comprehensive design blueprint

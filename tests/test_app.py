@@ -11,6 +11,8 @@ Tests cover:
   - Edge cases (None params, empty components, etc.)
 """
 
+from dataclasses import field
+
 import pytest
 
 import guibbon
@@ -357,6 +359,24 @@ class TestModifiedDescriptorsCollection:
         assert list1 == list2
         assert list1 is not list2  # Different list objects
 
+    def test_collect_modified_descriptors_recurses_into_nested_params(self):
+        """collect_modified_descriptors() includes nested dotted paths."""
+
+        @guibbon.params
+        class Resolution:
+            width: int = SliderDescriptor(values=range(1, 11), default=5, on_drag=True)
+
+        @guibbon.params
+        class Params:
+            resolution: Resolution = field(default_factory=Resolution)
+
+        app = App(Params())
+        Resolution.__guibbon_descriptors__["width"].triggered_callbacks.append("on_drag")
+
+        modified = app.collect_modified_descriptors()
+
+        assert modified == ["resolution.width.on_drag"]
+
 
 # ---------------------------------------------------------------------------
 # Test: Clear Modified Descriptors
@@ -403,6 +423,24 @@ class TestClearModifiedDescriptors:
 
         assert Params.__guibbon_descriptors__["size"].triggered_callbacks == []
         assert Params.__guibbon_descriptors__["sigma"].triggered_callbacks == []
+
+    def test_clear_modified_descriptors_recurses_into_nested_params(self):
+        """clear_modified_descriptors() clears nested descriptor callbacks."""
+
+        @guibbon.params
+        class Resolution:
+            width: int = SliderDescriptor(values=range(1, 11), default=5, on_drag=True)
+
+        @guibbon.params
+        class Params:
+            resolution: Resolution = field(default_factory=Resolution)
+
+        app = App(Params())
+        Resolution.__guibbon_descriptors__["width"].triggered_callbacks.append("on_drag")
+
+        app.clear_modified_descriptors()
+
+        assert Resolution.__guibbon_descriptors__["width"].triggered_callbacks == []
 
 
 # ---------------------------------------------------------------------------
