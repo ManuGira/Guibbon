@@ -26,6 +26,7 @@ from .core.params import (
     GetPath,
     params,
 )
+from .image_viewer import ImageViewer
 
 __version__ = "2.0.0-dev"
 __all__ = [
@@ -36,4 +37,5 @@ __all__ = [
     "Controller",
     "SliderDescriptor",
     "RadioDescriptor",
+    "ImageViewer",
 ]
