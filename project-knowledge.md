@@ -69,8 +69,13 @@ These decisions are final. Do not revisit or propose alternatives.
 - **59 tests passing** in `test_descriptor.py` covering descriptor system, modified_descriptors patterns
 - New example: `examples/demo_descriptors.py` demonstrating descriptor API and usage
 
+### COMPLETED — Phase 1, Module 3: `buildable.py`
+- `BuildableWidget` protocol: `@runtime_checkable` structural Protocol, framework-agnostic, zero imports
+- Single `build(self, parent: Any)` method; supports Tkinter, nicegui, PySide6
+- **24 tests passing** in `test_buildable.py` covering protocol structure, framework-agnosticism, structural satisfaction
+- **Total Phase 1 tests: 113 passing** (30 + 59 + 24)
+
 ### NOT YET STARTED — Remaining Phase 1
-- `buildable.py`: Framework-agnostic BuildableWidget protocol (NO framework imports; parent: Any)
 - `app.py`: App orchestrator (need_update cascading, modified_descriptors collection, main loop skeleton)
 
 ### NOT YET STARTED — Phases 2-4
@@ -86,8 +91,10 @@ These decisions are final. Do not revisit or propose alternatives.
 - `src/guibbon/core/descriptor.py` — Descriptor base classes (Module 2, COMPLETED)
 - `src/guibbon/controller/slider.py` — SliderDescriptor implementation (Module 2, COMPLETED)
 - `src/guibbon/controller/radio.py` — RadioDescriptor implementation (Module 2, COMPLETED)
+- `src/guibbon/core/buildable.py` — BuildableWidget protocol (Module 3, COMPLETED)
 - `tests/test_params.py` — 30 tests for params.py (Module 1)
 - `tests/test_descriptor.py` — 59 tests for descriptor.py + controller (Module 2)
+- `tests/test_buildable.py` — 24 tests for buildable.py (Module 3)
 - `examples/demo_params.py` — params decorator demo (`uv run python -m guibbon.examples.demo_params`)
 - `examples/demo_descriptors.py` — descriptor system demo (`uv run python -m guibbon.examples.demo_descriptors`)
 
