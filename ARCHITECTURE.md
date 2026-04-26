@@ -224,7 +224,7 @@ guibbon/
 ├── core/
 │   ├── params.py           # @guibbon.params decorator (✅ COMPLETED)
 │   ├── descriptor.py       # Descriptor base classes (✅ COMPLETED)
-│   ├── buildable.py        # BuildableWidget protocol (Phase 1)
+│   ├── buildable.py        # BuildableWidget protocol (✅ COMPLETED)
 │   └── app.py              # App orchestrator non-GUI (Phase 1)
 ├── controller/
 │   ├── slider.py           # SliderDescriptor (✅ COMPLETED)
@@ -259,8 +259,14 @@ guibbon/
 - **59 tests passing** covering descriptor ABC enforcement, metadata, callback patterns, modified_descriptors
 - New example: `examples/demo_descriptors.py` demonstrating descriptor system
 
-### NOT YET STARTED — Remaining Phase 1 (modules 3-4)
-- `buildable.py`: Framework-agnostic BuildableWidget protocol (NO framework imports; uses `Any` for parent type)
+### COMPLETED — Phase 1, Module 3: buildable.py
+- `BuildableWidget` protocol: `@runtime_checkable` structural Protocol (PEP 544)
+- Framework-agnostic: NO framework imports; uses `Any` for parent type; supports Tkinter, nicegui, PySide6
+- Single method: `build(self, parent: Any) -> None` for widget construction
+- **24 tests passing** covering protocol structure, framework-agnosticism, structural satisfaction, docstring examples
+- **Total Phase 1: 113 tests passing** (30 + 59 + 24)
+
+### NOT YET STARTED — Remaining Phase 1 (module 4)
 - `app.py`: App orchestrator (need_update cascading, modified_descriptors collection, main loop skeleton)
 
 ### NOT YET STARTED — Phase 2 (Week 3-4)
