@@ -10,6 +10,7 @@ Note: Concrete descriptors (SliderDescriptor, RadioDescriptor, …) live in thei
 respective component packages (e.g. guibbon.controller), not here.
 """
 
+from .buildable import BuildableWidget
 from .descriptor import (
     BuildableDescriptor,
     Descriptor,
@@ -27,6 +28,7 @@ from .params import (
 __all__ = [
     "params",
     "GetPath",
+    "BuildableWidget",
     "Descriptor",
     "BuildableDescriptor",
     "_BaseDescriptor",
