@@ -225,7 +225,7 @@ guibbon/
 │   ├── params.py           # @guibbon.params decorator (✅ COMPLETED)
 │   ├── descriptor.py       # Descriptor base classes (✅ COMPLETED)
 │   ├── buildable.py        # BuildableWidget protocol (✅ COMPLETED)
-│   └── app.py              # App orchestrator non-GUI (Phase 1)
+│   └── app.py              # App orchestrator non-GUI (✅ COMPLETED)
 ├── controller/
 │   ├── slider.py           # SliderDescriptor (✅ COMPLETED)
 │   ├── radio.py            # RadioDescriptor (✅ COMPLETED)
@@ -264,12 +264,16 @@ guibbon/
 - Framework-agnostic: NO framework imports; uses `Any` for parent type; supports Tkinter, nicegui, PySide6
 - Single method: `build(self, parent: Any) -> None` for widget construction
 - **24 tests passing** covering protocol structure, framework-agnosticism, structural satisfaction, docstring examples
-- **Total Phase 1: 113 tests passing** (30 + 59 + 24)
 
-### NOT YET STARTED — Remaining Phase 1 (module 4)
-- `app.py`: App orchestrator (need_update cascading, modified_descriptors collection, main loop skeleton)
+### COMPLETED — Phase 1, Module 4: app.py
+- `App` class: Params orchestrator, component registry, need_update cascading, modified_descriptors collection
+- `HasNeedUpdate` protocol: Component contract (need_update property)
+- Public API: `add_component()`, `is_running()`, `wait()`, `collect_modified_descriptors()`, `clear_modified_descriptors()`, `stop()`
+- Property `need_update`: Cascades from all components (OR logic); settable to propagate to all components
+- **27 tests passing** covering initialization, component lifecycle, need_update cascading, callback collection, integration cycles
+- **PHASE 1 COMPLETE: 140 total tests passing** (30 + 59 + 24 + 27), 100% coverage (168 statements)
 
-### NOT YET STARTED — Phase 2 (Week 3-4)
+### NOT YET STARTED — Phase 2 (Controller & ImageViewer Components)
 - Controller component assembly
 - ImageViewer component (port from Guibbon1)
 - App GUI integration + event loop
