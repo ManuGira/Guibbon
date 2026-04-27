@@ -55,6 +55,15 @@ class _FakeTkWidget:
     def pack(self, **kwargs: object) -> None:
         self.pack_calls.append(kwargs)
 
+    def pack_propagate(self, flag: bool) -> None:
+        pass
+
+    def register(self, func: object) -> object:
+        return func
+
+    def bind(self, event: str, callback: object) -> None:
+        pass
+
 
 class _FakeScale(_FakeTkWidget):
     """Fake Scale with bind/set/get behavior."""
@@ -74,8 +83,8 @@ class _FakeScale(_FakeTkWidget):
     def get(self) -> int:
         return self._value
 
-    def bind(self, event_name: str, callback: object) -> None:
-        self.bindings[event_name] = callback
+    def bind(self, event: str, callback: object) -> None:
+        self.bindings[event] = callback
 
 
 class _FakeStringVar:
@@ -100,6 +109,8 @@ class _FakeTkModule:
     HORIZONTAL = "horizontal"
     X = "x"
     W = "w"
+    LEFT = "left"
+    Y = "y"
 
 
 class TestControllerInitialization:
@@ -260,31 +271,32 @@ class TestBuild:
             size: int = SliderDescriptor(values=range(1, 11), default=5)
             mode: str = RadioDescriptor(options=["a", "b"], default="a")
 
+        monkeypatch.setitem(sys.modules, "tkinter", _FakeTkModule)
         controller = Controller(Params())
-        built: list[tuple[str, object]] = []
+        built: list[str] = []
 
         class _BuiltWidget:
             def __init__(self, field_path: str) -> None:
                 self.field_path = field_path
 
             def build(self, parent: object) -> None:
-                built.append((self.field_path, parent))
+                built.append(self.field_path)
 
         def fake_build_descriptor_widget(field_path: str, descriptor: BuildableDescriptor) -> _BuiltWidget:
             return _BuiltWidget(field_path)
 
         monkeypatch.setattr(controller, "_build_descriptor_widget", fake_build_descriptor_widget)
 
-        parent = object()
-        controller.build(parent)
+        controller.build(object())
 
-        assert built == [("size", parent), ("mode", parent)]
+        assert built == ["size", "mode"]
 
     def test_build_skips_invisible_descriptors(self, monkeypatch: pytest.MonkeyPatch):
         @guibbon.params
         class Params:
             size: int = SliderDescriptor(values=range(1, 11), default=5)
 
+        monkeypatch.setitem(sys.modules, "tkinter", _FakeTkModule)
         controller = Controller(Params())
         controller._descriptors["size"].is_visible = False
         called = False
@@ -356,6 +368,7 @@ class TestBuild:
         class Params:
             size: int = SliderDescriptor(values=range(1, 11), default=5)
 
+        monkeypatch.setitem(sys.modules, "tkinter", _FakeTkModule)
         controller = Controller(Params())
 
         monkeypatch.setattr(controller, "_build_descriptor_widget", lambda field_path, descriptor: None)

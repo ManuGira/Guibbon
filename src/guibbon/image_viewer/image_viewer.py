@@ -155,8 +155,8 @@ class ImageViewer:
 
     def __init__(
         self,
-        height: int = 480,
-        width: int = 640,
+        height: int = 720,
+        width: int = 720,
         mode: str = "fit",
         interpolation: int | None = None,
     ) -> None:

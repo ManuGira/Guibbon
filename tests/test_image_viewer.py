@@ -186,8 +186,8 @@ class TestImageViewerInit:
 
     def test_default_dimensions(self):
         v = ImageViewer()
-        assert v._canvas_h == 480
-        assert v._canvas_w == 640
+        assert v._canvas_h == 720
+        assert v._canvas_w == 720
 
     def test_custom_dimensions(self):
         v = ImageViewer(height=200, width=300)

@@ -25,8 +25,11 @@ from typing import Any
 from guibbon.core.buildable import BuildableWidget
 from guibbon.core.descriptor import BuildableDescriptor
 
+from ._theme import BG_CARD, BG_PANEL
 from .radio import RadioDescriptor
 from .slider import SliderDescriptor
+from .tk_radio_widget import _TkRadioWidget
+from .tk_slider_widget import _TkSliderWidget
 
 
 class Controller:
@@ -65,8 +68,22 @@ class Controller:
         field_path = f"_extra_{len(self._descriptors)}"
         self._descriptors[field_path] = descriptor
 
-    def build(self, parent: Any) -> None:
-        """Build widgets for all visible supported descriptors."""
+    def build(self, parent: Any, width: int = 360) -> None:
+        """Build widgets for all visible supported descriptors.
+
+        Each descriptor is embedded in its own "card" frame (slightly darker
+        background, small inner padding) separated by a 4-pixel vertical gap.
+
+        Args:
+            parent: Tk container to embed the control panel in.
+            width:  Fixed pixel width of the control panel (default 360).
+        """
+        import tkinter as tk
+
+        container = tk.Frame(parent, width=width, bg=BG_PANEL)
+        container.pack_propagate(False)
+        container.pack(side=tk.LEFT, fill=tk.Y)
+
         self._built_widgets = []
         for field_path, descriptor in self._descriptors.items():
             if not descriptor.is_visible:
@@ -74,7 +91,14 @@ class Controller:
             widget = self._build_descriptor_widget(field_path, descriptor)
             if widget is None:
                 continue
-            widget.build(parent)
+            card = tk.Frame(
+                container,
+                bg=BG_CARD,
+                padx=6,
+                pady=6,
+            )
+            card.pack(fill=tk.X, padx=4, pady=(4, 0))
+            widget.build(card)
             self._built_widgets.append(widget)
 
     def _build_descriptor_widget(
@@ -157,97 +181,3 @@ class Controller:
         self._set_param_value(field_path, value)
         descriptor.on_widget_change(trigger_type)
         self._need_update = True
-
-
-class _TkSliderWidget:
-    """Default Tkinter widget for ``SliderDescriptor``."""
-
-    def __init__(
-        self,
-        controller: Controller,
-        field_path: str,
-        descriptor: SliderDescriptor,
-    ) -> None:
-        self.controller = controller
-        self.field_path = field_path
-        self.descriptor = descriptor
-
-    def build(self, parent: Any) -> None:
-        import tkinter as tk
-
-        current_value = self.controller._get_param_value(self.field_path)
-        current_index = self.descriptor.values.index(current_value)
-
-        frame = tk.Frame(parent)
-        label = tk.Label(frame, text=self.field_path)
-        scale = tk.Scale(
-            frame,
-            from_=0,
-            to=len(self.descriptor.values) - 1,
-            orient=tk.HORIZONTAL,
-            command=self._on_drag,
-        )
-        scale.set(current_index)
-        scale.bind("<ButtonRelease-1>", self._on_release)
-        label.pack()
-        scale.pack(fill=tk.X)
-        frame.pack(fill=tk.X)
-
-    def _on_drag(self, index: str) -> None:
-        value = self.descriptor.values[int(float(index))]
-        self.controller._handle_widget_change(
-            self.field_path,
-            self.descriptor,
-            value,
-            "drag",
-        )
-
-    def _on_release(self, event: Any) -> None:
-        scale = event.widget
-        value = self.descriptor.values[int(scale.get())]
-        self.controller._handle_widget_change(
-            self.field_path,
-            self.descriptor,
-            value,
-            "release",
-        )
-
-
-class _TkRadioWidget:
-    """Default Tkinter widget for ``RadioDescriptor``."""
-
-    def __init__(
-        self,
-        controller: Controller,
-        field_path: str,
-        descriptor: RadioDescriptor,
-    ) -> None:
-        self.controller = controller
-        self.field_path = field_path
-        self.descriptor = descriptor
-
-    def build(self, parent: Any) -> None:
-        import tkinter as tk
-
-        frame = tk.Frame(parent)
-        label = tk.Label(frame, text=self.field_path)
-        selected = tk.StringVar(value=self.controller._get_param_value(self.field_path))
-        label.pack(anchor=tk.W)
-        for option in self.descriptor.options:
-            button = tk.Radiobutton(
-                frame,
-                text=option,
-                value=option,
-                variable=selected,
-                command=lambda chosen=option: self._on_change(chosen),
-            )
-            button.pack(anchor=tk.W)
-        frame.pack(fill=tk.X)
-
-    def _on_change(self, value: str) -> None:
-        self.controller._handle_widget_change(
-            self.field_path,
-            self.descriptor,
-            value,
-            "change",
-        )

@@ -99,7 +99,7 @@ def compute_image(p: Params) -> np.ndarray:
 def run() -> None:
     params = Params()
     controller = Controller(params)
-    viewer = ImageViewer(height=400, width=600, mode="fit")
+    viewer = ImageViewer(mode="fit")  # defaults: 720×720
     app = App(params)
     app.add_component(controller)
 
@@ -108,13 +108,10 @@ def run() -> None:
     root.title("Guibbon — interactive demo")
     root.resizable(False, False)
 
-    left_frame = tk.Frame(root, padx=8, pady=8)
-    left_frame.pack(side=tk.LEFT, fill=tk.Y)
-
     right_frame = tk.Frame(root)
     right_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
-    controller.build(left_frame)
+    controller.build(root)   # embeds fixed-width 200 px panel on the left
     viewer.build(right_frame)
 
     # ── Show initial image ────────────────────────────────────────────────

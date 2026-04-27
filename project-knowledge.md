@@ -90,8 +90,22 @@ These decisions are final. Do not revisit or propose alternatives.
 - `App.collect_modified_descriptors()` and `clear_modified_descriptors()` now recurse into nested params for consistency with controller routing
 - **25 tests passing** in `test_controller.py`; repo total now **167 passing tests**
 
-### NOT YET STARTED — Remaining Phases 2-4
-- Phase 2b: ImageViewer component (port from Guibbon1), App GUI integration, demo app wiring
+### COMPLETED — Phase 2b: `image_viewer/image_viewer.py` + demo app
+- `ImageViewer` component: pan/zoom canvas (720×720 default), cv2.warpPerspective for transform, Pillow only as numpy→Tk bridge
+- `_MousePan` state machine for drag; pure transform helpers `_identity()`, `_translation()`, `_scale()`, `_apply()`, `_inv()`
+- Toolbar: fit/fill/100%/home buttons, zoom entry, pan/zoom checkbox
+- **71 tests passing** in `test_image_viewer.py`; repo total now **238 passing tests**
+- `examples/demo_app.py` wires params → Controller → ImageViewer with refresh loop
+
+### COMPLETED — Controller UI polish
+- Dark card design replaced by **light theme** (configurable via `controller/_theme.py`)
+- Theme constants: `BG_PANEL`, `BG_CARD`, `BG_TROUGH`, `FG` — single file to change the whole panel look
+- `_TkSliderWidget` and `_TkRadioWidget` each extracted to their own files (`tk_slider_widget.py`, `tk_radio_widget.py`)
+- Circular imports avoided via `TYPE_CHECKING` guard for `Controller` import in widget files
+- Controller panel default width: **360px** (was 200px)
+- Radio button GC bug fixed: `tk.StringVar` stored as instance attribute
+
+### NOT YET STARTED — Remaining Phases 3-4
 - Phase 3: Base classes (ControllerAppBase, InteractiveImageAppBase, simple show/wait)
 - Phase 4: Documentation, examples, API reference
 
@@ -104,15 +118,21 @@ These decisions are final. Do not revisit or propose alternatives.
 - `src/guibbon/controller/slider.py` — SliderDescriptor implementation (Module 2, COMPLETED)
 - `src/guibbon/controller/radio.py` — RadioDescriptor implementation (Module 2, COMPLETED)
 - `src/guibbon/controller/controller.py` — Controller component assembly (Phase 2a, COMPLETED)
+- `src/guibbon/controller/_theme.py` — Light-theme colour constants (`BG_PANEL`, `BG_CARD`, `BG_TROUGH`, `FG`)
+- `src/guibbon/controller/tk_slider_widget.py` — Tkinter slider widget adapter
+- `src/guibbon/controller/tk_radio_widget.py` — Tkinter radio widget adapter
 - `src/guibbon/core/buildable.py` — BuildableWidget protocol (Module 3, COMPLETED)
 - `src/guibbon/core/app.py` — App orchestrator (Module 4, COMPLETED)
+- `src/guibbon/image_viewer/image_viewer.py` — ImageViewer component (Phase 2b, COMPLETED)
 - `tests/test_params.py` — 30 tests for params.py (Module 1)
 - `tests/test_descriptor.py` — 59 tests for descriptor.py + controller (Module 2)
 - `tests/test_buildable.py` — 24 tests for buildable.py (Module 3)
 - `tests/test_app.py` — 27 tests for app.py (Module 4)
 - `tests/test_controller.py` — 25 tests for controller.py (Phase 2a)
+- `tests/test_image_viewer.py` — 71 tests for image_viewer.py (Phase 2b)
 - `examples/demo_params.py` — params decorator demo (`uv run python -m guibbon.examples.demo_params`)
-- `examples/demo_descriptors.py` — descriptor system demo (`uv run python -m guibbon.examples.demo_descriptors`)
+- `examples/demo_descriptors.py` — descriptor system demo
+- `examples/demo_app.py` — end-to-end demo wiring params → Controller → ImageViewer
 
 ## Development Commands
 
