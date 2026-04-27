@@ -17,6 +17,7 @@ Usage:
         size: int = SliderDescriptor(values=range(1, 11), default=5)
 """
 
+from .apps import ControllerAppBase, InteractiveImageAppBase
 from .controller import Controller, RadioDescriptor, SliderDescriptor
 from .core.descriptor import (
     BuildableDescriptor,
@@ -27,6 +28,19 @@ from .core.params import (
     params,
 )
 from .image_viewer import ImageViewer
+
+__all__ = [
+    "ControllerAppBase",
+    "InteractiveImageAppBase",
+    "Controller",
+    "RadioDescriptor",
+    "SliderDescriptor",
+    "BuildableDescriptor",
+    "Descriptor",
+    "GetPath",
+    "params",
+    "ImageViewer",
+]
 
 __version__ = "2.0.0-dev"
 __all__ = [

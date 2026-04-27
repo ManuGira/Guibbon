@@ -303,6 +303,46 @@ class ImageViewer:
             self._init_panzoom()
             self._draw()
 
+    def wait(self, timeout_ms: int = 0) -> None:
+        """Stand-alone blocking display (Pattern 1 — simple show/wait).
+
+        Creates a Tk root window, builds the viewer into it, and blocks until
+        the window is closed (``timeout_ms=0``) or the timeout elapses.
+
+        Call :meth:`set_image` before or after :meth:`wait`; the image is
+        rendered as soon as the canvas is ready.
+
+        Must **not** be called after :meth:`build`.
+
+        Args:
+            timeout_ms: Milliseconds to keep the window open.  ``0`` (default)
+                        means block indefinitely until the user closes it.
+
+        Raises:
+            RuntimeError: If the viewer has already been embedded via
+                          :meth:`build`.
+
+        Example::
+
+            viewer = ImageViewer()
+            viewer.set_image(bgr_array)
+            viewer.wait(0)  # blocks until window is closed
+        """
+        import tkinter as tk
+
+        if self._canvas is not None:
+            raise RuntimeError(
+                "wait() cannot be called after build(); "
+                "use build() to embed the viewer in an existing window."
+            )
+        root = tk.Tk()
+        root.title("Guibbon — image viewer")
+        root.resizable(False, False)
+        self.build(root)
+        if timeout_ms > 0:
+            root.after(timeout_ms, root.destroy)
+        root.mainloop()
+
     # ------------------------------------------------------------------
     # Private: pan / zoom logic (testable without Tk)
     # ------------------------------------------------------------------
