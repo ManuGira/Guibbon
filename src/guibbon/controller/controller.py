@@ -68,21 +68,29 @@ class Controller:
         field_path = f"_extra_{len(self._descriptors)}"
         self._descriptors[field_path] = descriptor
 
-    def build(self, parent: Any, width: int = 360) -> None:
+    def build(self, parent: Any, width: int = 360, expand: bool = False) -> None:
         """Build widgets for all visible supported descriptors.
 
         Each descriptor is embedded in its own "card" frame (slightly darker
         background, small inner padding) separated by a 4-pixel vertical gap.
 
         Args:
-            parent: Tk container to embed the control panel in.
-            width:  Fixed pixel width of the control panel (default 360).
+            parent:  Tk container to embed the control panel in.
+            width:   Fixed pixel width of the control panel (default 360).
+            expand:  If True the panel expands to fill all available vertical
+                     space (use when the controller is the only widget in the
+                     window).  Default False (panel fills the height offered by
+                     sibling widgets such as an ImageViewer canvas).
         """
         import tkinter as tk
 
-        container = tk.Frame(parent, width=width, bg=BG_PANEL)
-        container.pack_propagate(False)
-        container.pack(side=tk.LEFT, fill=tk.Y)
+        container = tk.Frame(parent, bg=BG_PANEL)
+        # Enforce minimum width via a hidden spacer — works whether or not
+        # there are sibling widgets providing the window height.  This avoids
+        # pack_propagate(False) which suppresses height propagation and makes
+        # the panel invisible when there is no sibling (expand=True case).
+        tk.Frame(container, width=width, height=0, bg=BG_PANEL).pack()
+        container.pack(side=tk.LEFT, fill=tk.BOTH if expand else tk.Y, expand=expand)
 
         self._built_widgets = []
         for field_path, descriptor in self._descriptors.items():
@@ -100,6 +108,9 @@ class Controller:
             card.pack(fill=tk.X, padx=4, pady=(4, 0))
             widget.build(card)
             self._built_widgets.append(widget)
+
+        # Bottom spacer so the last card has a gap below it, matching the top gap.
+        tk.Frame(container, height=4, bg=BG_PANEL).pack()
 
     def _build_descriptor_widget(
         self,

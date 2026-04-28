@@ -70,7 +70,7 @@ class ControllerAppBase(abc.ABC):
 
         root = tk.Tk()
         root.title(self._title)
-        self._controller.build(root)
+        self._controller.build(root, expand=True)
         self.on_change(self.params, [])
 
         def _refresh() -> None:

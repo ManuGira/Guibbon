@@ -94,6 +94,7 @@ These decisions are final. Do not revisit or propose alternatives.
 - `ImageViewer` component: pan/zoom canvas (720×720 default), cv2.warpPerspective for transform, Pillow only as numpy→Tk bridge
 - `_MousePan` state machine for drag; pure transform helpers `_identity()`, `_translation()`, `_scale()`, `_apply()`, `_inv()`
 - Toolbar: fit/fill/100%/home buttons, zoom entry, pan/zoom checkbox
+- `ImageViewer.wait(timeout_ms=0)` for Pattern 1 standalone blocking display
 - **71 tests passing** in `test_image_viewer.py`; repo total now **238 passing tests**
 - `examples/demo_app.py` wires params → Controller → ImageViewer with refresh loop
 
@@ -104,10 +105,21 @@ These decisions are final. Do not revisit or propose alternatives.
 - Circular imports avoided via `TYPE_CHECKING` guard for `Controller` import in widget files
 - Controller panel default width: **360px** (was 200px)
 - Radio button GC bug fixed: `tk.StringVar` stored as instance attribute
+- `Controller.build(parent, width=360, expand=False)`: `expand=True` skips `pack_propagate(False)` and lets card children determine height (required for Pattern 2 standalone window); a zero-height spacer Frame enforces the minimum width instead
+- Bottom 4px spacer added after last card for symmetric border
 
-### NOT YET STARTED — Remaining Phases 3-4
-- Phase 3: Base classes (ControllerAppBase, InteractiveImageAppBase, simple show/wait)
-- Phase 4: Documentation, examples, API reference
+### COMPLETED — Phase 3: `apps/` package
+- `ControllerAppBase` (Pattern 2): subclass + define `Params` + implement `on_change()` + call `.run()`
+- `InteractiveImageAppBase` (Pattern 3): same but `on_change()` returns BGR image
+- `ImageViewer.wait(timeout_ms=0)` is Pattern 1 (already in Phase 2b)
+- Both base classes exported from `guibbon` root + `guibbon.apps`
+- `__all__` added to `guibbon/__init__.py`
+- **37 new tests** in `test_apps.py` + **2 Tk geometry regression tests** in `test_controller.py`
+- **277 total tests passing**
+- Demo scripts: `examples/demo_pattern1_wait.py`, `examples/demo_pattern2_controller.py`, `examples/demo_pattern3_image_app.py`
+
+### NOT YET STARTED — Phase 4
+- Documentation, examples, API reference
 
 ## Key Reference Files
 
@@ -123,21 +135,30 @@ These decisions are final. Do not revisit or propose alternatives.
 - `src/guibbon/controller/tk_radio_widget.py` — Tkinter radio widget adapter
 - `src/guibbon/core/buildable.py` — BuildableWidget protocol (Module 3, COMPLETED)
 - `src/guibbon/core/app.py` — App orchestrator (Module 4, COMPLETED)
-- `src/guibbon/image_viewer/image_viewer.py` — ImageViewer component (Phase 2b, COMPLETED)
+- `src/guibbon/image_viewer/image_viewer.py` — ImageViewer component incl. `wait()` (Phase 2b, COMPLETED)
+- `src/guibbon/apps/__init__.py` — apps package exports
+- `src/guibbon/apps/controller_app.py` — ControllerAppBase (Phase 3, COMPLETED)
+- `src/guibbon/apps/image_app.py` — InteractiveImageAppBase (Phase 3, COMPLETED)
 - `tests/test_params.py` — 30 tests for params.py (Module 1)
 - `tests/test_descriptor.py` — 59 tests for descriptor.py + controller (Module 2)
 - `tests/test_buildable.py` — 24 tests for buildable.py (Module 3)
 - `tests/test_app.py` — 27 tests for app.py (Module 4)
-- `tests/test_controller.py` — 25 tests for controller.py (Phase 2a)
+- `tests/test_controller.py` — 27 tests for controller.py (Phase 2a + geometry regression)
 - `tests/test_image_viewer.py` — 71 tests for image_viewer.py (Phase 2b)
-- `examples/demo_params.py` — params decorator demo (`uv run python -m guibbon.examples.demo_params`)
+- `tests/test_apps.py` — 37 tests for ControllerAppBase, InteractiveImageAppBase (Phase 3)
+- `examples/demo_params.py` — params decorator demo
 - `examples/demo_descriptors.py` — descriptor system demo
-- `examples/demo_app.py` — end-to-end demo wiring params → Controller → ImageViewer
+- `examples/demo_app.py` — low-level demo wiring params → Controller → ImageViewer
+- `examples/demo_pattern1_wait.py` — Pattern 1: standalone blocking display
+- `examples/demo_pattern2_controller.py` — Pattern 2: ControllerAppBase calculator
+- `examples/demo_pattern3_image_app.py` — Pattern 3: InteractiveImageAppBase image filter
 
 ## Development Commands
 
 ```bash
-uv sync                                    # Install dependencies
-uv run python -m pytest tests/ -v          # Run all tests
-uv run python -m guibbon.examples.demo_params  # Run demo
+uv sync                                 # Install dependencies
+uv run pytest                           # Run all tests (277 passing)
+./ci.ps1                                # Full CI: tests + ruff + ty
+uv run python examples/demo_pattern2_controller.py  # Pattern 2 demo
+uv run python examples/demo_pattern3_image_app.py   # Pattern 3 demo
 ```

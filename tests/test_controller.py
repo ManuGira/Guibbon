@@ -471,3 +471,51 @@ class TestPackageExports:
 
     def test_controller_exported_from_root_package(self):
         assert guibbon.Controller is Controller
+
+
+class TestBuildGeometry:
+    """Tk geometry regression tests — verify expand=True gives a visible window.
+
+    These tests create a real Tk root, call update_idletasks(), and check
+    winfo_height() > 1.  They run in the normal pytest process (no mainloop);
+    Tk event processing is not involved.  This is not flaky because:
+      - No mainloop / after() timers
+      - No mouse events
+      - No screen rendering
+    We just ask Tk's geometry manager to calculate layout via update_idletasks().
+    """
+
+    def test_expand_true_gives_minimum_width(self):
+        """expand=True must still enforce the requested minimum width."""
+        import tkinter as tk
+
+        @guibbon.params
+        class Params:
+            x: int = SliderDescriptor(values=[1, 2, 3], default=1)
+
+        root = tk.Tk()
+        root.withdraw()
+        try:
+            Controller(Params()).build(root, width=360, expand=True)
+            root.update_idletasks()
+            assert root.winfo_width() >= 360
+        finally:
+            root.destroy()
+
+    def test_expand_true_gives_nonzero_height(self):
+        """Controller-only window: expand=True must produce a visible (>1px) window."""
+        import tkinter as tk
+
+        @guibbon.params
+        class Params:
+            x: int = SliderDescriptor(values=[1, 2, 3], default=1)
+            mode: str = RadioDescriptor(options=["a", "b"], default="a")
+
+        root = tk.Tk()
+        root.withdraw()
+        try:
+            Controller(Params()).build(root, expand=True)
+            root.update_idletasks()
+            assert root.winfo_height() > 1
+        finally:
+            root.destroy()
